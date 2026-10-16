@@ -31,8 +31,9 @@ import {
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "@tanstack/react-router";
-import { useListings } from "@/lib/db";
+import { useListings, generateFirebaseSchema } from "@/lib/db";
 import { toast } from "sonner";
+import { Database } from "lucide-react";
 import {
   AreaChart,
   Area,
@@ -125,6 +126,24 @@ function AdminPage() {
   const navigate = useNavigate();
   const { data: listings } = useListings();
   const [activeTab, setActiveTab] = useState<"dashboard" | "verification" | "moderation" | "users" | "audit">("dashboard");
+  const [seedingFirebase, setSeedingFirebase] = useState(false);
+
+  async function handleSeedFirebase() {
+    setSeedingFirebase(true);
+    toast.info("Generating Firebase Schema and seeding collections...");
+    try {
+      const res = await generateFirebaseSchema();
+      if (res.success) {
+        toast.success(res.message);
+      } else {
+        toast.info(res.message);
+      }
+    } catch (err: any) {
+      toast.error(err.message || "Failed to generate Firebase schema");
+    } finally {
+      setSeedingFirebase(false);
+    }
+  }
 
   async function handleLogout() {
     await signOut();
@@ -223,7 +242,16 @@ function AdminPage() {
             </span>
           </div>
 
-          <div className="flex items-center gap-4 text-xs font-semibold">
+          <div className="flex items-center gap-3 text-xs font-semibold">
+            <button
+              onClick={handleSeedFirebase}
+              disabled={seedingFirebase}
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#ED7545] px-3.5 py-1 text-white hover:bg-[#d96536] transition-colors shadow-xs"
+              title="Write full schema documents into Firebase Firestore"
+            >
+              <Database className="size-3.5" />
+              <span>{seedingFirebase ? "Generating..." : "Generate Firebase Schema"}</span>
+            </button>
             <Link to="/app" className="rounded-full bg-white/10 px-3 py-1 hover:bg-white/20 transition-colors">
               Go to User App →
             </Link>
