@@ -105,7 +105,7 @@ function ListingPage() {
           <div className="flex gap-2">
             <input className="field" inputMode="numeric" maxLength={4} placeholder="Enter donor's pickup code" value={code} onChange={(e) => setCode(e.target.value)} />
             <button disabled={busy} onClick={() => {
-              if (code !== l.pickupCode) return toast.error("Code doesn't match");
+              if (code !== l.pickupCode) { toast.error("Code doesn't match"); return; }
               run(() => markPickedUp(l, me), "Pickup confirmed");
             }} className="shrink-0 rounded-full bg-primary px-5 font-semibold text-primary-foreground disabled:opacity-60">Picked up</button>
           </div>

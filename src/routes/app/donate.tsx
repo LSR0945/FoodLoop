@@ -72,9 +72,9 @@ function Donate() {
     const p = new Date(preparedAt).getTime();
     const d = new Date(deadline).getTime();
     const err = validateListing({ category, quantity, preparedAt: p, pickupDeadline: d, checklist, safetyDeclared: declared });
-    if (err) return toast.error(err);
-    if (!photo) return toast.error("Please add a photo of the food.");
-    if (!title.trim() || !locationText.trim()) return toast.error("Please add a title and pickup location.");
+    if (err) { toast.error(err); return; }
+    if (!photo) { toast.error("Please add a photo of the food."); return; }
+    if (!title.trim() || !locationText.trim()) { toast.error("Please add a title and pickup location."); return; }
     setBusy(true);
     try {
       const id = await createListing({

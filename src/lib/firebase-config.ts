@@ -5,6 +5,6 @@ import { createServerFn } from "@tanstack/react-start";
 export const getFirebaseConfig = createServerFn({ method: "GET" }).handler(async () => {
   return {
     apiKey: (process.env.GOOGLE_API_KEY ?? "").trim(),
-    measurementId: (process.env.GOOGLE_ANALYTICS_MEASUREMENT_ID ?? "").trim(),
+    measurementId: (process.env["GOOGLE_ANALYTICS_MEASUREMENT_ID"] ?? "").trim(),
   };
 });
