@@ -51,8 +51,8 @@ const INITIAL_STORIES: Story[] = [
     author: "Prerna Slum Welfare Center",
     role: "Child Welfare NGO",
     badge: "Verified Shelter",
-    avatar: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80",
-    image: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&auto=format&fit=crop&q=80",
+    avatar: "/images/hunger/ground3.jpg",
+    image: "/images/hunger/hunger3.png",
     time: "2 hours ago",
     title: "180 underprivileged children nourished with warm midday meal",
     content: "Instead of facing hungry mornings, children at our railway slum learning center received fresh, nutritious khichdi and fruits rescued from an evening banquet in Mathura. Dignified, clean, and heartfelt!",
@@ -68,8 +68,8 @@ const INITIAL_STORIES: Story[] = [
     author: "Govind Seva Ashram & Rain Basera",
     role: "Shelter Partner",
     badge: "Verified Shelter",
-    avatar: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=150&auto=format&fit=crop&q=80",
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80",
+    avatar: "/images/hunger/ground4.jpg",
+    image: "/images/hunger/hunger5.png",
     time: "Yesterday",
     title: "Night shelter feeding for 140 daily-wage workers and street kids",
     content: "Steaming hot khichdi, whole-wheat rotis, and fresh milk distributed to unhoused families near Mathura Junction. Warm food in winter provides dignity and strength to those who need it most.",
@@ -85,8 +85,8 @@ const INITIAL_STORIES: Story[] = [
     author: "Aman Verma",
     role: "Volunteer Courier Hero",
     badge: "50+ Deliveries",
-    avatar: "https://images.unsplash.com/photo-1578357078586-491adf1aa5c7?w=150&auto=format&fit=crop&q=80",
-    image: "https://images.unsplash.com/photo-1578357078586-491adf1aa5c7?w=800&auto=format&fit=crop&q=80",
+    avatar: "/images/hunger/card2.png",
+    image: "/images/hunger/hunger2.png",
     time: "2 days ago",
     title: "Night food rescue run from community langar to shelter",
     content: "Picked up 4 warm insulated dispensers from Gurdwara Sahib at 9:30 PM and reached the shelter before 10 PM. Seeing the kids and elders eat with dignity is the greatest reward.",
@@ -172,8 +172,8 @@ function CommunityPage() {
       author: authorName,
       role: authorRole,
       badge: "Verified Member",
-      avatar: profile?.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-      image: newImageUrl.trim() || "https://images.unsplash.com/photo-1555244162-803834f70033?w=800&auto=format&fit=crop&q=80",
+      avatar: profile?.photoURL || "/images/hunger/ground4.jpg",
+      image: newImageUrl.trim() || "/images/hunger/hunger3.png",
       time: "Just now",
       title: newTitle.trim(),
       content: newContent.trim(),
@@ -451,7 +451,7 @@ function CommunityPage() {
               <label className="text-xs font-bold text-[#242923]">Photo URL (Optional)</label>
               <input
                 type="url"
-                placeholder="https://images.unsplash.com/…"
+                placeholder="Paste photo link or /images/hunger/hunger3.png"
                 value={newImageUrl}
                 onChange={(e) => setNewImageUrl(e.target.value)}
                 className="mt-1 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] px-3.5 py-2 text-xs text-[#242923]"

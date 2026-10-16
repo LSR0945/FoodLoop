@@ -36,12 +36,12 @@ const entry = (status: Status, by: string, note?: string) => ({ status, at: Date
 
 // Authentic Indian Hunger Relief, Child Welfare, Langar & Donation Camp photos
 export const INDIAN_HUNGER_PHOTOS = {
-  indian_children_meal: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&auto=format&fit=crop&q=80",
-  slum_kids_feeding: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80",
-  child_eating_plate: "https://images.unsplash.com/photo-1578357078586-491adf1aa5c7?w=800&auto=format&fit=crop&q=80",
-  community_langar_camp: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&auto=format&fit=crop&q=80",
-  street_children_relief: "https://images.unsplash.com/photo-1509099836639-18ba1795216d?w=800&auto=format&fit=crop&q=80",
-  village_school_midday: "https://images.unsplash.com/photo-1596727147705-61a532a659bd?w=800&auto=format&fit=crop&q=80",
+  indian_children_meal: "/images/hunger/hunger3.png",
+  slum_kids_feeding: "/images/hunger/ground1.png",
+  child_eating_plate: "/images/hunger/ground4.jpg",
+  community_langar_camp: "/images/hunger/hunger5.png",
+  street_children_relief: "/images/hunger/hunger2.png",
+  village_school_midday: "/images/hunger/ground3.jpg",
 };
 
 export const SEED_LISTINGS: Listing[] = [
@@ -209,6 +209,8 @@ export function isOldDummyListing(l: Listing): boolean {
     p.includes("photo-1567529692333") || // chole kulche
     p.includes("photo-1488477181946") || // parfait jars
     p.includes("photo-1555244162803") || // catering cafe
+    p.includes("unsplash.com") || // purge any unsplash image
+    (l.photo && l.photo.includes("unsplash.com")) ||
     l.id.includes("pizza") ||
     l.id.includes("salad") ||
     l.id === "lst_seed_1" ||
@@ -223,11 +225,12 @@ export function isOldDummyListing(l: Listing): boolean {
 export function getStoredListings(): Listing[] {
   try {
     if (typeof window === "undefined") return SEED_LISTINGS;
-    const cacheKey = "foodloop_local_listings_v5";
+    const cacheKey = "foodloop_local_listings_v6";
     // Clean old caches
     localStorage.removeItem("foodloop_local_listings");
     localStorage.removeItem("annsetu_local_listings");
     localStorage.removeItem("foodloop_local_listings_v4");
+    localStorage.removeItem("foodloop_local_listings_v5");
 
     const raw = localStorage.getItem(cacheKey);
     if (!raw) {
@@ -254,7 +257,7 @@ export function getStoredListings(): Listing[] {
 export function setStoredListings(list: Listing[]) {
   try {
     if (typeof window !== "undefined") {
-      const cacheKey = "foodloop_local_listings_v5";
+      const cacheKey = "foodloop_local_listings_v6";
       const cleaned = list.filter((item) => !isOldDummyListing(item));
       localStorage.setItem(cacheKey, JSON.stringify(cleaned));
       window.dispatchEvent(new CustomEvent("foodloop_listing_updated"));

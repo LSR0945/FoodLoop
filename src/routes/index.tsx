@@ -92,8 +92,8 @@ const COMMUNITY_STORIES = [
     id: "story-1",
     author: "Govind Seva Ashram & Rain Basera",
     role: "Shelter Partner",
-    avatar: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=150&auto=format&fit=crop&q=80",
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80",
+    avatar: "/images/hunger/ground4.jpg",
+    image: "/images/hunger/hunger5.png",
     title: "180 hot meals distributed to daily wagers in winter",
     snippet:
       "When a large wedding banquet concluded at 11 PM, FoodLoop volunteers mobilized within 20 minutes. 180 plates of steaming nutritious pulao, dal, and fresh rotis were handed directly to homeless workers and children with warmth and dignity.",
@@ -105,8 +105,8 @@ const COMMUNITY_STORIES = [
     id: "story-2",
     author: "Prerna Slum School & Nutrition Center",
     role: "Child Welfare NGO",
-    avatar: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80",
-    image: "https://images.unsplash.com/photo-1578357078586-491adf1aa5c7?w=800&auto=format&fit=crop&q=80",
+    avatar: "/images/hunger/ground3.jpg",
+    image: "/images/hunger/hunger3.png",
     title: "Fresh bakery loaves & fruit baskets for 140 children",
     snippet:
       "Wholesale mandi donors and local bakeries diverted unblemished surplus fruits and bread before expiry. Every child in our morning remedial center received a wholesome, dignified breakfast.",
@@ -118,8 +118,8 @@ const COMMUNITY_STORIES = [
     id: "story-3",
     author: "Mother Teresa Hope Relief Mission",
     role: "Emergency Food Bank",
-    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    image: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&auto=format&fit=crop&q=80",
+    avatar: "/images/hunger/card2.png",
+    image: "/images/hunger/hunger2.png",
     title: "75 Emergency ration kits assembled during crisis",
     snippet:
       "Volunteers packed fortified grains, pulses, and cooking essentials for vulnerable families living on the city periphery. 100% verified digital handover with zero food waste.",
@@ -425,7 +425,7 @@ function LandingPage() {
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <div className="flex items-center gap-2 rounded-xl bg-[#F8F5ED] p-2 border border-[#E2DBD0]">
                       <img
-                        src="/images/hunger/hunger1.png"
+                        src="/images/hunger/ground1.png"
                         alt="Bhookh se pidit bachhe"
                         className="size-10 rounded-lg object-cover"
                       />
@@ -613,14 +613,14 @@ function LandingPage() {
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
             {/* Card 1: Night Shelter Camps
-                Photo: Indian children standing in line with empty bowls waiting for food — symbolises shelter feeding line */}
+                Photo: Large crowd of Indian people with bowls and thalis waiting in line for food — shelter relief feeding line */}
             <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/hunger/card4.png"
-                    alt="Indian bachhe khane ki line mein bowls lekar intezaar kar rahe hain"
-                    className="size-full object-cover object-top"
+                    src="/images/hunger/hunger5.png"
+                    alt="Indian log khane ki line mein thaliyon aur katoron ke sath intezaar kar rahe hain"
+                    className="size-full object-cover object-center"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#205C43] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
                     🌙 Night Shelter Camps
@@ -640,13 +640,13 @@ function LandingPage() {
             </div>
 
             {/* Card 2: Emergency Ration Kits
-                Photo: Volunteer delivering food aid box to a smiling girl — symbolises ration kit distribution */}
+                Photo: Indian family eating from emergency relief packets on the street */}
             <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/hunger/card2.png"
-                    alt="Youth volunteer food aid box delivery — Bhookha na soye koi"
+                    src="/images/hunger/hunger2.png"
+                    alt="Gareeb pariwar ko aapatkaleen khana aur ration distribution"
                     className="size-full object-cover object-center"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#ED7545] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">

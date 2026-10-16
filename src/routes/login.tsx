@@ -100,7 +100,7 @@ function LoginPage() {
             {/* Background image showing warm meals being shared with community */}
             <div className="absolute inset-0 z-0">
               <img
-                src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1000&auto=format&fit=crop&q=80"
+                src="/images/hunger/hunger3.png"
                 alt="Community food donation & hunger relief"
                 className="h-full w-full object-cover opacity-25 filter brightness-90"
               />

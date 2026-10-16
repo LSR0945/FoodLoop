@@ -153,7 +153,7 @@ function SignupPage() {
             {/* Food Relief Community Visual */}
             <div className="mt-8 relative rounded-2xl overflow-hidden border border-[#DDD5C8]/80 shadow-md">
               <img
-                src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&auto=format&fit=crop&q=80"
+                src="/images/hunger/card2.png"
                 alt="Community volunteers packing and distributing fresh meals"
                 className="h-52 w-full object-cover"
               />
