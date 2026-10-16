@@ -82,9 +82,9 @@ function SignupPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F5ED] text-[#242923] flex flex-col justify-between">
-      <header className="border-b border-[#E2DBD0] bg-white p-4">
+      <header className="border-b border-[#E2DBD0] bg-white px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <Logo size="sm" />
+          <Logo size="sm" showTagline={false} />
           <div className="flex items-center gap-3">
             <Link
               to="/"
@@ -150,18 +150,18 @@ function SignupPage() {
               </div>
             </div>
 
-            {/* Food Platter Visual (Mediterranean Crisp Salad & Chole Kulche theme) */}
+            {/* Food Relief Community Visual */}
             <div className="mt-8 relative rounded-2xl overflow-hidden border border-[#DDD5C8]/80 shadow-md">
               <img
-                src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=800&auto=format&fit=crop&q=80"
-                alt="Fresh wholesome food salad bowl"
-                className="h-48 w-full object-cover"
+                src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&auto=format&fit=crop&q=80"
+                alt="Community volunteers packing and distributing fresh meals"
+                className="h-52 w-full object-cover"
               />
               <div className="absolute top-3 right-3 rounded-full bg-[#205C43] text-white px-3 py-1 text-[11px] font-extrabold shadow-sm">
-                100% Free Sharing
+                Zero Waste • Zero Hunger
               </div>
               <div className="p-3 bg-white/95 backdrop-blur-xs flex items-center justify-between text-xs font-bold text-[#205C43]">
-                <span>Amritsari Chole Kulche • Wood-Fired Pizza • Fresh Bowls</span>
+                <span>❤️ Real Meals Shared With Real People</span>
               </div>
             </div>
           </div>

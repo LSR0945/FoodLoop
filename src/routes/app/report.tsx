@@ -137,7 +137,7 @@ function ReportPage() {
   // Food type breakdown
   const foodTypeData = useMemo(() => {
     const map: Record<string, number> = { veg: 0, "non-veg": 0, vegan: 0 };
-    filtered.forEach((l) => { if (map[l.foodType] !== undefined) map[l.foodType]++; });
+    filtered.forEach((l) => { if (l.foodType && map[l.foodType] !== undefined) map[l.foodType] = (map[l.foodType] ?? 0) + 1; });
     return Object.entries(map).map(([name, value]) => ({ name: name.charAt(0).toUpperCase() + name.slice(1), value }));
   }, [filtered]);
 
