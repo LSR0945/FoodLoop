@@ -16,6 +16,7 @@ import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppDonateRouteImport } from './routes/app/donate'
 import { Route as AppNotificationsRouteImport } from './routes/app/notifications'
 import { Route as AppProfileRouteImport } from './routes/app/profile'
+import { Route as AppReportRouteImport } from './routes/app/report'
 import { Route as AppListingIdRouteImport } from './routes/app/listing.$id'
 
 const IndexRoute = IndexRouteImport.update({
@@ -53,6 +54,11 @@ const AppProfileRoute = AppProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppReportRoute = AppReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppListingIdRoute = AppListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
@@ -66,6 +72,7 @@ export interface FileRoutesByFullPath {
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/report': typeof AppReportRoute
   '/app/': typeof AppIndexRoute
   '/app/listing/$id': typeof AppListingIdRoute
 }
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/report': typeof AppReportRoute
   '/app': typeof AppIndexRoute
   '/app/listing/$id': typeof AppListingIdRoute
 }
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/report': typeof AppReportRoute
   '/app/': typeof AppIndexRoute
   '/app/listing/$id': typeof AppListingIdRoute
 }
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
+    | '/app/report'
     | '/app/'
     | '/app/listing/$id'
   fileRoutesByTo: FileRoutesByTo
@@ -107,6 +117,7 @@ export interface FileRouteTypes {
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
+    | '/app/report'
     | '/app'
     | '/app/listing/$id'
   id:
@@ -117,6 +128,7 @@ export interface FileRouteTypes {
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
+    | '/app/report'
     | '/app/'
     | '/app/listing/$id'
   fileRoutesById: FileRoutesById
@@ -178,6 +190,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppProfileRouteImport
       parentRoute: typeof AppRouteRoute
     }
+    '/app/report': {
+      id: '/app/report'
+      path: '/report'
+      fullPath: '/app/report'
+      preLoaderRoute: typeof AppReportRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
     '/app/listing/$id': {
       id: '/app/listing/$id'
       path: '/listing/$id'
@@ -192,6 +211,7 @@ interface AppRouteRouteChildren {
   AppDonateRoute: typeof AppDonateRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppProfileRoute: typeof AppProfileRoute
+  AppReportRoute: typeof AppReportRoute
   AppIndexRoute: typeof AppIndexRoute
   AppListingIdRoute: typeof AppListingIdRoute
 }
@@ -200,6 +220,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDonateRoute: AppDonateRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppProfileRoute: AppProfileRoute,
+  AppReportRoute: AppReportRoute,
   AppIndexRoute: AppIndexRoute,
   AppListingIdRoute: AppListingIdRoute,
 }
