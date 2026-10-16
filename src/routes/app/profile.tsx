@@ -2,6 +2,8 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useMemo, useRef, useState } from "react";
 import {
   Award,
+  Bike,
+  Building2,
   Camera,
   Check,
   CheckCircle2,
@@ -71,11 +73,15 @@ function ProfilePage() {
   const [bio, setBio] = useState(profile?.bio || "");
   const [saving, setSaving] = useState(false);
 
-  // Filter listings belonging to this donor
+  const currentRole: Role = profile?.role || "donor";
+
+  // Filter listings based on current user role
   const myDonations = useMemo(() => {
     if (!user) return [];
+    if (currentRole === "ngo") return allListings.filter((l) => l.reservedBy === user.uid);
+    if (currentRole === "volunteer") return allListings.filter((l) => l.volunteerId === user.uid);
     return allListings.filter((l) => l.donorId === user.uid);
-  }, [allListings, user]);
+  }, [allListings, user, currentRole]);
 
   const filteredDonations = useMemo(() => {
     if (filter === "all") return myDonations;
@@ -89,7 +95,7 @@ function ProfilePage() {
   const stats = useMemo(() => {
     const total = myDonations.length;
     const completed = myDonations.filter((l) => l.status === "completed");
-    const active = myDonations.filter((l) => l.status === "available" || l.status === "reserved" || l.status === "assigned");
+    const active = myDonations.filter((l) => l.status === "available" || l.status === "reserved" || l.status === "assigned" || l.status === "picked_up");
     const served = completed.reduce((acc, l) => acc + (l.quantityDistributed || l.quantity || 0), 0);
     const wasteSavedKg = Math.round(served * 0.45); // estimated ~450g per meal
     return { total, completed: completed.length, active: active.length, served, wasteSavedKg };
@@ -126,7 +132,7 @@ function ProfilePage() {
     setSaving(true);
     try {
       await updateProfile(user.uid, {
-        name: name.trim() || profile?.name || "Donor",
+        name: name.trim() || profile?.name || "User",
         orgName: orgName.trim(),
         donorType: donorType as any,
         phone: phone.trim(),
@@ -134,9 +140,9 @@ function ProfilePage() {
         defaultPickupAddress: defaultPickupAddress.trim(),
         fssaiNumber: fssaiNumber.trim(),
         bio: bio.trim(),
-        role: "donor",
+        role: currentRole,
       });
-      toast.success("Donor profile updated successfully!");
+      toast.success("Profile updated successfully!");
       setActiveTab("donations");
     } catch (err) {
       toast.error((err as Error).message || "Could not save profile.");
@@ -225,14 +231,46 @@ function ProfilePage() {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1 rounded-full bg-saffron/20 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-saffron">
-                  <HeartHandshake className="size-3.5" /> Food Donor
+                  {currentRole === "ngo" ? (
+                    <>
+                      <Building2 className="size-3.5" /> NGO Partner
+                    </>
+                  ) : currentRole === "volunteer" ? (
+                    <>
+                      <Bike className="size-3.5" /> Delivery Volunteer
+                    </>
+                  ) : (
+                    <>
+                      <HeartHandshake className="size-3.5" /> Food Donor
+                    </>
+                  )}
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium backdrop-blur">
-                  <ShieldCheck className="size-3.5 text-emerald-400" /> BhojanBandhu Partner
+                  <ShieldCheck className="size-3.5 text-emerald-400" /> BhojanBandhu Verified
                 </span>
               </div>
-              <h1 className="mt-1 text-2xl font-bold sm:text-3xl">{displayName}</h1>
-              <p className="text-sm text-primary-foreground/80">{donorTypeLabel}</p>
+
+              {/* 1-Click Role Switcher Pill */}
+              <div className="mt-2.5 flex items-center gap-1 rounded-full bg-black/25 p-1 backdrop-blur max-w-fit">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-white/70 px-2">Role:</span>
+                {(["donor", "ngo", "volunteer"] as const).map((r) => (
+                  <button
+                    key={r}
+                    type="button"
+                    onClick={() => handleSwitchRole(r)}
+                    className={`rounded-full px-2.5 py-0.5 text-[11px] font-bold capitalize transition-colors ${
+                      currentRole === r
+                        ? "bg-saffron text-saffron-foreground shadow-xs"
+                        : "text-white/80 hover:bg-white/10"
+                    }`}
+                  >
+                    {r === "donor" ? "🍲 Donor" : r === "ngo" ? "🏢 NGO" : "🚴 Volunteer"}
+                  </button>
+                ))}
+              </div>
+
+              <h1 className="mt-2 text-2xl font-bold sm:text-3xl">{displayName}</h1>
+              <p className="text-sm text-primary-foreground/80">{currentRole === "donor" ? donorTypeLabel : currentRole === "ngo" ? "Registered NGO Partner" : "Active Community Volunteer"}</p>
               {profile?.email && <p className="text-xs text-primary-foreground/70">{profile.email}</p>}
             </div>
           </div>
@@ -303,7 +341,7 @@ function ProfilePage() {
             activeTab === "donations" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          My Food ({myDonations.length})
+          {currentRole === "donor" ? `My Food (${myDonations.length})` : currentRole === "ngo" ? `Claimed Food (${myDonations.length})` : `My Tasks (${myDonations.length})`}
         </button>
         <button
           onClick={() => setActiveTab("edit")}
@@ -356,12 +394,21 @@ function ProfilePage() {
               ))}
             </div>
 
-            <Link
-              to="/app/donate"
-              className="inline-flex items-center gap-1.5 rounded-full bg-saffron px-4 py-1.5 text-xs font-semibold text-saffron-foreground shadow-warm hover:brightness-105"
-            >
-              <PlusCircle className="size-3.5" /> Donate food
-            </Link>
+            {currentRole === "donor" ? (
+              <Link
+                to="/app/donate"
+                className="inline-flex items-center gap-1.5 rounded-full bg-saffron px-4 py-1.5 text-xs font-semibold text-saffron-foreground shadow-warm hover:brightness-105"
+              >
+                <PlusCircle className="size-3.5" /> Donate food
+              </Link>
+            ) : (
+              <Link
+                to="/app"
+                className="inline-flex items-center gap-1.5 rounded-full bg-primary px-4 py-1.5 text-xs font-semibold text-primary-foreground shadow-sm hover:brightness-105"
+              >
+                <PlusCircle className="size-3.5" /> Browse Food Feed
+              </Link>
+            )}
           </div>
 
           {filteredDonations.length === 0 ? (
