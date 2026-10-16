@@ -36,12 +36,12 @@ const entry = (status: Status, by: string, note?: string) => ({ status, at: Date
 
 // Authentic Indian Hunger Relief, Child Welfare, Langar & Donation Camp photos
 export const INDIAN_HUNGER_PHOTOS = {
-  indian_children_meal: "/images/hunger/hunger3.png",
-  slum_kids_feeding: "/images/hunger/ground1.png",
-  child_eating_plate: "/images/hunger/ground4.jpg",
-  community_langar_camp: "/images/hunger/hunger5.png",
-  street_children_relief: "/images/hunger/hunger2.png",
-  village_school_midday: "/images/hunger/ground3.jpg",
+  indian_children_meal: "/images/food/dal_khichdi_roti.jpg",
+  slum_kids_feeding: "/images/food/wheat_bread_buns.jpg",
+  child_eating_plate: "/images/food/shahi_paneer_pulao.jpg",
+  community_langar_camp: "/images/food/dry_ration_kits.jpg",
+  street_children_relief: "/images/food/milk_and_dahi.jpg",
+  village_school_midday: "/images/food/fruit_crates.jpg",
 };
 
 export const SEED_LISTINGS: Listing[] = [
@@ -49,7 +49,7 @@ export const SEED_LISTINGS: Listing[] = [
     id: "lst_seed_langar_khichdi",
     donorId: "donor_guru_nanak_seva",
     donorName: "Gurdwara Sahib Langar Seva",
-    donorAvatar: INDIAN_HUNGER_PHOTOS.indian_children_meal,
+    donorAvatar: "/images/hunger/ground4.jpg",
     donorPhone: "+91 98765 43210",
     title: "Ghee Dal Khichdi & 150 Rotis for Slum Feeding",
     description: "Nutritious, warm yellow dal khichdi slow-simmered in brass degh, with 150 fresh whole-wheat rotis cooked for underprivileged children and daily wagers at Mathura Rain Basera.",
@@ -64,7 +64,7 @@ export const SEED_LISTINGS: Listing[] = [
     storage: "hot",
     allergens: ["Gluten"],
     checklist: { covered: true, temperature: true, hygienic: true, notExpired: true },
-    photo: INDIAN_HUNGER_PHOTOS.indian_children_meal,
+    photo: "/images/food/dal_khichdi_roti.jpg",
     status: "available",
     createdAt: Date.now() - 1 * 3600_000,
     history: [{ status: "available", at: Date.now() - 1 * 3600_000, by: "Gurdwara Sahib Langar Seva", note: "Listed freshly cooked community langar khichdi" }],
@@ -73,7 +73,7 @@ export const SEED_LISTINGS: Listing[] = [
     id: "lst_seed_wedding_surplus",
     donorId: "donor_shree_radhe_banquet",
     donorName: "Radhe Krishna Wedding Caterers",
-    donorAvatar: INDIAN_HUNGER_PHOTOS.child_eating_plate,
+    donorAvatar: "/images/hunger/card2.png",
     donorPhone: "+91 98223 99887",
     title: "Banquet Surplus: Shahi Paneer, Pulao & Gulab Jamun",
     description: "Untouched, pristine banquet feast surplus preserved at 68°C in insulated food dispensers right after wedding reception concluded. High-protein meal for orphanages and night shelters.",
@@ -88,7 +88,7 @@ export const SEED_LISTINGS: Listing[] = [
     storage: "hot",
     allergens: ["Gluten", "Dairy"],
     checklist: { covered: true, temperature: true, hygienic: true, notExpired: true },
-    photo: INDIAN_HUNGER_PHOTOS.child_eating_plate,
+    photo: "/images/food/shahi_paneer_pulao.jpg",
     status: "available",
     createdAt: Date.now() - 1.5 * 3600_000,
     history: [{ status: "available", at: Date.now() - 1.5 * 3600_000, by: "Radhe Krishna Banquet", note: "Listed untouched wedding surplus feast" }],
@@ -97,7 +97,7 @@ export const SEED_LISTINGS: Listing[] = [
     id: "lst_seed_emergency_ration",
     donorId: "donor_annapurna_trust",
     donorName: "Maa Annapurna Hunger Relief Foundation",
-    donorAvatar: INDIAN_HUNGER_PHOTOS.community_langar_camp,
+    donorAvatar: "/images/hunger/hunger5.png",
     donorPhone: "+91 98112 33445",
     title: "Emergency Slum Dry Ration Survival Kits (Atta, Dal, Oil)",
     description: "Fortified emergency food kits assembled for poverty-stricken families and daily wagers. Contains 5kg wheat atta, 2kg chana dal, mustard oil, and biscuits.",
@@ -112,7 +112,7 @@ export const SEED_LISTINGS: Listing[] = [
     storage: "room",
     allergens: ["Gluten"],
     checklist: { covered: true, temperature: true, hygienic: true, notExpired: true },
-    photo: INDIAN_HUNGER_PHOTOS.community_langar_camp,
+    photo: "/images/food/dry_ration_kits.jpg",
     status: "available",
     createdAt: Date.now() - 2 * 3600_000,
     history: [{ status: "available", at: Date.now() - 2 * 3600_000, by: "Maa Annapurna Foundation", note: "Listed emergency family ration kits" }],
@@ -121,7 +121,7 @@ export const SEED_LISTINGS: Listing[] = [
     id: "lst_seed_slum_breakfast",
     donorId: "donor_navodaya_care",
     donorName: "Navodaya Slum Child Care Center",
-    donorAvatar: INDIAN_HUNGER_PHOTOS.slum_kids_feeding,
+    donorAvatar: "/images/hunger/ground3.jpg",
     donorPhone: "+91 98223 34455",
     title: "Wholesome Wheat Bread & Milk Buns for Street Children",
     description: "Surplus morning bakery batch packed in hygienic clean bags for children's morning breakfast program at remedial street schools.",
@@ -136,7 +136,7 @@ export const SEED_LISTINGS: Listing[] = [
     storage: "room",
     allergens: ["Gluten"],
     checklist: { covered: true, temperature: true, hygienic: true, notExpired: true },
-    photo: INDIAN_HUNGER_PHOTOS.slum_kids_feeding,
+    photo: "/images/food/wheat_bread_buns.jpg",
     status: "available",
     createdAt: Date.now() - 3 * 3600_000,
     history: [{ status: "available", at: Date.now() - 3 * 3600_000, by: "Navodaya Child Care", note: "Surplus bakery loaves for street children breakfast" }],
@@ -145,7 +145,7 @@ export const SEED_LISTINGS: Listing[] = [
     id: "lst_seed_mandi_fruits",
     donorId: "donor_kisan_mandi_mathura",
     donorName: "Kisan Wholesale Mandi Farmers Collective",
-    donorAvatar: INDIAN_HUNGER_PHOTOS.village_school_midday,
+    donorAvatar: "/images/hunger/card1.png",
     donorPhone: "+91 97112 88990",
     title: "Fresh Seasonal Fruits Crates (Bananas & Apples) for Orphanage",
     description: "Direct farm surplus crates of grade-A fresh seasonal fruits. Essential vitamins and natural nourishment for underprivileged children.",
@@ -160,7 +160,7 @@ export const SEED_LISTINGS: Listing[] = [
     storage: "room",
     allergens: [],
     checklist: { covered: true, temperature: true, hygienic: true, notExpired: true },
-    photo: INDIAN_HUNGER_PHOTOS.village_school_midday,
+    photo: "/images/food/fruit_crates.jpg",
     status: "available",
     createdAt: Date.now() - 4 * 3600_000,
     history: [{ status: "available", at: Date.now() - 4 * 3600_000, by: "Kisan Mandi Collective", note: "Fresh seasonal fruit donation for children" }],
@@ -169,7 +169,7 @@ export const SEED_LISTINGS: Listing[] = [
     id: "lst_seed_dairy_packets",
     donorId: "donor_braj_dairy",
     donorName: "Braj Bhoomi Dairy Milk Bank",
-    donorAvatar: INDIAN_HUNGER_PHOTOS.street_children_relief,
+    donorAvatar: "/images/hunger/ground1.png",
     donorPhone: "+91 93190 22334",
     title: "Pasteurized Milk Pouches & Nutritious Dahi for Toddlers",
     description: "Refrigerated fresh milk pouches and set curd tubs maintained strictly under cold chain. Donated to prevent malnutrition among shelter toddlers and elderly residents.",
@@ -184,7 +184,7 @@ export const SEED_LISTINGS: Listing[] = [
     storage: "chilled",
     allergens: ["Dairy"],
     checklist: { covered: true, temperature: true, hygienic: true, notExpired: true },
-    photo: INDIAN_HUNGER_PHOTOS.street_children_relief,
+    photo: "/images/food/milk_and_dahi.jpg",
     status: "available",
     createdAt: Date.now() - 2 * 3600_000,
     history: [{ status: "available", at: Date.now() - 2 * 3600_000, by: "Braj Bhoomi Dairy Bank", note: "Cold chain dairy surplus donation" }],
@@ -225,12 +225,13 @@ export function isOldDummyListing(l: Listing): boolean {
 export function getStoredListings(): Listing[] {
   try {
     if (typeof window === "undefined") return SEED_LISTINGS;
-    const cacheKey = "foodloop_local_listings_v6";
+    const cacheKey = "foodloop_local_listings_v7";
     // Clean old caches
     localStorage.removeItem("foodloop_local_listings");
     localStorage.removeItem("annsetu_local_listings");
     localStorage.removeItem("foodloop_local_listings_v4");
     localStorage.removeItem("foodloop_local_listings_v5");
+    localStorage.removeItem("foodloop_local_listings_v6");
 
     const raw = localStorage.getItem(cacheKey);
     if (!raw) {
@@ -257,7 +258,7 @@ export function getStoredListings(): Listing[] {
 export function setStoredListings(list: Listing[]) {
   try {
     if (typeof window !== "undefined") {
-      const cacheKey = "foodloop_local_listings_v6";
+      const cacheKey = "foodloop_local_listings_v7";
       const cleaned = list.filter((item) => !isOldDummyListing(item));
       localStorage.setItem(cacheKey, JSON.stringify(cleaned));
       window.dispatchEvent(new CustomEvent("foodloop_listing_updated"));

@@ -105,8 +105,8 @@ const COMMUNITY_STORIES = [
     id: "story-2",
     author: "Prerna Slum School & Nutrition Center",
     role: "Child Welfare NGO",
-    avatar: "/images/hunger/ground3.jpg",
-    image: "/images/hunger/hunger3.png",
+    avatar: "/images/food/fruit_crates.jpg",
+    image: "/images/food/wheat_bread_buns.jpg",
     title: "Fresh bakery loaves & fruit baskets for 140 children",
     snippet:
       "Wholesale mandi donors and local bakeries diverted unblemished surplus fruits and bread before expiry. Every child in our morning remedial center received a wholesome, dignified breakfast.",
@@ -119,7 +119,7 @@ const COMMUNITY_STORIES = [
     author: "Mother Teresa Hope Relief Mission",
     role: "Emergency Food Bank",
     avatar: "/images/hunger/card2.png",
-    image: "/images/hunger/hunger2.png",
+    image: "/images/food/dry_ration_kits.jpg",
     title: "75 Emergency ration kits assembled during crisis",
     snippet:
       "Volunteers packed fortified grains, pulses, and cooking essentials for vulnerable families living on the city periphery. 100% verified digital handover with zero food waste.",
@@ -613,13 +613,13 @@ function LandingPage() {
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
 
             {/* Card 1: Night Shelter Camps
-                Photo: Large crowd of Indian people with bowls and thalis waiting in line for food — shelter relief feeding line */}
+                Photo: Shelter residents and children seated in a row eating evening shelter meals */}
             <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/hunger/hunger5.png"
-                    alt="Indian log khane ki line mein thaliyon aur katoron ke sath intezaar kar rahe hain"
+                    src="/images/hunger/ground2.png"
+                    alt="Night shelter Rain Basera mein baithe log steel thaliyon mein garma-garam khana kha rahe hain"
                     className="size-full object-cover object-center"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#205C43] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
@@ -640,13 +640,13 @@ function LandingPage() {
             </div>
 
             {/* Card 2: Emergency Ration Kits
-                Photo: Indian family eating from emergency relief packets on the street */}
+                Photo: Sacks of fortified wheat flour, lentils, grains, and dry ration assembled */}
             <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/hunger/hunger2.png"
-                    alt="Gareeb pariwar ko aapatkaleen khana aur ration distribution"
+                    src="/images/food/dry_ration_kits.jpg"
+                    alt="Emergency dry ration kits atta dal chana grains packaging"
                     className="size-full object-cover object-center"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#ED7545] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
@@ -667,12 +667,12 @@ function LandingPage() {
             </div>
 
             {/* Card 3: Child Nutrition / Midday Meal Programme
-                Photo: Indian school children eating midday meal in a row — most iconic and symbolic for child nutrition */}
+                Photo: Indian school children sitting in uniform in school row eating midday meal */}
             <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/hunger/hunger3.png"
+                    src="/images/hunger/ground3.jpg"
                     alt="Indian bacche school midday meal programme mein thaliyon se khana kha rahe hain"
                     className="size-full object-cover object-center"
                   />
@@ -694,7 +694,7 @@ function LandingPage() {
             </div>
 
             {/* Card 4: Langar Seva
-                Photo: Smiling Indian boy holding a thali full of rice — warmth of community langar */}
+                Photo: Smiling Indian boy holding a thali full of warm rice & dal — warmth of community langar */}
             <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">

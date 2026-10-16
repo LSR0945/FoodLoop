@@ -39,10 +39,10 @@ export const Route = createFileRoute("/recipient")({
 type Tab = "dashboard" | "explore" | "reservations" | "history" | "saved" | "profile";
 
 const RECIPIENT_BG_IMAGES = [
-  "/images/hunger/hunger3.png", // Indian children meal
-  "/images/hunger/hunger5.png", // Slum children hunger relief
-  "/images/hunger/ground4.jpg", // Child eating meal
-  "/images/hunger/card2.png", // Community food relief
+  "/images/food/dal_khichdi_roti.jpg", // Indian meals
+  "/images/food/shahi_paneer_pulao.jpg", // Banquet feast
+  "/images/food/fruit_crates.jpg", // Fresh fruits
+  "/images/food/wheat_bread_buns.jpg", // Bakery bread
 ];
 
 function RecipientPortalPage() {
