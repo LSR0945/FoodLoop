@@ -36,6 +36,7 @@ import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppDonateRouteImport } from './routes/app/donate'
 import { Route as AppNotificationsRouteImport } from './routes/app/notifications'
 import { Route as AppProfileRouteImport } from './routes/app/profile'
+import { Route as AppReportRouteImport } from './routes/app/report'
 import { Route as DonationsIdRouteImport } from './routes/donations.$id'
 import { Route as OnboardingProfileRouteImport } from './routes/onboarding.profile'
 import { Route as OnboardingRoleRouteImport } from './routes/onboarding.role'
@@ -177,6 +178,11 @@ const AppProfileRoute = AppProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const AppReportRoute = AppReportRouteImport.update({
+  id: '/report',
+  path: '/report',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const DonationsIdRoute = DonationsIdRouteImport.update({
   id: '/donations/$id',
   path: '/donations/$id',
@@ -230,6 +236,7 @@ export interface FileRoutesByFullPath {
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/report': typeof AppReportRoute
   '/donations/$id': typeof DonationsIdRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
   '/onboarding/role': typeof OnboardingRoleRoute
@@ -263,6 +270,7 @@ export interface FileRoutesByTo {
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/report': typeof AppReportRoute
   '/donations/$id': typeof DonationsIdRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
   '/onboarding/role': typeof OnboardingRoleRoute
@@ -298,6 +306,7 @@ export interface FileRoutesById {
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
+  '/app/report': typeof AppReportRoute
   '/donations/$id': typeof DonationsIdRoute
   '/onboarding/profile': typeof OnboardingProfileRoute
   '/onboarding/role': typeof OnboardingRoleRoute
@@ -334,6 +343,7 @@ export interface FileRouteTypes {
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
+    | '/app/report'
     | '/donations/$id'
     | '/onboarding/profile'
     | '/onboarding/role'
@@ -367,6 +377,7 @@ export interface FileRouteTypes {
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
+    | '/app/report'
     | '/donations/$id'
     | '/onboarding/profile'
     | '/onboarding/role'
@@ -401,6 +412,7 @@ export interface FileRouteTypes {
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
+    | '/app/report'
     | '/donations/$id'
     | '/onboarding/profile'
     | '/onboarding/role'
@@ -628,6 +640,13 @@ declare module '@tanstack/react-router' {
       path: '/profile'
       fullPath: '/app/profile'
       preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/app/report': {
+      id: '/app/report'
+      path: '/report'
+      fullPath: '/app/report'
+      preLoaderRoute: typeof AppReportRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/donations/$id': {

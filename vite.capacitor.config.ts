@@ -11,6 +11,8 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src"),
     },
   },
+  // CRITICAL: Use relative base path so assets resolve under file:// in Capacitor WebView
+  base: "./",
   build: {
     outDir: "dist-capacitor",
     emptyOutDir: true,

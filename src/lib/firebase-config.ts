@@ -1,10 +1,8 @@
-import { createServerFn } from "@tanstack/react-start";
-
-// Firebase web config values are public identifiers; they are stored as project
-// secrets, so the server hands them to the browser at startup.
-export const getFirebaseConfig = createServerFn({ method: "GET" }).handler(async () => {
+// Firebase web config values are public identifiers.
+export async function getFirebaseConfig() {
   return {
-    apiKey: (process.env["GOOGLE_API_KEY"] || "AIzaSyApsvkLkXXgx7_4GBtoSntbcPp2_ZvozRs").trim(),
-    measurementId: (process.env["GOOGLE_ANALYTICS_MEASUREMENT_ID"] ?? "").trim(),
+    apiKey: "AIzaSyApsvkLkXXgx7_4GBtoSntbcPp2_ZvozRs",
+    measurementId: "",
   };
-});
+}
+
