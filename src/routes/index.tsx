@@ -399,10 +399,11 @@ function LandingPage() {
                     </span>
                   </div>
 
+                  {/* Main big hunger relief photo */}
                   <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#EDE8DE]">
                     <img
-                      src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80"
-                      alt="Community Food Distribution Camp"
+                      src="/images/hunger/hunger3.png"
+                      alt="Bhookh se pidit bhartiya bachhe khana kha rahe hain"
                       className="size-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
@@ -415,33 +416,55 @@ function LandingPage() {
                       </span>
                     </div>
                     <div className="absolute bottom-3 left-3 right-3 text-white">
-                      <p className="text-[11px] font-medium text-amber-200">Govind Seva Ashram · 180 hot meals</p>
-                      <h4 className="font-display text-base font-bold drop-shadow">Community Relief Kitchen & Shelter Feeding</h4>
+                      <p className="text-[11px] font-medium text-amber-200">Midday Meal Programme · 180 hot meals</p>
+                      <h4 className="font-display text-base font-bold drop-shadow">Children's Community Relief Kitchen & Shelter Feeding</h4>
                     </div>
                   </div>
 
-                  {/* Micro mini-feed showing actual hunger relief initiatives */}
+                  {/* 4-photo hunger grid — uploaded local images */}
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <div className="flex items-center gap-2 rounded-xl bg-[#F8F5ED] p-2 border border-[#E2DBD0]">
                       <img
-                        src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=200&auto=format&fit=crop&q=80"
-                        alt="Community Langar Kitchen"
+                        src="/images/hunger/hunger1.png"
+                        alt="Bhookh se pidit bachhe"
                         className="size-10 rounded-lg object-cover"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[11px] font-bold text-[#242923]">Langar Seva Khichdi</p>
-                        <p className="text-[10px] text-[#656C62]">120 hot packs · Gurdwara</p>
+                        <p className="truncate text-[11px] font-bold text-[#242923]">Bhukhe Bachhe</p>
+                        <p className="text-[10px] text-[#656C62]">Hunger Relief Camp</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 rounded-xl bg-[#F8F5ED] p-2 border border-[#E2DBD0]">
                       <img
-                        src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=200&auto=format&fit=crop&q=80"
-                        alt="Dry Ration Bags"
+                        src="/images/hunger/hunger2.png"
+                        alt="Gareeb pariwar khana kha raha hai"
                         className="size-10 rounded-lg object-cover"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[11px] font-bold text-[#242923]">Emergency Rations</p>
-                        <p className="text-[10px] text-[#656C62]">75 kits · Hope Depot</p>
+                        <p className="truncate text-[11px] font-bold text-[#242923]">Gali Ka Khana</p>
+                        <p className="text-[10px] text-[#656C62]">75 kits · Slum Drive</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-xl bg-[#F8F5ED] p-2 border border-[#E2DBD0]">
+                      <img
+                        src="/images/hunger/hunger4.png"
+                        alt="Bache roti maang rahe hain"
+                        className="size-10 rounded-lg object-cover"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[11px] font-bold text-[#242923]">Roti ke liye talash</p>
+                        <p className="text-[10px] text-[#656C62]">60 meals · NCR Drive</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 rounded-xl bg-[#F8F5ED] p-2 border border-[#E2DBD0]">
+                      <img
+                        src="/images/hunger/hunger5.png"
+                        alt="Gareeb log khane ki line mein"
+                        className="size-10 rounded-lg object-cover"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-[11px] font-bold text-[#242923]">Food Queue Relief</p>
+                        <p className="text-[10px] text-[#656C62]">120 packs · UP Drive</p>
                       </div>
                     </div>
                   </div>
