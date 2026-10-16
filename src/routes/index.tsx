@@ -611,17 +611,19 @@ function LandingPage() {
 
           {/* 4-Card Real-World Ground Action Cards */}
           <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            {/* Card 1: Night Shelter Camps */}
+
+            {/* Card 1: Night Shelter Camps
+                Photo: Indian children standing in line with empty bowls waiting for food — symbolises shelter feeding line */}
             <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/hunger/ground1.png"
-                    alt="Bachhe milkar khana kha rahe hain"
-                    className="size-full object-cover"
+                    src="/images/hunger/card4.png"
+                    alt="Indian bachhe khane ki line mein bowls lekar intezaar kar rahe hain"
+                    className="size-full object-cover object-top"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#205C43] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
-                    Night Shelter Camps
+                    🌙 Night Shelter Camps
                   </span>
                 </div>
                 <div className="p-4">
@@ -637,17 +639,18 @@ function LandingPage() {
               </div>
             </div>
 
-            {/* Card 2: Emergency Ration Kits */}
+            {/* Card 2: Emergency Ration Kits
+                Photo: Volunteer delivering food aid box to a smiling girl — symbolises ration kit distribution */}
             <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/hunger/ground2.png"
-                    alt="Chhote bachhe thaliyon se khana kha rahe hain"
-                    className="size-full object-cover"
+                    src="/images/hunger/card2.png"
+                    alt="Youth volunteer food aid box delivery — Bhookha na soye koi"
+                    className="size-full object-cover object-center"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#ED7545] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
-                    Emergency Food Bank
+                    📦 Emergency Food Bank
                   </span>
                 </div>
                 <div className="p-4">
@@ -663,43 +666,45 @@ function LandingPage() {
               </div>
             </div>
 
-            {/* Card 3: Slum School Breakfast */}
+            {/* Card 3: Child Nutrition / Midday Meal Programme
+                Photo: Indian school children eating midday meal in a row — most iconic and symbolic for child nutrition */}
             <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/hunger/ground3.jpg"
-                    alt="Bachhe school mein khana kha rahe hain"
-                    className="size-full object-cover"
+                    src="/images/hunger/hunger3.png"
+                    alt="Indian bacche school midday meal programme mein thaliyon se khana kha rahe hain"
+                    className="size-full object-cover object-center"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#3F8F62] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
-                    Child Nutrition
+                    🍽️ Child Nutrition
                   </span>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-display text-base font-bold text-[#242923]">Slum Learning Breakfast</h3>
+                  <h3 className="font-display text-base font-bold text-[#242923]">Midday Meal Programme</h3>
                   <p className="mt-1.5 text-xs text-[#656C62] leading-relaxed">
-                    Seasonal fruit crates and wholesome bakery loaves redirected to community schools so children never have to learn on an empty stomach.
+                    Hot nutritious meals served to children in community schools so they never have to study on an empty stomach. Every child deserves to eat.
                   </p>
                 </div>
               </div>
               <div className="border-t border-[#DDD5C8]/60 bg-[#F8F5ED]/50 px-4 py-2.5 flex items-center justify-between text-[11px]">
                 <span className="font-bold text-[#205C43]">🍎 6,900+ Kids</span>
-                <span className="text-[#656C62]">Daily Breakfast</span>
+                <span className="text-[#656C62]">Daily Meal</span>
               </div>
             </div>
 
-            {/* Card 4: Langar Seva */}
+            {/* Card 4: Langar Seva
+                Photo: Smiling Indian boy holding a thali full of rice — warmth of community langar */}
             <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
                     src="/images/hunger/ground4.jpg"
-                    alt="Baccha thali lekar khushi se dekh raha hai"
-                    className="size-full object-cover"
+                    alt="Muskurata Indian baccha thali mein chawal lekar langar seva ka anand le raha hai"
+                    className="size-full object-cover object-top"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#242923] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
-                    Langar Seva
+                    🤲 Langar Seva
                   </span>
                 </div>
                 <div className="p-4">
@@ -714,6 +719,7 @@ function LandingPage() {
                 <span className="text-[#656C62]">Open Kitchens</span>
               </div>
             </div>
+
           </div>
 
           {/* Hunger Facts vs FoodLoop Solution Callout Banner */}
