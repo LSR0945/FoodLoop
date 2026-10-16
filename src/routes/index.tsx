@@ -28,7 +28,8 @@ import { useAuth } from "@/lib/auth";
 import { useListings } from "@/lib/db";
 import { isOpen } from "@/lib/priority";
 
-export const Route = createFileRoute("/")({
+export const Route = createFileRoute("/")(
+  {
   head: () => ({
     meta: [
       { title: "FoodLoop — Good food. Shared with purpose." },
@@ -440,6 +441,15 @@ function LandingPage() {
                   </div>
                 </div>
               </div>
+            </div>
+
+            {/* Trust badges */}
+            <div className="mt-10 flex flex-wrap gap-3">
+              {["✅ FSSAI Compliant Checklist", "🔒 Pickup Code Verified", "⚡ Real-time Listings", "🌱 Zero Waste Mission"].map((b) => (
+                <span key={b} className="rounded-full bg-hero-foreground/10 px-3 py-1 text-xs font-medium backdrop-blur">
+                  {b}
+                </span>
+              ))}
             </div>
           </div>
         </div>

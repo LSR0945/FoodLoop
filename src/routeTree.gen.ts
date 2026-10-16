@@ -672,6 +672,7 @@ interface AppRouteRouteChildren {
   AppDonateRoute: typeof AppDonateRoute
   AppNotificationsRoute: typeof AppNotificationsRoute
   AppProfileRoute: typeof AppProfileRoute
+  AppReportRoute: typeof AppReportRoute
   AppIndexRoute: typeof AppIndexRoute
   AppListingIdRoute: typeof AppListingIdRoute
 }
@@ -680,6 +681,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppDonateRoute: AppDonateRoute,
   AppNotificationsRoute: AppNotificationsRoute,
   AppProfileRoute: AppProfileRoute,
+  AppReportRoute: AppReportRoute,
   AppIndexRoute: AppIndexRoute,
   AppListingIdRoute: AppListingIdRoute,
 }
