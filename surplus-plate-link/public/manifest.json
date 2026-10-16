@@ -1,0 +1,42 @@
+{
+  "name": "FoodLoop - Surplus Food Sharing",
+  "short_name": "FoodLoop",
+  "description": "Good food. Shared with purpose. Connect surplus food with recipient shelters and volunteers.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#F8F5ED",
+  "theme_color": "#205C43",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    },
+    {
+      "src": "/foodloop-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/foodloop-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["food", "social", "lifestyle"],
+  "shortcuts": [
+    {
+      "name": "Explore Food",
+      "url": "/explore",
+      "description": "Discover fresh surplus meals nearby"
+    },
+    {
+      "name": "List Surplus Food",
+      "url": "/donor",
+      "description": "Donate surplus meals"
+    }
+  ]
+}
