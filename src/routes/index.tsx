@@ -90,42 +90,42 @@ const HOW_IT_WORKS_ROLES = [
 const COMMUNITY_STORIES = [
   {
     id: "story-1",
-    author: "Grand Horizon Banquet",
-    role: "Food Donor",
-    avatar: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=150&auto=format&fit=crop&q=80",
-    image: "https://images.unsplash.com/photo-1555244162-803834f70033?w=800&auto=format&fit=crop&q=80",
-    title: "180 wedding meals rescued in 30 minutes",
+    author: "Govind Seva Ashram & Rain Basera",
+    role: "Shelter Partner",
+    avatar: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=150&auto=format&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80",
+    title: "180 hot meals distributed to daily wagers in winter",
     snippet:
-      "Instead of letting delicious paneer pulao and dal go to waste after an evening banquet, we listed it on FoodLoop. Asha Shelter collected it within 30 minutes. Clean and dignified!",
+      "When a large wedding banquet concluded at 11 PM, FoodLoop volunteers mobilized within 20 minutes. 180 plates of steaming nutritious pulao, dal, and fresh rotis were handed directly to homeless workers and children with warmth and dignity.",
     meals: 180,
     time: "Yesterday",
-    location: "Civil Lines",
+    location: "Rain Basera & Station Road",
   },
   {
     id: "story-2",
-    author: "Asha Children's Shelter",
-    role: "Recipient NGO",
-    avatar: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=150&auto=format&fit=crop&q=80",
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80",
-    title: "Fresh bakery breakfast for 90 kids",
+    author: "Prerna Slum School & Nutrition Center",
+    role: "Child Welfare NGO",
+    avatar: "https://images.unsplash.com/photo-1544717305-2782549b5136?w=150&auto=format&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1578357078586-491adf1aa5c7?w=800&auto=format&fit=crop&q=80",
+    title: "Fresh bakery loaves & fruit baskets for 140 children",
     snippet:
-      "Artisan bakeries on FoodLoop give our children wholesome multigrain bread and fruit buns every Sunday. Grateful to our volunteer delivery hero Aman!",
-    meals: 90,
+      "Wholesale mandi donors and local bakeries diverted unblemished surplus fruits and bread before expiry. Every child in our morning remedial center received a wholesome, dignified breakfast.",
+    meals: 140,
     time: "2 days ago",
-    location: "Mathura Station Area",
+    location: "Sector 4 Rehabilitation Colony",
   },
   {
     id: "story-3",
-    author: "Karan Verma",
-    role: "Volunteer Courier",
+    author: "Mother Teresa Hope Relief Mission",
+    role: "Emergency Food Bank",
     avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
-    image: "https://images.unsplash.com/photo-1526367790999-0150786686a2?w=800&auto=format&fit=crop&q=80",
-    title: "Night food run across university town",
+    image: "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&auto=format&fit=crop&q=80",
+    title: "75 Emergency ration kits assembled during crisis",
     snippet:
-      "Rescued 4 insulated crates from the hostel mess at 10 PM. Reached the night shelter before 10:30 PM. Warm food on chilly nights means everything.",
-    meals: 120,
+      "Volunteers packed fortified grains, pulses, and cooking essentials for vulnerable families living on the city periphery. 100% verified digital handover with zero food waste.",
+    meals: 375,
     time: "3 days ago",
-    location: "Campus to Rain Basera",
+    location: "Yamuna Flood Relief Depot",
   },
 ];
 
@@ -295,16 +295,16 @@ function LandingPage() {
             <div className="lg:col-span-7">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#3F8F62]/30 bg-white/80 px-3.5 py-1 text-xs font-bold text-[#205C43] shadow-xs backdrop-blur-sm">
                 <span className="size-2 rounded-full bg-[#ED7545] animate-ping" />
-                <span>Good food. Shared with purpose.</span>
+                <span>Zero Hunger Mission · Free Community Food Relief</span>
               </div>
 
               <h1 className="mt-4 font-display text-4xl font-extrabold tracking-tight text-[#242923] sm:text-6xl sm:leading-[1.12]">
                 Rescue surplus food. <br />
-                <span className="text-[#205C43]">Nourish your city.</span>
+                <span className="text-[#205C43]">Fight hunger together.</span>
               </h1>
 
               <p className="mt-5 max-w-xl text-base leading-relaxed text-[#656C62] sm:text-lg">
-                FoodLoop connects restaurants, caterers, and households with nearby shelters and volunteer couriers — turning surplus meals into immediate nourishment before time runs out.
+                FoodLoop mobilizes surplus meals from caterers, community kitchens, and food donors directly to underprivileged children, night shelters, and families in need — eradicating hunger with dignity.
               </p>
 
               {/* Integrated Search Input */}
@@ -313,7 +313,7 @@ function LandingPage() {
                   <Search className="absolute left-4 top-3.5 size-5 text-[#656C62]" />
                   <input
                     type="text"
-                    placeholder="Search surplus meals, bakery, or locality (e.g. Biryani, Campus, Bread)…"
+                    placeholder="Search surplus meals, rations, or locality (e.g. Langar, Khichdi, Shelter)…"
                     value={heroSearch}
                     onChange={(e) => setHeroSearch(e.target.value)}
                     className="w-full rounded-full border border-[#DDD5C8] bg-white py-3 pl-12 pr-4 text-sm font-medium text-[#242923] placeholder:text-[#656C62]/70 shadow-sm focus:border-[#205C43] focus:outline-none focus:ring-2 focus:ring-[#205C43]/20"
@@ -347,7 +347,7 @@ function LandingPage() {
               <div className="mt-8 flex flex-wrap items-center gap-6 text-xs font-semibold text-[#656C62]">
                 <div className="flex items-center gap-1.5">
                   <ShieldCheck className="size-4 text-[#3F8F62]" />
-                  <span>Verified NGO Network</span>
+                  <span>Verified Shelter Network</span>
                 </div>
                 <div className="flex items-center gap-1.5">
                   <Clock className="size-4 text-[#ED7545]" />
@@ -360,67 +360,69 @@ function LandingPage() {
               </div>
             </div>
 
-            {/* Right Visual Image Showcase with Chole Kulche, Pizza & Salads */}
+            {/* Right Visual Image Showcase with Authentic Hunger Relief & Food Rescue */}
             <div className="relative lg:col-span-5">
               <div className="relative mx-auto max-w-md">
                 <div className="overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white p-3 shadow-2xl">
                   {/* Category Pills directly above card */}
                   <div className="mb-3 flex items-center justify-between border-b border-[#DDD5C8]/50 pb-2.5">
-                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#656C62]">🔥 Fresh Surplus Right Now</span>
+                    <span className="text-[11px] font-bold uppercase tracking-wider text-[#ED7545] flex items-center gap-1">
+                      <span className="size-2 rounded-full bg-[#ED7545] animate-ping" /> Live Relief Distribution
+                    </span>
                     <span className="inline-flex items-center gap-1 rounded-full bg-[#3F8F62]/15 px-2 py-0.5 text-[10px] font-bold text-[#205C43]">
-                      Live in Mathura & NCR
+                      Mathura & NCR Drive
                     </span>
                   </div>
 
                   <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#EDE8DE]">
                     <img
-                      src="https://images.unsplash.com/photo-1567529692333-de9fd6772897?w=800&auto=format&fit=crop&q=80"
-                      alt="Amritsari Chole Kulche surplus donation"
+                      src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80"
+                      alt="Community Food Distribution Camp"
                       className="size-full object-cover"
                     />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
                     <div className="absolute left-3 top-3 flex gap-1.5">
                       <span className="rounded-full bg-[#205C43] px-2.5 py-0.5 text-[11px] font-bold text-white shadow">
-                        🟢 Veg
+                        🟢 100% Free
                       </span>
                       <span className="rounded-full bg-white/95 px-2.5 py-0.5 text-[11px] font-bold text-[#ED7545] shadow">
-                        ⚡ Urgent: 3h left
+                        ⚡ Urgent: 2h left
                       </span>
                     </div>
                     <div className="absolute bottom-3 left-3 right-3 text-white">
-                      <p className="text-[11px] font-medium text-amber-200">Mall Road Kitchen · 50 portions</p>
-                      <h4 className="font-display text-base font-bold drop-shadow">Amritsari Chole Kulche & Tangy Onions</h4>
+                      <p className="text-[11px] font-medium text-amber-200">Govind Seva Ashram · 180 hot meals</p>
+                      <h4 className="font-display text-base font-bold drop-shadow">Community Relief Kitchen & Shelter Feeding</h4>
                     </div>
                   </div>
 
-                  {/* Micro mini-feed inspired by modern food delivery & social apps */}
+                  {/* Micro mini-feed showing actual hunger relief initiatives */}
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <div className="flex items-center gap-2 rounded-xl bg-[#F8F5ED] p-2 border border-[#E2DBD0]">
                       <img
-                        src="https://images.unsplash.com/photo-1513104890138-7c749659a591?w=200&auto=format&fit=crop&q=80"
-                        alt="Pizza"
+                        src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=200&auto=format&fit=crop&q=80"
+                        alt="Community Langar Kitchen"
                         className="size-10 rounded-lg object-cover"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[11px] font-bold text-[#242923]">Wood-Fired Pizza</p>
-                        <p className="text-[10px] text-[#656C62]">28 boxes · Sector 18</p>
+                        <p className="truncate text-[11px] font-bold text-[#242923]">Langar Seva Khichdi</p>
+                        <p className="text-[10px] text-[#656C62]">120 hot packs · Gurdwara</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-2 rounded-xl bg-[#F8F5ED] p-2 border border-[#E2DBD0]">
                       <img
-                        src="https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=200&auto=format&fit=crop&q=80"
-                        alt="Salad"
+                        src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=200&auto=format&fit=crop&q=80"
+                        alt="Dry Ration Bags"
                         className="size-10 rounded-lg object-cover"
                       />
                       <div className="min-w-0 flex-1">
-                        <p className="truncate text-[11px] font-bold text-[#242923]">Crisp Herb Salad</p>
-                        <p className="text-[10px] text-[#656C62]">35 bowls · Eco Hub</p>
+                        <p className="truncate text-[11px] font-bold text-[#242923]">Emergency Rations</p>
+                        <p className="text-[10px] text-[#656C62]">75 kits · Hope Depot</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="mt-3 flex items-center justify-between border-t border-[#DDD5C8]/50 pt-2.5">
-                    <span className="text-xs font-semibold text-[#205C43]">Instant 1-Click NGO Pickup</span>
+                    <span className="text-xs font-semibold text-[#205C43]">Instant 1-Click Shelter Pickup</span>
                     <Link
                       to="/explore"
                       className="rounded-full bg-[#ED7545] px-4 py-1.5 text-xs font-bold text-white shadow-xs hover:brightness-105"
@@ -433,10 +435,10 @@ function LandingPage() {
                 {/* Floating Metric Pill */}
                 <div className="absolute -bottom-6 -left-6 rounded-2xl border border-[#DDD5C8] bg-white p-3.5 shadow-xl backdrop-blur-md hidden sm:flex items-center gap-3">
                   <div className="grid size-10 place-items-center rounded-xl bg-[#205C43]/10 text-[#205C43]">
-                    <TrendingUp className="size-5" />
+                    <Heart className="size-5 text-[#ED7545]" />
                   </div>
                   <div>
-                    <p className="text-lg font-extrabold text-[#205C43]">14,250+ Meals</p>
+                    <p className="text-lg font-extrabold text-[#205C43]">42,850+ Meals</p>
                     <p className="text-[10px] font-semibold text-[#656C62]">Rescued & Delivered</p>
                   </div>
                 </div>
@@ -474,6 +476,158 @@ function LandingPage() {
             <div className="text-center sm:text-left">
               <p className="font-display text-3xl font-extrabold text-[#242923] sm:text-4xl">99.4%</p>
               <p className="mt-1 text-xs font-bold uppercase tracking-wider text-[#656C62]">Successful Handover Rate</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 3.5 Ground Action: Real Hunger Relief & Food Distribution in Action */}
+      <section className="bg-gradient-to-b from-[#F8F5ED] via-white to-[#F8F5ED] py-16 sm:py-24 border-b border-[#E2DBD0]">
+        <div className="mx-auto max-w-6xl px-4">
+          <div className="text-center max-w-3xl mx-auto">
+            <span className="inline-flex items-center gap-1.5 rounded-full bg-[#ED7545]/10 px-3.5 py-1 text-xs font-bold uppercase tracking-wider text-[#ED7545]">
+              <Heart className="size-3.5 text-[#ED7545]" /> Ground Action & Hunger Relief
+            </span>
+            <h2 className="mt-3 font-display text-3xl font-bold tracking-tight text-[#242923] sm:text-5xl">
+              Real Food Distribution <br />
+              <span className="text-[#205C43]">Serving Those in Greatest Need</span>
+            </h2>
+            <p className="mt-3 text-sm text-[#656C62] leading-relaxed">
+              From wedding banquet surpluses and wholesale mandi produce to night shelters and child welfare centers. Every single portion rescued is a step towards zero hunger.
+            </p>
+          </div>
+
+          {/* 4-Card Real-World Ground Action Cards */}
+          <div className="mt-12 grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {/* Card 1: Night Shelter Camps */}
+            <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
+              <div>
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
+                  <img
+                    src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80"
+                    alt="Night Shelter Feeding Drive"
+                    className="size-full object-cover"
+                  />
+                  <span className="absolute left-2.5 top-2.5 rounded-full bg-[#205C43] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
+                    Night Shelter Camps
+                  </span>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-display text-base font-bold text-[#242923]">Hot Evening Shelter Meals</h3>
+                  <p className="mt-1.5 text-xs text-[#656C62] leading-relaxed">
+                    Freshly cooked nutritious khichdi, dal, and rotis served to daily-wage workers, homeless elders, and children at municipal Rain Baseras.
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-[#DDD5C8]/60 bg-[#F8F5ED]/50 px-4 py-2.5 flex items-center justify-between text-[11px]">
+                <span className="font-bold text-[#205C43]">🍲 18,400+ Meals</span>
+                <span className="text-[#656C62]">Nightly Service</span>
+              </div>
+            </div>
+
+            {/* Card 2: Emergency Ration Kits */}
+            <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
+              <div>
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
+                  <img
+                    src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&auto=format&fit=crop&q=80"
+                    alt="Emergency Ration Kits"
+                    className="size-full object-cover"
+                  />
+                  <span className="absolute left-2.5 top-2.5 rounded-full bg-[#ED7545] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
+                    Emergency Food Bank
+                  </span>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-display text-base font-bold text-[#242923]">Dry Ration & Grain Kits</h3>
+                  <p className="mt-1.5 text-xs text-[#656C62] leading-relaxed">
+                    Fortified wheat flour, lentils, cooking oil, and high-energy biscuits assembled for distressed families facing acute food insecurity.
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-[#DDD5C8]/60 bg-[#F8F5ED]/50 px-4 py-2.5 flex items-center justify-between text-[11px]">
+                <span className="font-bold text-[#205C43]">📦 4,200+ Kits</span>
+                <span className="text-[#656C62]">Slum Relief</span>
+              </div>
+            </div>
+
+            {/* Card 3: Slum School Breakfast */}
+            <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
+              <div>
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
+                  <img
+                    src="https://images.unsplash.com/photo-1578357078586-491adf1aa5c7?w=800&auto=format&fit=crop&q=80"
+                    alt="Child Nutrition Program"
+                    className="size-full object-cover"
+                  />
+                  <span className="absolute left-2.5 top-2.5 rounded-full bg-[#3F8F62] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
+                    Child Nutrition
+                  </span>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-display text-base font-bold text-[#242923]">Slum Learning Breakfast</h3>
+                  <p className="mt-1.5 text-xs text-[#656C62] leading-relaxed">
+                    Seasonal fruit crates and wholesome bakery loaves redirected to community schools so children never have to learn on an empty stomach.
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-[#DDD5C8]/60 bg-[#F8F5ED]/50 px-4 py-2.5 flex items-center justify-between text-[11px]">
+                <span className="font-bold text-[#205C43]">🍎 6,900+ Kids</span>
+                <span className="text-[#656C62]">Daily Breakfast</span>
+              </div>
+            </div>
+
+            {/* Card 4: Langar Seva */}
+            <div className="overflow-hidden rounded-2xl border border-[#DDD5C8] bg-white shadow-xs flex flex-col justify-between hover:shadow-md transition-shadow">
+              <div>
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
+                  <img
+                    src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&auto=format&fit=crop&q=80"
+                    alt="Community Langar Seva"
+                    className="size-full object-cover"
+                  />
+                  <span className="absolute left-2.5 top-2.5 rounded-full bg-[#242923] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
+                    Langar Seva
+                  </span>
+                </div>
+                <div className="p-4">
+                  <h3 className="font-display text-base font-bold text-[#242923]">Community Langar Seva</h3>
+                  <p className="mt-1.5 text-xs text-[#656C62] leading-relaxed">
+                    Large-batch community kitchen pots cooking wholesome vegetarian food distributed with total equality, dignity, and compassion.
+                  </p>
+                </div>
+              </div>
+              <div className="border-t border-[#DDD5C8]/60 bg-[#F8F5ED]/50 px-4 py-2.5 flex items-center justify-between text-[11px]">
+                <span className="font-bold text-[#205C43]">🤲 13,350+ Portions</span>
+                <span className="text-[#656C62]">Open Kitchens</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Hunger Facts vs FoodLoop Solution Callout Banner */}
+          <div className="mt-10 rounded-3xl border border-[#DDD5C8] bg-[#205C43] p-6 sm:p-8 text-white shadow-lg">
+            <div className="grid gap-6 sm:grid-cols-3 divide-y sm:divide-y-0 sm:divide-x divide-white/20">
+              <div className="sm:pr-6">
+                <span className="text-2xl sm:text-3xl font-extrabold text-[#ED7545]">194.4 Million</span>
+                <h4 className="mt-1 text-sm font-bold">Facing Chronic Hunger in India</h4>
+                <p className="mt-1 text-xs text-white/80 leading-relaxed">
+                  According to FAO, millions go to sleep hungry every night while food worth crores gets discarded.
+                </p>
+              </div>
+              <div className="pt-4 sm:pt-0 sm:px-6">
+                <span className="text-2xl sm:text-3xl font-extrabold text-amber-300">68 Million Tonnes</span>
+                <h4 className="mt-1 text-sm font-bold">Edible Food Wasted Every Year</h4>
+                <p className="mt-1 text-xs text-white/80 leading-relaxed">
+                  Discarded from banquets, corporate cafeterias, bakeries, and wholesale mandis without reaching those in need.
+                </p>
+              </div>
+              <div className="pt-4 sm:pt-0 sm:pl-6">
+                <span className="text-2xl sm:text-3xl font-extrabold text-emerald-300">30–45 Mins</span>
+                <h4 className="mt-1 text-sm font-bold">FoodLoop Average Rapid Dispatch</h4>
+                <p className="mt-1 text-xs text-white/80 leading-relaxed">
+                  Real-time matching connects donors and volunteer couriers to deliver hot meals before time runs out.
+                </p>
+              </div>
             </div>
           </div>
         </div>
