@@ -445,13 +445,49 @@ function LandingPage() {
               </div>
             </div>
 
-            {/* Trust badges */}
-            <div className="mt-10 flex flex-wrap gap-3">
-              {["✅ FSSAI Compliant Checklist", "🔒 Pickup Code Verified", "⚡ Real-time Listings", "🌱 Zero Waste Mission"].map((b) => (
-                <span key={b} className="rounded-full bg-hero-foreground/10 px-3 py-1 text-xs font-medium backdrop-blur">
-                  {b}
-                </span>
-              ))}
+            {/* Bottom Hero Trust & Compliance Strip (Spans full 12 columns cleanly) */}
+            <div className="lg:col-span-12 mt-6 pt-6 border-t border-[#DDD5C8]/70">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
+                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3.5 shadow-xs backdrop-blur-sm hover:border-[#205C43]/40 transition-all">
+                  <div className="grid size-10 place-items-center rounded-xl bg-[#205C43]/10 text-[#205C43] shrink-0 text-lg">
+                    🛡️
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#242923]">FSSAI Compliant</p>
+                    <p className="text-[11px] text-[#656C62]">Safety & hygiene checklist</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3.5 shadow-xs backdrop-blur-sm hover:border-[#ED7545]/40 transition-all">
+                  <div className="grid size-10 place-items-center rounded-xl bg-[#ED7545]/10 text-[#ED7545] shrink-0 text-lg">
+                    🔒
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#242923]">4-Digit Pickup OTP</p>
+                    <p className="text-[11px] text-[#656C62]">Secure donor handover</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3.5 shadow-xs backdrop-blur-sm hover:border-amber-500/40 transition-all">
+                  <div className="grid size-10 place-items-center rounded-xl bg-amber-500/10 text-amber-700 shrink-0 text-lg">
+                    ⚡
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#242923]">Live Countdown</p>
+                    <p className="text-[11px] text-[#656C62]">Rapid 45-min volunteer alert</p>
+                  </div>
+                </div>
+
+                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3.5 shadow-xs backdrop-blur-sm hover:border-emerald-500/40 transition-all">
+                  <div className="grid size-10 place-items-center rounded-xl bg-emerald-500/10 text-emerald-700 shrink-0 text-lg">
+                    🌱
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-[#242923]">Zero Food Waste</p>
+                    <p className="text-[11px] text-[#656C62]">UN SDG 2 Zero Hunger</p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
