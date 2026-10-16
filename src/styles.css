@@ -109,12 +109,18 @@
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
+    padding-top: env(safe-area-inset-top, 0px);
   }
   h1, h2, h3 {
     font-family: var(--font-display);
     letter-spacing: -0.01em;
   }
 }
+
+.mobile-header-safe {
+  padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
+}
+
 
 @utility hero-overlay {
   background: linear-gradient(

@@ -29,13 +29,13 @@ export function Logo({ light = false, size = "md", showTagline = true }: LogoPro
       />
 
       {/* Brand Typography */}
-      <div className="flex flex-col">
+      <div className="flex flex-col leading-tight">
         <span className={`font-display font-extrabold tracking-tight ${textSizes[size]}`}>
           <span className={light ? "text-white" : "text-[#205C43]"}>Food</span>
           <span className="text-[#ED7545]">Loop</span>
         </span>
         {showTagline && (
-          <span className={`-mt-1 text-[10px] font-semibold tracking-wide ${light ? "text-white/80" : "text-muted-foreground"}`}>
+          <span className={`hidden sm:inline-block -mt-0.5 text-[10px] font-semibold tracking-wide ${light ? "text-white/80" : "text-muted-foreground"}`}>
             Good food. Shared with purpose.
           </span>
         )}

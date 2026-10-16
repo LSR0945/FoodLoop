@@ -179,15 +179,15 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F5ED] text-[#242923]">
-      {/* 1. Header & Navigation */}
-      <header className="sticky top-0 z-40 border-b border-[#E2DBD0]/80 bg-[#F8F5ED]/95 backdrop-blur-md">
-        <div className="mx-auto max-w-6xl px-4 py-3 space-y-2">
-          {/* Top Row: Logo, Nav, Auth */}
-          <div className="flex items-center justify-between gap-4">
-            <Logo size="md" />
+      {/* 1. Mobile-First App Header & Navigation */}
+      <header className="sticky top-0 z-40 border-b border-[#E2DBD0]/80 bg-[#F8F5ED]/95 backdrop-blur-md pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
+        <div className="mx-auto max-w-6xl px-3 sm:px-4 py-2 sm:py-3 space-y-2">
+          {/* Top Row: App Logo & Actions */}
+          <div className="flex items-center justify-between gap-2">
+            <Logo size="sm" showTagline={false} />
 
-            {/* Center Navigation Links */}
-            <nav className="hidden items-center gap-7 text-sm font-semibold text-[#242923]/80 md:flex">
+            {/* Desktop Center Navigation Links */}
+            <nav className="hidden items-center gap-6 text-sm font-semibold text-[#242923]/80 md:flex">
               <Link to="/explore" className="transition-colors hover:text-[#205C43]">
                 Explore Food
               </Link>
@@ -206,14 +206,14 @@ function LandingPage() {
             </nav>
 
             {/* Right Action Buttons */}
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5 sm:gap-2">
               {user ? (
                 <>
                   <Link
                     to={profile?.role === "donor" ? "/donor" : profile?.role === "volunteer" ? "/volunteer" : profile?.role === "admin" ? "/admin" : "/recipient"}
-                    className="rounded-full bg-[#205C43] px-4 py-2 text-xs font-bold text-white shadow-xs hover:brightness-105"
+                    className="rounded-full bg-[#205C43] px-3 py-1.5 text-[11px] sm:text-xs font-bold text-white shadow-xs hover:brightness-105"
                   >
-                    Go to Portal ({profile?.name || "Dashboard"})
+                    Portal
                   </Link>
                   <button
                     onClick={async () => {
@@ -221,7 +221,7 @@ function LandingPage() {
                       toast.success("Signed out successfully.");
                       navigate({ to: "/login" });
                     }}
-                    className="rounded-full border border-red-200 bg-red-50/70 px-3.5 py-2 text-xs font-bold text-red-600 hover:bg-red-100 transition-colors"
+                    className="rounded-full border border-red-200 bg-red-50/70 px-2.5 py-1.5 text-[11px] sm:text-xs font-bold text-red-600 hover:bg-red-100 transition-colors"
                   >
                     Sign Out
                   </button>
@@ -230,57 +230,57 @@ function LandingPage() {
                 <>
                   <Link
                     to="/login"
-                    className="rounded-full px-4 py-2 text-xs font-semibold text-[#242923] hover:bg-[#E9EFEA] transition-colors"
+                    className="rounded-full px-2.5 py-1.5 text-xs font-semibold text-[#242923] hover:bg-[#E9EFEA] transition-colors"
                   >
                     Log In
                   </Link>
                   <Link
                     to="/signup"
-                    className="inline-flex items-center gap-1.5 rounded-full bg-[#205C43] px-4 py-2 text-xs font-bold text-white shadow-xs hover:brightness-105 transition-all"
+                    className="inline-flex items-center gap-1 rounded-full bg-[#205C43] px-3 py-1.5 text-xs font-bold text-white shadow-xs hover:brightness-105 transition-all"
                   >
-                    <HeartHandshake className="size-3.5 text-[#ED7545]" /> Sign Up Free
+                    <HeartHandshake className="size-3 text-[#ED7545]" />
+                    <span>Sign Up</span>
                   </Link>
                 </>
               )}
             </div>
           </div>
 
-          {/* Demo Bar for Hackathon Judges & Evaluators */}
-          <div className="flex flex-wrap items-center justify-between gap-2.5 border-t border-[#DDD5C8]/50 pt-2 text-xs">
-            <div className="flex items-center gap-1.5 font-bold text-[#205C43]">
-              <Sparkles className="size-3.5 text-[#ED7545] animate-pulse" />
-              <span>Judge & Evaluator Demo Bar:</span>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
+          {/* Clean Horizontal Scroll Demo Bar for Judges/Evaluators */}
+          <div className="flex items-center gap-2 overflow-x-auto no-scrollbar border-t border-[#DDD5C8]/50 pt-1.5 text-[11px]">
+            <span className="shrink-0 font-bold text-[#205C43] flex items-center gap-1">
+              <Sparkles className="size-3 text-[#ED7545]" /> Demo:
+            </span>
+            <div className="flex items-center gap-1.5 pb-0.5">
               <Link
                 to="/explore"
-                className="inline-flex items-center gap-1 rounded-full border border-[#DDD5C8] bg-white px-3 py-1 font-semibold text-[#242923] hover:border-[#205C43] transition-colors"
+                className="shrink-0 inline-flex items-center gap-1 rounded-full border border-[#DDD5C8] bg-white px-2.5 py-0.5 font-medium text-[#242923] hover:border-[#205C43]"
               >
-                👀 Guest (Explore)
+                👀 Explore
               </Link>
               <Link
                 to="/donor"
-                className="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-3 py-1 font-semibold text-amber-800 hover:bg-amber-100 transition-colors"
+                className="shrink-0 inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 font-medium text-amber-800"
               >
-                🍲 Donor Portal
+                🍲 Donor
               </Link>
               <Link
                 to="/recipient"
-                className="inline-flex items-center gap-1 rounded-full border border-sky-300 bg-sky-50 px-3 py-1 font-semibold text-sky-800 hover:bg-sky-100 transition-colors"
+                className="shrink-0 inline-flex items-center gap-1 rounded-full border border-sky-300 bg-sky-50 px-2.5 py-0.5 font-medium text-sky-800"
               >
-                🤲 Recipient Portal
+                🤲 Recipient
               </Link>
               <Link
                 to="/volunteer"
-                className="inline-flex items-center gap-1 rounded-full border border-indigo-300 bg-indigo-50 px-3 py-1 font-semibold text-indigo-800 hover:bg-indigo-100 transition-colors"
+                className="shrink-0 inline-flex items-center gap-1 rounded-full border border-indigo-300 bg-indigo-50 px-2.5 py-0.5 font-medium text-indigo-800"
               >
-                🚴 Volunteer Portal
+                🚴 Volunteer
               </Link>
               <Link
                 to="/admin"
-                className="inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-3 py-1 font-semibold text-emerald-800 hover:bg-emerald-100 transition-colors"
+                className="shrink-0 inline-flex items-center gap-1 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 font-medium text-emerald-800"
               >
-                🛡️ Admin Portal
+                🛡️ Admin
               </Link>
             </div>
           </div>
