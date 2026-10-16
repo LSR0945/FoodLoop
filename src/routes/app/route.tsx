@@ -1,98 +1,57 @@
-import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
-import { Bell, Home, PlusCircle, User } from "lucide-react";
+import { createFileRoute, Outlet, useNavigate } from "@tanstack/react-router";
+import { useEffect } from "react";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
-import { useNotifications } from "@/lib/db";
 
 export const Route = createFileRoute("/app")({
   component: AppShell,
 });
 
+/**
+ * The /app shell acts as a smart redirect hub.
+ * It sends each authenticated user directly to their role-specific portal.
+ * Unauthenticated users are sent to /auth.
+ */
 function AppShell() {
   const { user, profile, loading } = useAuth();
   const navigate = useNavigate();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
-  const { data: notifs } = useNotifications(user?.uid);
-  const unread = notifs.filter((n) => !n.read).length;
 
-  if (loading) {
-    return (
-      <div className="grid min-h-screen place-items-center bg-background">
-        <p className="animate-pulse text-muted-foreground">Loading BhojanBandhu…</p>
-      </div>
-    );
-  }
-  if (!user) {
-    navigate({ to: "/auth", replace: true });
-    return null;
-  }
+  useEffect(() => {
+    if (loading) return;
 
-  const tabs = [
-    { to: "/app", icon: Home, label: "Feed", exact: true },
-    { to: "/app/donate", icon: PlusCircle, label: "Donate" },
-    { to: "/app/notifications", icon: Bell, label: "Alerts", badge: unread },
-    { to: "/app/profile", icon: User, label: "Profile" },
-  ];
+    if (!user) {
+      navigate({ to: "/auth", replace: true });
+      return;
+    }
 
+    // Route each role to its dedicated portal
+    const role = profile?.role;
+    if (role === "donor") {
+      navigate({ to: "/donor", replace: true });
+    } else if (role === "recipient" || role === "ngo") {
+      navigate({ to: "/recipient", replace: true });
+    } else if (role === "volunteer") {
+      navigate({ to: "/volunteer", replace: true });
+    } else if (role === "admin") {
+      navigate({ to: "/admin", replace: true });
+    } else {
+      // Unknown/missing role — go to auth to pick role
+      navigate({ to: "/auth", replace: true });
+    }
+  }, [loading, user, profile, navigate]);
+
+  // Show branded loading screen while redirecting
   return (
-    <div className="min-h-screen bg-background pb-20 sm:pb-0">
-      <header className="sticky top-0 z-10 border-b border-border bg-background/90 backdrop-blur">
-        <div className="mx-auto flex max-w-5xl items-center justify-between px-4 py-3">
-          <Logo />
-          <nav className="hidden items-center gap-1 sm:flex">
-            {tabs.map((t) => (
-              <Link
-                key={t.to}
-                to={t.to}
-                className={`relative rounded-full px-4 py-2 text-sm font-semibold ${
-                  pathname === t.to ? "bg-primary text-primary-foreground" : "text-muted-foreground"
-                }`}
-              >
-                {t.label}
-                {!!t.badge && (
-                  <span className="absolute -right-1 -top-1 grid size-5 place-items-center rounded-full bg-destructive text-[10px] font-bold text-destructive-foreground">
-                    {t.badge}
-                  </span>
-                )}
-              </Link>
-            ))}
-          </nav>
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center gap-1 rounded-full bg-saffron/20 px-3 py-1 text-xs font-bold capitalize text-accent-foreground">
-              {profile?.role === "ngo" ? "🏢 NGO Partner" : profile?.role === "volunteer" ? "🚴 Volunteer" : "🍲 Food Donor"}
-            </span>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto max-w-5xl px-4 py-6">
-        <Outlet />
-      </main>
-
-      <nav className="fixed inset-x-0 bottom-0 z-10 border-t border-border bg-card sm:hidden">
-        <div className="grid grid-cols-4">
-          {tabs.map((t) => {
-            const active = t.exact ? pathname === t.to : pathname.startsWith(t.to);
-            return (
-              <Link
-                key={t.to}
-                to={t.to}
-                className={`relative flex flex-col items-center gap-0.5 py-2.5 text-[11px] font-semibold ${
-                  active ? "text-primary" : "text-muted-foreground"
-                }`}
-              >
-                <t.icon className="size-5" />
-                {t.label}
-                {!!t.badge && (
-                  <span className="absolute right-[22%] top-1 grid size-4 place-items-center rounded-full bg-destructive text-[9px] font-bold text-destructive-foreground">
-                    {t.badge}
-                  </span>
-                )}
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+    <div className="flex min-h-screen flex-col items-center justify-center gap-6" style={{ background: "var(--color-cream)" }}>
+      <Logo size="lg" />
+      <div className="flex flex-col items-center gap-3">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-green-200 border-t-green-600" />
+        <p className="text-sm font-medium text-gray-500">
+          {loading ? "Loading FoodLoop…" : "Redirecting to your portal…"}
+        </p>
+      </div>
+      {/* Render Outlet for any child routes that might match */}
+      <Outlet />
     </div>
   );
 }

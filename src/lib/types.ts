@@ -1,4 +1,4 @@
-export type Role = "donor" | "ngo" | "volunteer";
+export type Role = "donor" | "recipient" | "ngo" | "volunteer" | "admin";
 export type Shift = "morning" | "afternoon" | "evening" | "night";
 
 export interface DonorRecord {
@@ -13,13 +13,14 @@ export interface DonorRecord {
   fssaiNumber?: string;
   bio?: string;
   photoURL?: string;
+  verified?: boolean;
   createdAt: number;
 }
 
 export interface NGORecord {
   uid: string;
   name: string;
-  orgName: string; // NGO / Trust name
+  orgName: string; // Recipient / NGO / Trust name
   contactPerson: string;
   registrationNumber?: string; // Darpan / Trust Reg ID
   email: string;
@@ -28,6 +29,7 @@ export interface NGORecord {
   operatingAddress?: string;
   dailyCapacity?: number; // approx beneficiaries served
   photoURL?: string;
+  verified?: boolean;
   createdAt: number;
 }
 
@@ -41,6 +43,7 @@ export interface VolunteerRecord {
   vehicleType?: "bike" | "scooter" | "car" | "bicycle" | "walking";
   emergencyContact?: string;
   photoURL?: string;
+  verified?: boolean;
   createdAt: number;
 }
 
@@ -64,6 +67,7 @@ export interface Profile {
   dailyCapacity?: number;
   vehicleType?: "bike" | "scooter" | "car" | "bicycle" | "walking";
   emergencyContact?: string;
+  verified?: boolean;
   createdAt: number;
 }
 
@@ -102,6 +106,7 @@ export interface Listing {
   donorAvatar?: string;
   donorPhone?: string;
   title: string;
+  description?: string;
   category: Category;
   foodType: "veg" | "non-veg" | "vegan";
   quantity: number;
@@ -114,6 +119,7 @@ export interface Listing {
   allergens: string[];
   checklist: Checklist;
   photo?: string;
+  gallery?: string[];
   status: Status;
   reservedBy?: string;
   reservedByName?: string;
@@ -135,6 +141,53 @@ export interface AppNotification {
   listingId?: string;
   read: boolean;
   createdAt: number;
+}
+
+export interface CommunityStory {
+  id: string;
+  author: string;
+  role: string;
+  badge: string;
+  avatar: string;
+  image: string;
+  time: string;
+  title: string;
+  content: string;
+  mealsServed: number;
+  likes: number;
+  location: string;
+  createdAt?: number;
+}
+
+export interface VerificationRequest {
+  id: string;
+  userId: string;
+  name: string;
+  type: "ngo" | "donor" | "volunteer";
+  registrationId: string;
+  contactPerson: string;
+  area: string;
+  date: string;
+  status: "pending" | "approved" | "rejected";
+  notes?: string;
+}
+
+export interface AuditLogItem {
+  id: string;
+  action: string;
+  actor: string;
+  target: string;
+  time: string;
+  details: string;
+}
+
+export interface PlatformNotice {
+  id: string;
+  title: string;
+  body: string;
+  targetRole: "all" | "donor" | "recipient" | "volunteer";
+  active: boolean;
+  date: string;
 }
 
 export const STATUS_LABEL: Record<Status, string> = {

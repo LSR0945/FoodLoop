@@ -1,0 +1,493 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useState } from "react";
+import {
+  Building2,
+  Heart,
+  HeartHandshake,
+  MessageCircle,
+  PlusCircle,
+  Send,
+  Share2,
+  Sparkles,
+  Users,
+  Utensils,
+  X,
+} from "lucide-react";
+import { toast } from "sonner";
+import { Logo } from "@/components/Logo";
+import { useAuth } from "@/lib/auth";
+
+export const Route = createFileRoute("/community")({
+  head: () => ({
+    meta: [
+      { title: "Community Stories — FoodLoop" },
+      { name: "description", content: "Inspiring surplus food rescue stories, grassroots moments, and donor spotlights on FoodLoop." },
+      { property: "og:title", content: "Community Stories — FoodLoop" },
+      { property: "og:description", content: "Inspiring surplus food rescue stories, grassroots moments, and donor spotlights on FoodLoop." },
+    ],
+  }),
+  component: CommunityPage,
+});
+
+interface Story {
+  id: string;
+  author: string;
+  role: string;
+  badge: string;
+  avatar: string;
+  image: string;
+  time: string;
+  title: string;
+  content: string;
+  mealsServed: number;
+  likes: number;
+  location: string;
+  comments?: { id: string; author: string; text: string; time: string }[];
+}
+
+const INITIAL_STORIES: Story[] = [
+  {
+    id: "story-1",
+    author: "Grand Horizon Banquet",
+    role: "Food Donor",
+    badge: "Verified Donor",
+    avatar: "https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=150&auto=format&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1547928576-a4a33237cbc3?w=800&auto=format&fit=crop&q=80",
+    time: "2 hours ago",
+    title: "180 meals rescued from evening wedding reception",
+    content: "Instead of throwing away 40 kg of fresh Paneer Biryani and Dal Makhani after yesterday's reception, our team listed it on FoodLoop. Within 25 minutes, Asha Shelter claimed the entire batch. Clean, dignified handover!",
+    mealsServed: 180,
+    likes: 42,
+    location: "Sector 14, Mathura",
+    comments: [
+      { id: "c1", author: "Asha Shelter Team", text: "The meals were delicious and warm when received. Thank you Chef Ramesh!", time: "1h ago" },
+    ],
+  },
+  {
+    id: "story-2",
+    author: "Feeding Hope Children's Home",
+    role: "Recipient Shelter",
+    badge: "Verified NGO",
+    avatar: "https://images.unsplash.com/photo-1582213782179-e0d53f98f2ca?w=150&auto=format&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80",
+    time: "Yesterday",
+    title: "Fresh bakery treats and bread for 90 shelter kids",
+    content: "A huge thank you to Baker's Street Cafe! The surplus artisanal bread, muffins, and fruit buns made our Sunday breakfast unforgettable for the children. Grateful to volunteer Aman for prompt delivery.",
+    mealsServed: 90,
+    likes: 89,
+    location: "Station Road Shelter",
+    comments: [
+      { id: "c2", author: "Aman Sharma", text: "Always happy to do the morning delivery run! The kids' smiles made my day.", time: "Yesterday" },
+    ],
+  },
+  {
+    id: "story-3",
+    author: "Aman Sharma",
+    role: "Delivery Volunteer",
+    badge: "50+ Deliveries",
+    avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+    image: "https://images.unsplash.com/photo-1526367790999-0150786686a2?w=800&auto=format&fit=crop&q=80",
+    time: "2 days ago",
+    title: "Late night run from university cafeteria to night shelter",
+    content: "Picked up 3 thermal crates from the campus mess at 9:30 PM and safely reached Vrindavan Rain Basera before 10 PM. Nothing compares to the warmth of good food on cold nights.",
+    mealsServed: 65,
+    likes: 114,
+    location: "GLA Campus to Rain Basera",
+    comments: [],
+  },
+];
+
+function CommunityPage() {
+  const { user, profile } = useAuth();
+  const [stories, setStories] = useState<Story[]>(() => {
+    try {
+      if (typeof window !== "undefined") {
+        const raw = localStorage.getItem("foodloop_community_stories");
+        if (raw) return JSON.parse(raw);
+      }
+    } catch {}
+    return INITIAL_STORIES;
+  });
+
+  const [likesState, setLikesState] = useState<Record<string, number>>({});
+  const [liked, setLiked] = useState<Record<string, boolean>>({});
+  const [activeCommentPost, setActiveCommentPost] = useState<string | null>(null);
+  const [commentInput, setCommentInput] = useState("");
+
+  // Create Story Modal
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [newTitle, setNewTitle] = useState("");
+  const [newContent, setNewContent] = useState("");
+  const [newMeals, setNewMeals] = useState<number>(50);
+  const [newLocation, setNewLocation] = useState("");
+  const [newImageUrl, setNewImageUrl] = useState("");
+
+  function toggleLike(id: string, initialLikes: number) {
+    setLiked((prev) => ({ ...prev, [id]: !prev[id] }));
+    setLikesState((prev) => {
+      const current = prev[id] !== undefined ? prev[id] : initialLikes;
+      return { ...prev, [id]: liked[id] ? current - 1 : current + 1 };
+    });
+  }
+
+  function handleAddComment(storyId: string) {
+    if (!commentInput.trim()) return;
+    const authorName = profile?.name || user?.displayName || user?.email?.split("@")[0] || "Community Member";
+    const newComment = {
+      id: "c_" + Date.now(),
+      author: authorName,
+      text: commentInput.trim(),
+      time: "Just now",
+    };
+
+    setStories((prev) => {
+      const updated = prev.map((s) => {
+        if (s.id === storyId) {
+          return { ...s, comments: [...(s.comments || []), newComment] };
+        }
+        return s;
+      });
+      try {
+        localStorage.setItem("foodloop_community_stories", JSON.stringify(updated));
+      } catch {}
+      return updated;
+    });
+
+    setCommentInput("");
+    toast.success("Comment added!");
+  }
+
+  function handleCreateStory(e: React.FormEvent) {
+    e.preventDefault();
+    if (!newTitle.trim() || !newContent.trim()) {
+      toast.error("Please enter a title and story content.");
+      return;
+    }
+
+    const authorName = profile?.orgName || profile?.name || user?.displayName || "Community Member";
+    const authorRole = profile?.role === "donor" ? "Food Donor" : profile?.role === "volunteer" ? "Delivery Volunteer" : "Recipient Shelter";
+
+    const newStory: Story = {
+      id: "story_" + Date.now(),
+      author: authorName,
+      role: authorRole,
+      badge: "Verified Member",
+      avatar: profile?.photoURL || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+      image: newImageUrl.trim() || "https://images.unsplash.com/photo-1555244162-803834f70033?w=800&auto=format&fit=crop&q=80",
+      time: "Just now",
+      title: newTitle.trim(),
+      content: newContent.trim(),
+      mealsServed: newMeals || 25,
+      likes: 1,
+      location: newLocation.trim() || profile?.area || "Community Center",
+      comments: [],
+    };
+
+    const updated = [newStory, ...stories];
+    setStories(updated);
+    try {
+      localStorage.setItem("foodloop_community_stories", JSON.stringify(updated));
+    } catch {}
+
+    toast.success("Your food rescue story has been published!");
+    setShowCreateModal(false);
+    setNewTitle("");
+    setNewContent("");
+    setNewImageUrl("");
+  }
+
+  return (
+    <div className="min-h-screen bg-[#F8F5ED] text-[#242923]">
+      {/* Header */}
+      <header className="sticky top-0 z-30 border-b border-[#E2DBD0] bg-white/95 backdrop-blur-md">
+        <div className="mx-auto flex max-w-6xl items-center justify-between px-4 py-3.5">
+          <Logo size="sm" />
+          <nav className="hidden items-center gap-6 text-sm font-semibold text-[#242923]/80 md:flex">
+            <Link to="/explore" className="hover:text-[#205C43] transition-colors">
+              Explore Food
+            </Link>
+            <Link to="/how-it-works" className="hover:text-[#205C43] transition-colors">
+              How It Works
+            </Link>
+            <Link to="/community" className="text-[#205C43] font-bold">
+              Community
+            </Link>
+            <Link to="/impact" className="hover:text-[#205C43] transition-colors">
+              Impact
+            </Link>
+          </nav>
+          <div className="flex items-center gap-2.5">
+            {user ? (
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(true)}
+                className="inline-flex items-center gap-1.5 rounded-full bg-[#205C43] px-4 py-2 text-xs font-bold text-white shadow-xs hover:brightness-105"
+              >
+                <PlusCircle className="size-3.5" /> Share a Story
+              </button>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="rounded-full px-4 py-1.5 text-xs font-semibold text-[#242923] hover:bg-[#E9EFEA]"
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/signup"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-[#205C43] px-4 py-1.5 text-xs font-bold text-white shadow-xs hover:brightness-105"
+                >
+                  Join FoodLoop
+                </Link>
+              </>
+            )}
+          </div>
+        </div>
+      </header>
+
+      <main className="mx-auto max-w-3xl px-4 py-10">
+        <div className="text-center">
+          <span className="inline-flex items-center gap-1.5 rounded-full bg-[#205C43]/10 px-3 py-1 text-xs font-bold text-[#205C43]">
+            <Sparkles className="size-3.5 text-[#ED7545]" /> Community Voices & Impact
+          </span>
+          <h1 className="mt-2 font-display text-3xl font-extrabold sm:text-4xl text-[#242923]">
+            FoodLoop Community Feed
+          </h1>
+          <p className="mt-1 text-sm text-[#656C62]">
+            Celebrating the everyday donors, shelters, and volunteers who make zero-waste hunger relief possible.
+          </p>
+        </div>
+
+        {/* Stories List */}
+        <div className="mt-8 space-y-6">
+          {stories.map((story) => {
+            const isLiked = liked[story.id];
+            const currentLikes = likesState[story.id] !== undefined ? likesState[story.id] : story.likes;
+            const isCommenting = activeCommentPost === story.id;
+
+            return (
+              <article
+                key={story.id}
+                className="overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white shadow-sm"
+              >
+                {/* Author Bar */}
+                <div className="flex items-center justify-between p-5 pb-3">
+                  <div className="flex items-center gap-3">
+                    <img
+                      src={story.avatar}
+                      alt={story.author}
+                      className="size-11 rounded-2xl object-cover ring-2 ring-[#205C43]/20 shadow-xs"
+                    />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <h3 className="font-bold text-sm text-[#242923]">{story.author}</h3>
+                        <span className="rounded-full bg-[#205C43]/10 px-2 py-0.5 text-[10px] font-bold text-[#205C43]">
+                          {story.badge}
+                        </span>
+                      </div>
+                      <p className="text-xs text-[#656C62]">
+                        {story.role} • {story.location} • <span className="text-[11px]">{story.time}</span>
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Photo */}
+                <div className="relative aspect-[16/9] w-full overflow-hidden bg-muted">
+                  <img
+                    src={story.image}
+                    alt={story.title}
+                    className="size-full object-cover transition-transform hover:scale-[1.02] duration-300"
+                    loading="lazy"
+                  />
+                  <div className="absolute bottom-3 left-3 rounded-full bg-black/60 px-3 py-1 text-xs font-bold text-white backdrop-blur">
+                    🍲 {story.mealsServed} meals shared
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="p-5">
+                  <h4 className="font-display font-bold text-lg text-[#242923]">{story.title}</h4>
+                  <p className="mt-2 text-sm leading-relaxed text-[#656C62]">{story.content}</p>
+
+                  {/* Actions */}
+                  <div className="mt-5 flex items-center justify-between border-t border-[#DDD5C8] pt-4 text-xs">
+                    <div className="flex items-center gap-4">
+                      <button
+                        type="button"
+                        onClick={() => toggleLike(story.id, story.likes)}
+                        className={`inline-flex items-center gap-1.5 font-bold transition-colors ${
+                          isLiked ? "text-destructive" : "text-[#656C62] hover:text-[#242923]"
+                        }`}
+                      >
+                        <Heart className={`size-4 ${isLiked ? "fill-current text-destructive" : ""}`} />
+                        <span>{currentLikes} cheers</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (!user) {
+                            toast.info("Please sign in to comment on stories.");
+                            return;
+                          }
+                          setActiveCommentPost(isCommenting ? null : story.id);
+                        }}
+                        className="inline-flex items-center gap-1.5 font-semibold text-[#656C62] hover:text-[#242923]"
+                      >
+                        <MessageCircle className="size-4" />
+                        <span>Comment ({story.comments?.length || 0})</span>
+                      </button>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (typeof navigator !== "undefined" && navigator.clipboard) {
+                          navigator.clipboard.writeText(window.location.href);
+                          toast.success("Story link copied to clipboard!");
+                        }
+                      }}
+                      className="inline-flex items-center gap-1 text-[#656C62] hover:text-[#205C43] transition-colors"
+                    >
+                      <Share2 className="size-3.5" /> Share
+                    </button>
+                  </div>
+
+                  {/* Comment Section Drawer */}
+                  {isCommenting && (
+                    <div className="mt-4 border-t border-[#DDD5C8] pt-3 space-y-2">
+                      <div className="flex gap-2">
+                        <input
+                          type="text"
+                          placeholder="Write a supportive comment…"
+                          value={commentInput}
+                          onChange={(e) => setCommentInput(e.target.value)}
+                          onKeyDown={(e) => e.key === "Enter" && handleAddComment(story.id)}
+                          className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] px-3.5 py-1.5 text-xs text-[#242923] focus:border-[#205C43] focus:outline-none"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => handleAddComment(story.id)}
+                          className="rounded-xl bg-[#205C43] px-3.5 py-1.5 text-xs font-bold text-white hover:brightness-105"
+                        >
+                          <Send className="size-3" />
+                        </button>
+                      </div>
+
+                      {story.comments && story.comments.length > 0 && (
+                        <div className="space-y-1.5 pt-2">
+                          {story.comments.map((c) => (
+                            <div key={c.id} className="rounded-xl bg-[#F8F5ED] p-2 text-xs">
+                              <p className="font-bold text-[#205C43]">{c.author}</p>
+                              <p className="text-[#242923]">{c.text}</p>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </main>
+
+      {/* Share a Story Modal */}
+      {showCreateModal && (
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/50 p-4 backdrop-blur-xs">
+          <form
+            onSubmit={handleCreateStory}
+            className="w-full max-w-md rounded-3xl border border-[#DDD5C8] bg-white p-6 shadow-2xl space-y-4"
+          >
+            <div className="flex items-center justify-between">
+              <h3 className="font-display text-xl font-bold text-[#242923]">Share Your Food Rescue Story</h3>
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(false)}
+                className="text-[#656C62] hover:text-[#242923]"
+              >
+                <X className="size-5" />
+              </button>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-[#242923]">Story Headline</label>
+              <input
+                type="text"
+                required
+                placeholder="e.g. Rescued 80 hot meals from evening celebration"
+                value={newTitle}
+                onChange={(e) => setNewTitle(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] px-3.5 py-2 text-xs font-bold text-[#242923]"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs font-bold text-[#242923]">Meals Served</label>
+                <input
+                  type="number"
+                  min={1}
+                  value={newMeals}
+                  onChange={(e) => setNewMeals(Number(e.target.value))}
+                  className="mt-1 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] px-3.5 py-2 text-xs font-bold text-[#242923]"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-bold text-[#242923]">Neighborhood / Area</label>
+                <input
+                  type="text"
+                  placeholder="e.g. Civil Lines"
+                  value={newLocation}
+                  onChange={(e) => setNewLocation(e.target.value)}
+                  className="mt-1 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] px-3.5 py-2 text-xs text-[#242923]"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-[#242923]">Photo URL (Optional)</label>
+              <input
+                type="url"
+                placeholder="https://images.unsplash.com/…"
+                value={newImageUrl}
+                onChange={(e) => setNewImageUrl(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] px-3.5 py-2 text-xs text-[#242923]"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-bold text-[#242923]">Your Story</label>
+              <textarea
+                rows={4}
+                required
+                placeholder="Describe how the surplus was rescued, who received it, and the impact…"
+                value={newContent}
+                onChange={(e) => setNewContent(e.target.value)}
+                className="mt-1 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] p-3 text-xs leading-relaxed text-[#242923]"
+              />
+            </div>
+
+            <div className="flex justify-end gap-2 pt-2">
+              <button
+                type="button"
+                onClick={() => setShowCreateModal(false)}
+                className="rounded-full px-4 py-2 text-xs font-bold text-[#656C62]"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="rounded-full bg-[#205C43] px-6 py-2 text-xs font-bold text-white shadow-xs hover:brightness-105"
+              >
+                Post Story
+              </button>
+            </div>
+          </form>
+        </div>
+      )}
+    </div>
+  );
+}

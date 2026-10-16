@@ -10,17 +10,56 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AboutRouteImport } from './routes/about'
+import { Route as AccessibilityRouteImport } from './routes/accessibility'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AppRouteRouteImport } from './routes/app/route'
 import { Route as AuthRouteImport } from './routes/auth'
+import { Route as CommunityRouteImport } from './routes/community'
+import { Route as ContactRouteImport } from './routes/contact'
+import { Route as DonorRouteImport } from './routes/donor'
+import { Route as ExploreRouteImport } from './routes/explore'
+import { Route as FaqRouteImport } from './routes/faq'
+import { Route as FoodSafetyRouteImport } from './routes/food-safety'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
+import { Route as HowItWorksRouteImport } from './routes/how-it-works'
+import { Route as ImpactRouteImport } from './routes/impact'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as RecipientRouteImport } from './routes/recipient'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as VerificationRouteImport } from './routes/verification'
+import { Route as VerifyEmailRouteImport } from './routes/verify-email'
+import { Route as VolunteerRouteImport } from './routes/volunteer'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppDonateRouteImport } from './routes/app/donate'
 import { Route as AppNotificationsRouteImport } from './routes/app/notifications'
 import { Route as AppProfileRouteImport } from './routes/app/profile'
+import { Route as DonationsIdRouteImport } from './routes/donations.$id'
+import { Route as OnboardingProfileRouteImport } from './routes/onboarding.profile'
+import { Route as OnboardingRoleRouteImport } from './routes/onboarding.role'
+import { Route as PeopleUserIdRouteImport } from './routes/people.$userId'
 import { Route as AppListingIdRouteImport } from './routes/app/listing.$id'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccessibilityRoute = AccessibilityRouteImport.update({
+  id: '/accessibility',
+  path: '/accessibility',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppRouteRoute = AppRouteRouteImport.update({
@@ -31,6 +70,91 @@ const AppRouteRoute = AppRouteRouteImport.update({
 const AuthRoute = AuthRouteImport.update({
   id: '/auth',
   path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ContactRoute = ContactRouteImport.update({
+  id: '/contact',
+  path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DonorRoute = DonorRouteImport.update({
+  id: '/donor',
+  path: '/donor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExploreRoute = ExploreRouteImport.update({
+  id: '/explore',
+  path: '/explore',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FaqRoute = FaqRouteImport.update({
+  id: '/faq',
+  path: '/faq',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FoodSafetyRoute = FoodSafetyRouteImport.update({
+  id: '/food-safety',
+  path: '/food-safety',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HowItWorksRoute = HowItWorksRouteImport.update({
+  id: '/how-it-works',
+  path: '/how-it-works',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ImpactRoute = ImpactRouteImport.update({
+  id: '/impact',
+  path: '/impact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const RecipientRoute = RecipientRouteImport.update({
+  id: '/recipient',
+  path: '/recipient',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerificationRoute = VerificationRouteImport.update({
+  id: '/verification',
+  path: '/verification',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VerifyEmailRoute = VerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const VolunteerRoute = VolunteerRouteImport.update({
+  id: '/volunteer',
+  path: '/volunteer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppIndexRoute = AppIndexRouteImport.update({
@@ -53,6 +177,26 @@ const AppProfileRoute = AppProfileRouteImport.update({
   path: '/profile',
   getParentRoute: () => AppRouteRoute,
 } as any)
+const DonationsIdRoute = DonationsIdRouteImport.update({
+  id: '/donations/$id',
+  path: '/donations/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingProfileRoute = OnboardingProfileRouteImport.update({
+  id: '/onboarding/profile',
+  path: '/onboarding/profile',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const OnboardingRoleRoute = OnboardingRoleRouteImport.update({
+  id: '/onboarding/role',
+  path: '/onboarding/role',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PeopleUserIdRoute = PeopleUserIdRouteImport.update({
+  id: '/people/$userId',
+  path: '/people/$userId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppListingIdRoute = AppListingIdRouteImport.update({
   id: '/listing/$id',
   path: '/listing/$id',
@@ -62,19 +206,67 @@ const AppListingIdRoute = AppListingIdRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/accessibility': typeof AccessibilityRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
+  '/contact': typeof ContactRoute
+  '/donor': typeof DonorRoute
+  '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
+  '/food-safety': typeof FoodSafetyRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/impact': typeof ImpactRoute
+  '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
+  '/recipient': typeof RecipientRoute
+  '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/volunteer': typeof VolunteerRoute
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
+  '/donations/$id': typeof DonationsIdRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/onboarding/role': typeof OnboardingRoleRoute
+  '/people/$userId': typeof PeopleUserIdRoute
   '/app/': typeof AppIndexRoute
   '/app/listing/$id': typeof AppListingIdRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/accessibility': typeof AccessibilityRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
+  '/contact': typeof ContactRoute
+  '/donor': typeof DonorRoute
+  '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
+  '/food-safety': typeof FoodSafetyRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/impact': typeof ImpactRoute
+  '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
+  '/recipient': typeof RecipientRoute
+  '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/volunteer': typeof VolunteerRoute
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
+  '/donations/$id': typeof DonationsIdRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/onboarding/role': typeof OnboardingRoleRoute
+  '/people/$userId': typeof PeopleUserIdRoute
   '/app': typeof AppIndexRoute
   '/app/listing/$id': typeof AppListingIdRoute
 }
@@ -82,10 +274,34 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/app': typeof AppRouteRouteWithChildren
+  '/about': typeof AboutRoute
+  '/accessibility': typeof AccessibilityRoute
+  '/admin': typeof AdminRoute
   '/auth': typeof AuthRoute
+  '/community': typeof CommunityRoute
+  '/contact': typeof ContactRoute
+  '/donor': typeof DonorRoute
+  '/explore': typeof ExploreRoute
+  '/faq': typeof FaqRoute
+  '/food-safety': typeof FoodSafetyRoute
+  '/forgot-password': typeof ForgotPasswordRoute
+  '/how-it-works': typeof HowItWorksRoute
+  '/impact': typeof ImpactRoute
+  '/login': typeof LoginRoute
+  '/privacy': typeof PrivacyRoute
+  '/recipient': typeof RecipientRoute
+  '/signup': typeof SignupRoute
+  '/terms': typeof TermsRoute
+  '/verification': typeof VerificationRoute
+  '/verify-email': typeof VerifyEmailRoute
+  '/volunteer': typeof VolunteerRoute
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
+  '/donations/$id': typeof DonationsIdRoute
+  '/onboarding/profile': typeof OnboardingProfileRoute
+  '/onboarding/role': typeof OnboardingRoleRoute
+  '/people/$userId': typeof PeopleUserIdRoute
   '/app/': typeof AppIndexRoute
   '/app/listing/$id': typeof AppListingIdRoute
 }
@@ -94,29 +310,101 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/app'
+    | '/about'
+    | '/accessibility'
+    | '/admin'
     | '/auth'
+    | '/community'
+    | '/contact'
+    | '/donor'
+    | '/explore'
+    | '/faq'
+    | '/food-safety'
+    | '/forgot-password'
+    | '/how-it-works'
+    | '/impact'
+    | '/login'
+    | '/privacy'
+    | '/recipient'
+    | '/signup'
+    | '/terms'
+    | '/verification'
+    | '/verify-email'
+    | '/volunteer'
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
+    | '/donations/$id'
+    | '/onboarding/profile'
+    | '/onboarding/role'
+    | '/people/$userId'
     | '/app/'
     | '/app/listing/$id'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
+    | '/accessibility'
+    | '/admin'
     | '/auth'
+    | '/community'
+    | '/contact'
+    | '/donor'
+    | '/explore'
+    | '/faq'
+    | '/food-safety'
+    | '/forgot-password'
+    | '/how-it-works'
+    | '/impact'
+    | '/login'
+    | '/privacy'
+    | '/recipient'
+    | '/signup'
+    | '/terms'
+    | '/verification'
+    | '/verify-email'
+    | '/volunteer'
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
+    | '/donations/$id'
+    | '/onboarding/profile'
+    | '/onboarding/role'
+    | '/people/$userId'
     | '/app'
     | '/app/listing/$id'
   id:
     | '__root__'
     | '/'
     | '/app'
+    | '/about'
+    | '/accessibility'
+    | '/admin'
     | '/auth'
+    | '/community'
+    | '/contact'
+    | '/donor'
+    | '/explore'
+    | '/faq'
+    | '/food-safety'
+    | '/forgot-password'
+    | '/how-it-works'
+    | '/impact'
+    | '/login'
+    | '/privacy'
+    | '/recipient'
+    | '/signup'
+    | '/terms'
+    | '/verification'
+    | '/verify-email'
+    | '/volunteer'
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
+    | '/donations/$id'
+    | '/onboarding/profile'
+    | '/onboarding/role'
+    | '/people/$userId'
     | '/app/'
     | '/app/listing/$id'
   fileRoutesById: FileRoutesById
@@ -124,7 +412,31 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AppRouteRoute: typeof AppRouteRouteWithChildren
+  AboutRoute: typeof AboutRoute
+  AccessibilityRoute: typeof AccessibilityRoute
+  AdminRoute: typeof AdminRoute
   AuthRoute: typeof AuthRoute
+  CommunityRoute: typeof CommunityRoute
+  ContactRoute: typeof ContactRoute
+  DonorRoute: typeof DonorRoute
+  ExploreRoute: typeof ExploreRoute
+  FaqRoute: typeof FaqRoute
+  FoodSafetyRoute: typeof FoodSafetyRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
+  HowItWorksRoute: typeof HowItWorksRoute
+  ImpactRoute: typeof ImpactRoute
+  LoginRoute: typeof LoginRoute
+  PrivacyRoute: typeof PrivacyRoute
+  RecipientRoute: typeof RecipientRoute
+  SignupRoute: typeof SignupRoute
+  TermsRoute: typeof TermsRoute
+  VerificationRoute: typeof VerificationRoute
+  VerifyEmailRoute: typeof VerifyEmailRoute
+  VolunteerRoute: typeof VolunteerRoute
+  DonationsIdRoute: typeof DonationsIdRoute
+  OnboardingProfileRoute: typeof OnboardingProfileRoute
+  OnboardingRoleRoute: typeof OnboardingRoleRoute
+  PeopleUserIdRoute: typeof PeopleUserIdRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -134,6 +446,27 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/accessibility': {
+      id: '/accessibility'
+      path: '/accessibility'
+      fullPath: '/accessibility'
+      preLoaderRoute: typeof AccessibilityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app': {
@@ -148,6 +481,125 @@ declare module '@tanstack/react-router' {
       path: '/auth'
       fullPath: '/auth'
       preLoaderRoute: typeof AuthRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/contact': {
+      id: '/contact'
+      path: '/contact'
+      fullPath: '/contact'
+      preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/donor': {
+      id: '/donor'
+      path: '/donor'
+      fullPath: '/donor'
+      preLoaderRoute: typeof DonorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/explore': {
+      id: '/explore'
+      path: '/explore'
+      fullPath: '/explore'
+      preLoaderRoute: typeof ExploreRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/faq': {
+      id: '/faq'
+      path: '/faq'
+      fullPath: '/faq'
+      preLoaderRoute: typeof FaqRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/food-safety': {
+      id: '/food-safety'
+      path: '/food-safety'
+      fullPath: '/food-safety'
+      preLoaderRoute: typeof FoodSafetyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/how-it-works': {
+      id: '/how-it-works'
+      path: '/how-it-works'
+      fullPath: '/how-it-works'
+      preLoaderRoute: typeof HowItWorksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/impact': {
+      id: '/impact'
+      path: '/impact'
+      fullPath: '/impact'
+      preLoaderRoute: typeof ImpactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/recipient': {
+      id: '/recipient'
+      path: '/recipient'
+      fullPath: '/recipient'
+      preLoaderRoute: typeof RecipientRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verification': {
+      id: '/verification'
+      path: '/verification'
+      fullPath: '/verification'
+      preLoaderRoute: typeof VerificationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/verify-email': {
+      id: '/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof VerifyEmailRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/volunteer': {
+      id: '/volunteer'
+      path: '/volunteer'
+      fullPath: '/volunteer'
+      preLoaderRoute: typeof VolunteerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/app/': {
@@ -177,6 +629,34 @@ declare module '@tanstack/react-router' {
       fullPath: '/app/profile'
       preLoaderRoute: typeof AppProfileRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/donations/$id': {
+      id: '/donations/$id'
+      path: '/donations/$id'
+      fullPath: '/donations/$id'
+      preLoaderRoute: typeof DonationsIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/profile': {
+      id: '/onboarding/profile'
+      path: '/onboarding/profile'
+      fullPath: '/onboarding/profile'
+      preLoaderRoute: typeof OnboardingProfileRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/role': {
+      id: '/onboarding/role'
+      path: '/onboarding/role'
+      fullPath: '/onboarding/role'
+      preLoaderRoute: typeof OnboardingRoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/people/$userId': {
+      id: '/people/$userId'
+      path: '/people/$userId'
+      fullPath: '/people/$userId'
+      preLoaderRoute: typeof PeopleUserIdRouteImport
+      parentRoute: typeof rootRouteImport
     }
     '/app/listing/$id': {
       id: '/app/listing/$id'
@@ -211,7 +691,31 @@ const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AppRouteRoute: AppRouteRouteWithChildren,
+  AboutRoute: AboutRoute,
+  AccessibilityRoute: AccessibilityRoute,
+  AdminRoute: AdminRoute,
   AuthRoute: AuthRoute,
+  CommunityRoute: CommunityRoute,
+  ContactRoute: ContactRoute,
+  DonorRoute: DonorRoute,
+  ExploreRoute: ExploreRoute,
+  FaqRoute: FaqRoute,
+  FoodSafetyRoute: FoodSafetyRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
+  HowItWorksRoute: HowItWorksRoute,
+  ImpactRoute: ImpactRoute,
+  LoginRoute: LoginRoute,
+  PrivacyRoute: PrivacyRoute,
+  RecipientRoute: RecipientRoute,
+  SignupRoute: SignupRoute,
+  TermsRoute: TermsRoute,
+  VerificationRoute: VerificationRoute,
+  VerifyEmailRoute: VerifyEmailRoute,
+  VolunteerRoute: VolunteerRoute,
+  DonationsIdRoute: DonationsIdRoute,
+  OnboardingProfileRoute: OnboardingProfileRoute,
+  OnboardingRoleRoute: OnboardingRoleRoute,
+  PeopleUserIdRoute: PeopleUserIdRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

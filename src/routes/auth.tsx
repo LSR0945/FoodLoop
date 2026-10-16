@@ -28,10 +28,10 @@ import type { DonorRecord, NGORecord, Role, Shift, VolunteerRecord } from "@/lib
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Registration & Sign In — BhojanBandhu" },
-      { name: "description", content: "Dedicated registration for Food Donors, NGOs, and Volunteers on BhojanBandhu." },
-      { property: "og:title", content: "Registration & Sign In — BhojanBandhu" },
-      { property: "og:description", content: "Dedicated registration for Food Donors, NGOs, and Volunteers on BhojanBandhu." },
+      { title: "Registration & Sign In — FoodLoop" },
+      { name: "description", content: "Dedicated registration for Food Donors, Recipient Shelters, and Delivery Volunteers on FoodLoop." },
+      { property: "og:title", content: "Registration & Sign In — FoodLoop" },
+      { property: "og:description", content: "Dedicated registration for Food Donors, Recipient Shelters, and Delivery Volunteers on FoodLoop." },
     ],
   }),
   component: AuthPage,
@@ -155,28 +155,40 @@ function AuthPage() {
   async function handleDemoLogin(demoRole: Role) {
     setBusy(true);
     try {
-      const demoData = {
+      const demoData: Record<Role, { email: string; pass: string; name: string; org: string }> = {
         donor: {
-          email: "donor.demo@bhojanbandhu.org",
+          email: "donor.demo@foodloop.org",
           pass: "demo123456",
-          name: "Varis Khan (Green Garden)",
-          org: "Green Garden Restaurant",
+          name: "Campus Dining Services",
+          org: "Campus Dining Hall",
         },
         ngo: {
-          email: "ngo.demo@bhojanbandhu.org",
+          email: "shelter.demo@foodloop.org",
           pass: "demo123456",
-          name: "Feeding Hope Foundation",
-          org: "Feeding Hope Trust",
+          name: "Asha Children Shelter",
+          org: "Asha Hope Foundation",
+        },
+        recipient: {
+          email: "shelter.demo@foodloop.org",
+          pass: "demo123456",
+          name: "Asha Children Shelter",
+          org: "Asha Hope Foundation",
         },
         volunteer: {
-          email: "volunteer.demo@bhojanbandhu.org",
+          email: "volunteer.demo@foodloop.org",
           pass: "demo123456",
           name: "Aman Sharma (Volunteer)",
           org: "",
         },
+        admin: {
+          email: "admin.moderator@foodloop.org",
+          pass: "demo123456",
+          name: "FoodLoop Safety Moderator",
+          org: "FoodLoop HQ",
+        },
       };
 
-      const target = demoData[demoRole];
+      const target = demoData[demoRole] || demoData.donor;
       const { auth, db } = await getFirebase();
       const { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile: updateAuthProfile } = await import("firebase/auth");
       const { doc, setDoc } = await import("firebase/firestore");
@@ -250,8 +262,33 @@ function AuthPage() {
       if (mode === "login") {
         // Log in to existing account
         const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
-        await updateProfile(cred.user.uid, { role });
-        toast.success(`Welcome back to BhojanBandhu as ${role.toUpperCase()}!`);
+        
+        // Check if user already has a registered role in local or database records
+        let existingRole: Role | undefined;
+        try {
+          const raw = localStorage.getItem("annsetu_profile_" + cred.user.uid);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            if (parsed.role) existingRole = parsed.role;
+          }
+        } catch {}
+
+        if (!existingRole) {
+          try {
+            const rawNgos = localStorage.getItem("foodloop_recipients_table") || localStorage.getItem("bhojanbandhu_ngos_table");
+            if (rawNgos && JSON.parse(rawNgos).some((n: any) => n.uid === cred.user.uid || n.email === email.trim())) {
+              existingRole = "ngo";
+            }
+            const rawVols = localStorage.getItem("foodloop_volunteers_table") || localStorage.getItem("bhojanbandhu_volunteers_table");
+            if (!existingRole && rawVols && JSON.parse(rawVols).some((v: any) => v.uid === cred.user.uid || v.email === email.trim())) {
+              existingRole = "volunteer";
+            }
+          } catch {}
+        }
+
+        const finalRole = existingRole || role;
+        await updateProfile(cred.user.uid, { role: finalRole });
+        toast.success(`Welcome back to FoodLoop as ${finalRole.toUpperCase()}!`);
         navigate({ to: "/app" });
         return;
       }
@@ -375,12 +412,12 @@ function AuthPage() {
       <main className="mx-auto w-full max-w-xl flex-1 px-4 py-8">
         <div className="text-center">
           <h1 className="text-3xl font-extrabold tracking-tight">
-            {mode === "signup" ? "Join BhojanBandhu" : "Welcome Back"}
+            {mode === "signup" ? "Join FoodLoop" : "Welcome Back"}
           </h1>
           <p className="mt-1 text-sm text-muted-foreground">
             {mode === "signup"
               ? "Select your role below to open your dedicated registration form:"
-              : "Sign in to your BhojanBandhu account."}
+              : "Sign in to your FoodLoop account."}
           </p>
         </div>
 

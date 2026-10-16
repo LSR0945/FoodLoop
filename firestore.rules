@@ -1,0 +1,137 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Helper functions
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isAuthenticated() && request.auth.uid == userId;
+    }
+    
+    function isAdmin() {
+      return isAuthenticated() && 
+        (request.auth.token.admin == true || 
+         get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin');
+    }
+    
+    function isVerifiedPartner() {
+      return isAuthenticated() && 
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.verified == true;
+    }
+
+    // Users and Profiles
+    match /users/{userId} {
+      allow read: if isAuthenticated();
+      allow create: if isAuthenticated() && request.auth.uid == userId;
+      allow update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Donors table
+    match /donors/{donorId} {
+      allow read: if true;
+      allow create, update: if isOwner(donorId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Recipients and NGOs table
+    match /recipients/{recipientId} {
+      allow read: if true;
+      allow create, update: if isOwner(recipientId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+    match /ngos/{ngoId} {
+      allow read: if true;
+      allow create, update: if isOwner(ngoId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Volunteers table
+    match /volunteers/{volunteerId} {
+      allow read: if isAuthenticated();
+      allow create, update: if isOwner(volunteerId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Listings (Food donations)
+    match /listings/{listingId} {
+      // Anyone can read available listings for discovery
+      allow read: if true;
+      // Authenticated users can list surplus food
+      allow create: if isAuthenticated() && request.resource.data.donorId == request.auth.uid;
+      // Updates: Donor can edit/withdraw; Recipient can reserve; Volunteer can mark picked up/delivered; Admin can moderate
+      allow update: if isAuthenticated() && (
+        resource.data.donorId == request.auth.uid ||
+        request.resource.data.reservedBy == request.auth.uid ||
+        resource.data.reservedBy == request.auth.uid ||
+        request.resource.data.volunteerId == request.auth.uid ||
+        resource.data.volunteerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isAdmin() || (isAuthenticated() && resource.data.donorId == request.auth.uid && resource.data.status == 'available');
+    }
+
+    // Reservations
+    match /reservations/{reservationId} {
+      allow read: if isAuthenticated() && (
+        resource.data.recipientId == request.auth.uid ||
+        resource.data.donorId == request.auth.uid ||
+        resource.data.volunteerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && (
+        resource.data.recipientId == request.auth.uid ||
+        resource.data.donorId == request.auth.uid ||
+        resource.data.volunteerId == request.auth.uid ||
+        isAdmin()
+      );
+      allow delete: if isAdmin();
+    }
+
+    // Notifications
+    match /notifications/{notificationId} {
+      allow read: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow create: if isAuthenticated();
+      allow update: if isAuthenticated() && resource.data.userId == request.auth.uid;
+      allow delete: if isAuthenticated() && resource.data.userId == request.auth.uid;
+    }
+
+    // Community Stories
+    match /community/{storyId} {
+      allow read: if true;
+      allow create: if isAuthenticated();
+      allow update, delete: if isAuthenticated() && (resource.data.authorUid == request.auth.uid || isAdmin());
+    }
+
+    // Verification Submissions (Protected documentation)
+    match /verifications/{docId} {
+      allow read: if isOwner(resource.data.userId) || isAdmin();
+      allow create: if isAuthenticated() && request.resource.data.userId == request.auth.uid;
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Reports & Flagged Content
+    match /reports/{reportId} {
+      allow read: if isAdmin();
+      allow create: if isAuthenticated() || true;
+      allow update, delete: if isAdmin();
+    }
+
+    // Platform Notices
+    match /notices/{noticeId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Audit Logs
+    match /audit_logs/{logId} {
+      allow read: if isAdmin();
+      allow write: if isAdmin() || isAuthenticated();
+    }
+  }
+}

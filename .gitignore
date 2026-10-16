@@ -34,3 +34,10 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Capacitor & Android builds
+dist-capacitor/
+android/app/build/
+android/.gradle/
+android/build/
+FoodLoop/

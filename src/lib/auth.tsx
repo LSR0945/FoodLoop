@@ -1,19 +1,70 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { User } from "firebase/auth";
-import type { Profile } from "./types";
+import type { Profile, Role } from "./types";
 import { getFirebase } from "./firebase";
 
-interface AuthState {
+interface InternalAuthState {
   user: User | null;
   profile: Profile | null;
   loading: boolean;
   error: string | null;
 }
 
-const Ctx = createContext<AuthState>({ user: null, profile: null, loading: true, error: null });
+export interface AuthState extends InternalAuthState {
+  signOut: () => Promise<void>;
+}
+
+export async function signOutUser(): Promise<void> {
+  try {
+    const { auth } = await getFirebase();
+    const { signOut: fbSignOut } = await import("firebase/auth");
+    await fbSignOut(auth);
+  } catch (err) {
+    console.warn("Firebase signOut failed:", err);
+  }
+  try {
+    if (typeof window !== "undefined") {
+      Object.keys(localStorage).forEach((key) => {
+        if (key.startsWith("foodloop_") || key.startsWith("annsetu_")) {
+          // Keep listings so demo data stays available
+          if (!key.includes("listings")) {
+            localStorage.removeItem(key);
+          }
+        }
+      });
+      window.dispatchEvent(new CustomEvent("foodloop_profile_updated", { detail: null }));
+    }
+  } catch {}
+}
+
+const Ctx = createContext<AuthState>({
+  user: null,
+  profile: null,
+  loading: true,
+  error: null,
+  signOut: signOutUser,
+});
 
 export function AuthProvider({ children }: { children: ReactNode }) {
-  const [state, setState] = useState<AuthState>({ user: null, profile: null, loading: true, error: null });
+  const [state, setState] = useState<InternalAuthState>({ user: null, profile: null, loading: true, error: null });
+
+  // Listen for local profile updates (role switch, name, photo changes)
+  useEffect(() => {
+    const onProfileUpdated = (e: any) => {
+      if (e.detail) {
+        setState((s) => ({
+          ...s,
+          profile: s.profile ? { ...s.profile, ...e.detail } : (e.detail as Profile),
+        }));
+      }
+    };
+    window.addEventListener("foodloop_profile_updated", onProfileUpdated);
+    window.addEventListener("annsetu_profile_updated", onProfileUpdated);
+    return () => {
+      window.removeEventListener("foodloop_profile_updated", onProfileUpdated);
+      window.removeEventListener("annsetu_profile_updated", onProfileUpdated);
+    };
+  }, []);
 
   useEffect(() => {
     let unsubAuth = () => {};
@@ -35,19 +86,24 @@ export function AuthProvider({ children }: { children: ReactNode }) {
             (snap) => {
               if (snap.exists()) {
                 const p = snap.data() as Profile;
-                try { localStorage.setItem("annsetu_profile_" + user.uid, JSON.stringify(p)); } catch {}
+                try {
+                  localStorage.setItem("foodloop_profile_" + user.uid, JSON.stringify(p));
+                  localStorage.setItem("annsetu_profile_" + user.uid, JSON.stringify(p));
+                } catch {}
                 setState({ user, profile: p, loading: false, error: null });
               } else {
                 let saved: Profile | null = null;
                 try {
-                  const raw = localStorage.getItem("annsetu_profile_" + user.uid);
+                  const raw =
+                    localStorage.getItem("foodloop_profile_" + user.uid) ||
+                    localStorage.getItem("annsetu_profile_" + user.uid);
                   if (raw) saved = JSON.parse(raw);
                 } catch {}
                 const fallback: Profile = saved ?? {
                   uid: user.uid,
-                  name: user.displayName || user.email?.split("@")[0] || "Food Donor",
+                  name: user.displayName || user.email?.split("@")[0] || "User",
                   email: user.email || "",
-                  role: "donor",
+                  role: ((saved as any)?.role as Role) || "donor",
                   createdAt: Date.now(),
                 };
                 setState({ user, profile: fallback, loading: false, error: null });
@@ -60,7 +116,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               // On error (e.g. firestore permissions), load cached or fallback profile
               let saved: Profile | null = null;
               try {
-                const raw = localStorage.getItem("annsetu_profile_" + user.uid);
+                const raw =
+                  localStorage.getItem("foodloop_profile_" + user.uid) ||
+                  localStorage.getItem("annsetu_profile_" + user.uid);
                 if (raw) saved = JSON.parse(raw);
               } catch {}
               const fallback: Profile = saved ?? {
@@ -84,7 +142,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
   }, []);
 
-  return <Ctx.Provider value={state}>{children}</Ctx.Provider>;
+  const handleSignOut = async () => {
+    await signOutUser();
+    setState({ user: null, profile: null, loading: false, error: null });
+  };
+
+  return <Ctx.Provider value={{ ...state, signOut: handleSignOut }}>{children}</Ctx.Provider>;
 }
 
 export const useAuth = () => useContext(Ctx);

@@ -5,9 +5,9 @@ import { markRead, useNotifications } from "@/lib/db";
 export const Route = createFileRoute("/app/notifications")({
   head: () => ({
     meta: [
-      { title: "Alerts — BhojanBandhu" },
-      { name: "description", content: "Updates on your donations, reservations and pickups." },
-      { property: "og:title", content: "Alerts — BhojanBandhu" },
+      { title: "Alerts & Notifications — FoodLoop" },
+      { name: "description", content: "Updates on your donations, reservations and pickups on FoodLoop." },
+      { property: "og:title", content: "Alerts & Notifications — FoodLoop" },
       { property: "og:description", content: "Updates on your donations, reservations and pickups." },
     ],
   }),

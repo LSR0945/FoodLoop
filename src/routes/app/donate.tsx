@@ -11,10 +11,10 @@ import { ALLERGENS, CATEGORIES, type Category, type Checklist } from "@/lib/type
 export const Route = createFileRoute("/app/donate")({
   head: () => ({
     meta: [
-      { title: "Donate food — BhojanBandhu" },
-      { name: "description", content: "Snap a photo and list your surplus food for nearby NGOs in under a minute on BhojanBandhu." },
-      { property: "og:title", content: "Donate food — BhojanBandhu" },
-      { property: "og:description", content: "Snap a photo and list your surplus food for nearby NGOs in under a minute." },
+      { title: "Donate Surplus Food — FoodLoop" },
+      { name: "description", content: "Snap a photo and list your surplus food for nearby shelters in under a minute on FoodLoop." },
+      { property: "og:title", content: "Donate Surplus Food — FoodLoop" },
+      { property: "og:description", content: "Snap a photo and list your surplus food for nearby shelters in under a minute." },
     ],
   }),
   component: Donate,
