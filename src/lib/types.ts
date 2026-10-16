@@ -10,6 +10,10 @@ export interface Profile {
   phone?: string;
   area?: string;
   shifts?: Shift[];
+  donorType?: "restaurant" | "catering" | "hostel" | "event" | "household" | "other";
+  fssaiNumber?: string;
+  defaultPickupAddress?: string;
+  bio?: string;
   createdAt: number;
 }
 

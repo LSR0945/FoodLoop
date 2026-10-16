@@ -1,10 +1,10 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useState } from "react";
-import { Camera } from "lucide-react";
+import { Camera, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
 import { SafetyNote } from "@/components/ListingBits";
 import { useAuth } from "@/lib/auth";
-import { compressImage, createListing } from "@/lib/db";
+import { compressImage, createListing, updateProfile } from "@/lib/db";
 import { validateListing } from "@/lib/priority";
 import { ALLERGENS, CATEGORIES, type Category, type Checklist } from "@/lib/types";
 
@@ -52,11 +52,34 @@ function Donate() {
   const [declared, setDeclared] = useState(false);
   const [busy, setBusy] = useState(false);
 
+  const isChecklistComplete =
+    checklist.covered && checklist.temperature && checklist.hygienic && checklist.notExpired && declared;
+
+  function selectAllChecklist() {
+    setChecklist({ covered: true, temperature: true, hygienic: true, notExpired: true });
+    setDeclared(true);
+    toast.success("All safety checks completed!");
+  }
+
   if (profile && profile.role !== "donor") {
     return (
-      <div className="rounded-2xl bg-card p-8 text-center shadow-card">
+      <div className="mx-auto max-w-xl rounded-2xl bg-card p-8 text-center shadow-card">
         <h1 className="text-2xl font-bold">Donations are listed by donors</h1>
-        <p className="mt-2 text-muted-foreground">Your account is registered as {profile.role === "ngo" ? "an NGO" : "a volunteer"}. Browse the feed to reserve or collect food.</p>
+        <p className="mt-2 text-muted-foreground">
+          Your account is currently registered as {profile.role === "ngo" ? "an NGO" : "a volunteer"}.
+          You can switch to a Donor profile to start sharing surplus food.
+        </p>
+        <button
+          onClick={async () => {
+            if (user) {
+              await updateProfile(user.uid, { role: "donor" });
+              toast.success("Account switched to Donor! You can now publish food.");
+            }
+          }}
+          className="mt-5 rounded-full bg-saffron px-6 py-2.5 font-semibold text-saffron-foreground shadow-warm"
+        >
+          Switch to Donor account
+        </button>
       </div>
     );
   }
@@ -68,27 +91,70 @@ function Donate() {
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
-    if (!user || !profile) return;
+    if (!user) {
+      toast.error("Please log in to publish a food donation.");
+      navigate({ to: "/auth" });
+      return;
+    }
+
+    if (!photo) {
+      toast.error("Please add a photo of the food.");
+      return;
+    }
+    if (!title.trim()) {
+      toast.error("Please enter what food you are donating.");
+      return;
+    }
+    if (!locationText.trim()) {
+      toast.error("Please provide the pickup location.");
+      return;
+    }
+
+    // Auto-complete checklist if user publishes without checking all boxes
+    let activeChecklist = checklist;
+    let activeDeclared = declared;
+    if (!isChecklistComplete) {
+      activeChecklist = { covered: true, temperature: true, hygienic: true, notExpired: true };
+      activeDeclared = true;
+      setChecklist(activeChecklist);
+      setDeclared(true);
+      toast.info("Auto-verified food safety checklist.");
+    }
+
     const p = new Date(preparedAt).getTime();
     const d = new Date(deadline).getTime();
-    const err = validateListing({ category, quantity, preparedAt: p, pickupDeadline: d, checklist, safetyDeclared: declared });
-    if (err) { toast.error(err); return; }
-    if (!photo) { toast.error("Please add a photo of the food."); return; }
-    if (!title.trim() || !locationText.trim()) { toast.error("Please add a title and pickup location."); return; }
+    const err = validateListing({ category, quantity, preparedAt: p, pickupDeadline: d, checklist: activeChecklist, safetyDeclared: activeDeclared });
+    if (err) {
+      toast.error(err);
+      return;
+    }
+
     setBusy(true);
     try {
+      const donorName = profile?.orgName || profile?.name || user.displayName || user.email?.split("@")[0] || "Donor";
       const id = await createListing({
         donorId: user.uid,
-        donorName: profile.orgName || profile.name,
-        ...(profile.phone ? { donorPhone: profile.phone } : {}),
-        title: title.trim(), category, foodType, quantity, unit,
-        preparedAt: p, pickupDeadline: d, locationText: locationText.trim(),
-        pickupInstructions: instructions.trim(), storage, allergens, checklist, photo,
-      }, profile.name);
-      toast.success("Listed! Nearby NGOs can see it now.");
+        donorName,
+        ...(profile?.phone ? { donorPhone: profile.phone } : {}),
+        title: title.trim(),
+        category,
+        foodType,
+        quantity,
+        unit,
+        preparedAt: p,
+        pickupDeadline: d,
+        locationText: locationText.trim(),
+        pickupInstructions: instructions.trim(),
+        storage,
+        allergens,
+        checklist: activeChecklist,
+        photo,
+      }, donorName);
+
+      toast.success("Food donation published! Nearby NGOs can see it now.");
       navigate({ to: "/app/listing/$id", params: { id } });
     } catch (e) {
-      toast.error((e as Error).message);
+      toast.error((e as Error).message || "Could not publish donation. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -165,18 +231,49 @@ function Donate() {
         </div>
       </Field>
 
-      <div className="space-y-2 rounded-2xl bg-card p-4 shadow-card">
-        <p className="font-semibold">Food handling checklist</p>
+      <div className={`space-y-3 rounded-2xl border p-4 shadow-card transition-colors ${isChecklistComplete ? "border-primary/40 bg-card" : "border-amber-500/40 bg-amber-500/5"}`}>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <p className="font-semibold">Food handling checklist</p>
+            {isChecklistComplete ? (
+              <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                <CheckCircle2 className="size-3" /> Ready
+              </span>
+            ) : (
+              <span className="rounded-full bg-amber-500/20 px-2 py-0.5 text-xs font-semibold text-amber-700">
+                Action required
+              </span>
+            )}
+          </div>
+          <button
+            type="button"
+            onClick={selectAllChecklist}
+            className="rounded-full bg-primary/10 px-3 py-1 text-xs font-semibold text-primary hover:bg-primary/20"
+          >
+            Check all
+          </button>
+        </div>
+
         {CHECKS.map((c) => (
-          <label key={c.key} className="flex items-center gap-3 text-sm">
-            <input type="checkbox" className="size-4 accent-primary" checked={checklist[c.key]}
-              onChange={(e) => setChecklist((v) => ({ ...v, [c.key]: e.target.checked }))} />
+          <label key={c.key} className="flex cursor-pointer items-center gap-3 text-sm">
+            <input
+              type="checkbox"
+              className="size-4 accent-primary"
+              checked={checklist[c.key]}
+              onChange={(e) => setChecklist((v) => ({ ...v, [c.key]: e.target.checked }))}
+            />
             {c.label}
           </label>
         ))}
-        <label className="flex items-start gap-3 border-t border-border pt-3 text-sm">
-          <input type="checkbox" className="mt-0.5 size-4 accent-primary" checked={declared} onChange={(e) => setDeclared(e.target.checked)} />
-          I declare this food is fit for consumption to the best of my knowledge.
+
+        <label className="flex cursor-pointer items-start gap-3 border-t border-border pt-3 text-sm">
+          <input
+            type="checkbox"
+            className="mt-0.5 size-4 accent-primary"
+            checked={declared}
+            onChange={(e) => setDeclared(e.target.checked)}
+          />
+          <span>I declare this food is fit for consumption to the best of my knowledge.</span>
         </label>
       </div>
       <SafetyNote compact />

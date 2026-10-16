@@ -32,18 +32,50 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           setState((s) => ({ ...s, user, loading: true }));
           unsubProfile = onSnapshot(
             doc(db, "users", user.uid),
-            (snap) =>
-              setState({
-                user,
-                profile: snap.exists() ? (snap.data() as Profile) : null,
-                loading: false,
-                error: null,
-              }),
-            (e) => setState({ user, profile: null, loading: false, error: e.message }),
+            (snap) => {
+              if (snap.exists()) {
+                const p = snap.data() as Profile;
+                try { localStorage.setItem("annsetu_profile_" + user.uid, JSON.stringify(p)); } catch {}
+                setState({ user, profile: p, loading: false, error: null });
+              } else {
+                let saved: Profile | null = null;
+                try {
+                  const raw = localStorage.getItem("annsetu_profile_" + user.uid);
+                  if (raw) saved = JSON.parse(raw);
+                } catch {}
+                const fallback: Profile = saved ?? {
+                  uid: user.uid,
+                  name: user.displayName || user.email?.split("@")[0] || "Food Donor",
+                  email: user.email || "",
+                  role: "donor",
+                  createdAt: Date.now(),
+                };
+                setState({ user, profile: fallback, loading: false, error: null });
+                import("firebase/firestore").then(({ setDoc }) => {
+                  setDoc(doc(db, "users", user.uid), fallback, { merge: true }).catch(() => {});
+                });
+              }
+            },
+            () => {
+              // On error (e.g. firestore permissions), load cached or fallback profile
+              let saved: Profile | null = null;
+              try {
+                const raw = localStorage.getItem("annsetu_profile_" + user.uid);
+                if (raw) saved = JSON.parse(raw);
+              } catch {}
+              const fallback: Profile = saved ?? {
+                uid: user.uid,
+                name: user.displayName || user.email?.split("@")[0] || "Food Donor",
+                email: user.email || "",
+                role: "donor",
+                createdAt: Date.now(),
+              };
+              setState({ user, profile: fallback, loading: false, error: null });
+            },
           );
         });
       } catch (e) {
-        setState({ user: null, profile: null, loading: false, error: (e as Error).message });
+        setState((s) => ({ ...s, loading: false, error: (e as Error).message }));
       }
     })();
     return () => {

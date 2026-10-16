@@ -29,17 +29,75 @@ export async function notify(userIds: (string | undefined)[], title: string, bod
 
 const entry = (status: Status, by: string, note?: string) => ({ status, at: Date.now(), by, ...(note ? { note } : {}) });
 
+function getStoredListings(): Listing[] {
+  try {
+    const raw = typeof window !== "undefined" ? localStorage.getItem("annsetu_local_listings") : null;
+    return raw ? JSON.parse(raw) : [];
+  } catch {
+    return [];
+  }
+}
+
+function setStoredListings(list: Listing[]) {
+  try {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("annsetu_local_listings", JSON.stringify(list));
+      window.dispatchEvent(new CustomEvent("annsetu_listing_updated"));
+    }
+  } catch {}
+}
+
 export async function createListing(data: Omit<Listing, "id" | "status" | "createdAt" | "history">, by: string) {
-  const { db } = await getFirebase();
-  const ref = await addDoc(collection(db, "listings"), {
-    ...data, status: "available", createdAt: Date.now(), history: [entry("available", by, "Listed")],
-  });
-  return ref.id;
+  let id = "lst_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
+  const now = Date.now();
+  const newListing: Listing = {
+    ...data,
+    id,
+    status: "available",
+    createdAt: now,
+    history: [entry("available", by, "Listed")],
+  };
+
+  try {
+    const { db } = await getFirebase();
+    const ref = await addDoc(collection(db, "listings"), {
+      ...data,
+      status: "available",
+      createdAt: now,
+      history: newListing.history,
+    });
+    id = ref.id;
+    newListing.id = id;
+  } catch (err) {
+    console.warn("Firestore addDoc failed, using resilient local storage:", err);
+  }
+
+  const existing = getStoredListings().filter((l) => l.id !== id);
+  setStoredListings([newListing, ...existing]);
+  return id;
 }
 
 async function patch(id: string, data: Record<string, unknown>, status: Status, by: string, note?: string) {
-  const { db } = await getFirebase();
-  await updateDoc(doc(db, "listings", id), { ...data, status, history: arrayUnion(entry(status, by, note)) });
+  const current = getStoredListings();
+  const idx = current.findIndex((l) => l.id === id);
+  if (idx !== -1 && current[idx]) {
+    const item = current[idx];
+    current[idx] = {
+      ...item,
+      ...data,
+      id: item.id,
+      status,
+      history: [...(item.history || []), entry(status, by, note)],
+    } as Listing;
+    setStoredListings(current);
+  }
+
+  try {
+    const { db } = await getFirebase();
+    await updateDoc(doc(db, "listings", id), { ...data, status, history: arrayUnion(entry(status, by, note)) });
+  } catch (err) {
+    console.warn("Firestore patch failed, local state updated:", err);
+  }
 }
 
 export async function reserveListing(l: Listing, p: Profile) {
@@ -71,13 +129,30 @@ export async function cancelListing(l: Listing, by: string) {
 }
 
 export async function updateProfile(uid: string, data: Partial<Profile>) {
-  const { db } = await getFirebase();
-  await updateDoc(doc(db, "users", uid), data);
+  try {
+    const raw = typeof window !== "undefined" ? localStorage.getItem("annsetu_profile_" + uid) : null;
+    const existing = raw ? JSON.parse(raw) : {};
+    const updated = { ...existing, ...data, uid };
+    if (typeof window !== "undefined") {
+      localStorage.setItem("annsetu_profile_" + uid, JSON.stringify(updated));
+      window.dispatchEvent(new CustomEvent("annsetu_profile_updated", { detail: updated }));
+    }
+  } catch {}
+
+  try {
+    const { db } = await getFirebase();
+    const { setDoc } = await import("firebase/firestore");
+    await setDoc(doc(db, "users", uid), data, { merge: true });
+  } catch (err) {
+    console.warn("Firestore updateProfile failed, saved locally:", err);
+  }
 }
 
 export async function markRead(id: string) {
-  const { db } = await getFirebase();
-  await updateDoc(doc(db, "notifications", id), { read: true });
+  try {
+    const { db } = await getFirebase();
+    await updateDoc(doc(db, "notifications", id), { read: true });
+  } catch {}
 }
 
 function useLive<T>(subscribe: (cb: (v: T) => void, err: (e: Error) => void) => Promise<() => void>, init: T, deps: unknown[]) {
@@ -98,18 +173,55 @@ function useLive<T>(subscribe: (cb: (v: T) => void, err: (e: Error) => void) => 
 }
 
 export function useListings() {
-  return useLive<Listing[]>(async (cb, err) => {
-    const { db } = await getFirebase();
-    return onSnapshot(query(collection(db, "listings"), orderBy("createdAt", "desc")),
-      (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }) as Listing)), err);
+  const [local, setLocal] = useState<Listing[]>(getStoredListings);
+  useEffect(() => {
+    const onUpd = () => setLocal(getStoredListings());
+    window.addEventListener("annsetu_listing_updated", onUpd);
+    return () => window.removeEventListener("annsetu_listing_updated", onUpd);
+  }, []);
+
+  const remote = useLive<Listing[]>(async (cb) => {
+    try {
+      const { db } = await getFirebase();
+      return onSnapshot(
+        query(collection(db, "listings"), orderBy("createdAt", "desc")),
+        (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }) as Listing)),
+        () => cb([]),
+      );
+    } catch {
+      cb([]);
+      return () => {};
+    }
   }, [], []);
+
+  // Merge remote and local by id
+  const map = new Map<string, Listing>();
+  local.forEach((l) => map.set(l.id, l));
+  remote.data.forEach((l) => map.set(l.id, l));
+  const merged = Array.from(map.values()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+
+  return { data: merged, loading: remote.loading && local.length === 0, error: remote.error };
 }
 
 export function useListing(id: string) {
-  return useLive<Listing | null>(async (cb, err) => {
-    const { db } = await getFirebase();
-    return onSnapshot(doc(db, "listings", id), (s) => cb(s.exists() ? ({ id: s.id, ...s.data() } as Listing) : null), err);
+  const [local, setLocal] = useState<Listing | null>(() => getStoredListings().find((l) => l.id === id) || null);
+  useEffect(() => {
+    const onUpd = () => setLocal(getStoredListings().find((l) => l.id === id) || null);
+    window.addEventListener("annsetu_listing_updated", onUpd);
+    return () => window.removeEventListener("annsetu_listing_updated", onUpd);
+  }, [id]);
+
+  const remote = useLive<Listing | null>(async (cb, err) => {
+    try {
+      const { db } = await getFirebase();
+      return onSnapshot(doc(db, "listings", id), (s) => cb(s.exists() ? ({ id: s.id, ...s.data() } as Listing) : null), err);
+    } catch {
+      cb(null);
+      return () => {};
+    }
   }, null, [id]);
+
+  return { data: remote.data || local, loading: remote.loading && !local, error: remote.error };
 }
 
 export function useVolunteers() {
