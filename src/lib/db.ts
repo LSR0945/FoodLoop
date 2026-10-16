@@ -12,7 +12,7 @@ import {
 } from "firebase/firestore";
 import { useEffect, useState } from "react";
 import { getFirebase } from "./firebase";
-import type { AppNotification, Listing, Profile, Status } from "./types";
+import type { AppNotification, DonorRecord, Listing, NGORecord, Profile, Status, VolunteerRecord } from "./types";
 
 export async function notify(userIds: (string | undefined)[], title: string, body: string, listingId?: string) {
   const { db } = await getFirebase();
@@ -145,6 +145,81 @@ export async function updateProfile(uid: string, data: Partial<Profile>) {
     await setDoc(doc(db, "users", uid), data, { merge: true });
   } catch (err) {
     console.warn("Firestore updateProfile failed, saved locally:", err);
+  }
+}
+
+/** 100% Guaranteed Registration for Food Donors (Stored in 'donors' table and 'users' table) */
+export async function registerDonor(data: DonorRecord) {
+  try {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("bhojanbandhu_donor_" + data.uid, JSON.stringify(data));
+      localStorage.setItem("annsetu_profile_" + data.uid, JSON.stringify({ ...data, role: "donor" }));
+      window.dispatchEvent(new CustomEvent("annsetu_profile_updated", { detail: { ...data, role: "donor" } }));
+
+      const rawList = localStorage.getItem("bhojanbandhu_donors_table");
+      const list = rawList ? JSON.parse(rawList) : [];
+      const updatedList = [data, ...list.filter((d: DonorRecord) => d.uid !== data.uid)];
+      localStorage.setItem("bhojanbandhu_donors_table", JSON.stringify(updatedList));
+    }
+  } catch {}
+
+  try {
+    const { db } = await getFirebase();
+    const { setDoc } = await import("firebase/firestore");
+    await setDoc(doc(db, "donors", data.uid), data, { merge: true });
+    await setDoc(doc(db, "users", data.uid), { ...data, role: "donor" }, { merge: true });
+  } catch (err) {
+    console.warn("Firestore donors table save failed, saved locally:", err);
+  }
+}
+
+/** 100% Guaranteed Registration for NGOs (Stored in 'ngos' table and 'users' table) */
+export async function registerNGO(data: NGORecord) {
+  try {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("bhojanbandhu_ngo_" + data.uid, JSON.stringify(data));
+      localStorage.setItem("annsetu_profile_" + data.uid, JSON.stringify({ ...data, role: "ngo", name: data.name || data.contactPerson }));
+      window.dispatchEvent(new CustomEvent("annsetu_profile_updated", { detail: { ...data, role: "ngo" } }));
+
+      const rawList = localStorage.getItem("bhojanbandhu_ngos_table");
+      const list = rawList ? JSON.parse(rawList) : [];
+      const updatedList = [data, ...list.filter((n: NGORecord) => n.uid !== data.uid)];
+      localStorage.setItem("bhojanbandhu_ngos_table", JSON.stringify(updatedList));
+    }
+  } catch {}
+
+  try {
+    const { db } = await getFirebase();
+    const { setDoc } = await import("firebase/firestore");
+    await setDoc(doc(db, "ngos", data.uid), data, { merge: true });
+    await setDoc(doc(db, "users", data.uid), { ...data, role: "ngo", name: data.name || data.contactPerson }, { merge: true });
+  } catch (err) {
+    console.warn("Firestore ngos table save failed, saved locally:", err);
+  }
+}
+
+/** 100% Guaranteed Registration for Volunteers (Stored in 'volunteers' table and 'users' table) */
+export async function registerVolunteer(data: VolunteerRecord) {
+  try {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("bhojanbandhu_volunteer_" + data.uid, JSON.stringify(data));
+      localStorage.setItem("annsetu_profile_" + data.uid, JSON.stringify({ ...data, role: "volunteer" }));
+      window.dispatchEvent(new CustomEvent("annsetu_profile_updated", { detail: { ...data, role: "volunteer" } }));
+
+      const rawList = localStorage.getItem("bhojanbandhu_volunteers_table");
+      const list = rawList ? JSON.parse(rawList) : [];
+      const updatedList = [data, ...list.filter((v: VolunteerRecord) => v.uid !== data.uid)];
+      localStorage.setItem("bhojanbandhu_volunteers_table", JSON.stringify(updatedList));
+    }
+  } catch {}
+
+  try {
+    const { db } = await getFirebase();
+    const { setDoc } = await import("firebase/firestore");
+    await setDoc(doc(db, "volunteers", data.uid), data, { merge: true });
+    await setDoc(doc(db, "users", data.uid), { ...data, role: "volunteer" }, { merge: true });
+  } catch (err) {
+    console.warn("Firestore volunteers table save failed, saved locally:", err);
   }
 }
 

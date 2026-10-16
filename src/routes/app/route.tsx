@@ -57,9 +57,11 @@ function AppShell() {
               </Link>
             ))}
           </nav>
-          <span className="rounded-full bg-saffron/20 px-3 py-1 text-xs font-semibold capitalize text-accent-foreground sm:hidden">
-            {profile?.role ?? ""}
-          </span>
+          <div className="flex items-center gap-2">
+            <span className="inline-flex items-center gap-1 rounded-full bg-saffron/20 px-3 py-1 text-xs font-bold capitalize text-accent-foreground">
+              {profile?.role === "ngo" ? "🏢 NGO Partner" : profile?.role === "volunteer" ? "🚴 Volunteer" : "🍲 Food Donor"}
+            </span>
+          </div>
         </div>
       </header>
 

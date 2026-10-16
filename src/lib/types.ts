@@ -1,6 +1,49 @@
 export type Role = "donor" | "ngo" | "volunteer";
 export type Shift = "morning" | "afternoon" | "evening" | "night";
 
+export interface DonorRecord {
+  uid: string;
+  name: string;
+  orgName?: string;
+  donorType: "restaurant" | "catering" | "hostel" | "event" | "household" | "other";
+  email: string;
+  phone: string;
+  area: string;
+  defaultPickupAddress?: string;
+  fssaiNumber?: string;
+  bio?: string;
+  photoURL?: string;
+  createdAt: number;
+}
+
+export interface NGORecord {
+  uid: string;
+  name: string;
+  orgName: string; // NGO / Trust name
+  contactPerson: string;
+  registrationNumber?: string; // Darpan / Trust Reg ID
+  email: string;
+  phone: string;
+  area: string;
+  operatingAddress?: string;
+  dailyCapacity?: number; // approx beneficiaries served
+  photoURL?: string;
+  createdAt: number;
+}
+
+export interface VolunteerRecord {
+  uid: string;
+  name: string;
+  email: string;
+  phone: string;
+  area: string;
+  shifts: Shift[];
+  vehicleType?: "bike" | "scooter" | "car" | "bicycle" | "walking";
+  emergencyContact?: string;
+  photoURL?: string;
+  createdAt: number;
+}
+
 export interface Profile {
   uid: string;
   name: string;
@@ -15,6 +58,12 @@ export interface Profile {
   defaultPickupAddress?: string;
   bio?: string;
   photoURL?: string;
+  contactPerson?: string;
+  registrationNumber?: string;
+  operatingAddress?: string;
+  dailyCapacity?: number;
+  vehicleType?: "bike" | "scooter" | "car" | "bicycle" | "walking";
+  emergencyContact?: string;
   createdAt: number;
 }
 
