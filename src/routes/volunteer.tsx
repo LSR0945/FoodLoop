@@ -47,10 +47,10 @@ const SHIFT_LABEL: Record<Shift, string> = {
 };
 
 const VOLUNTEER_BG_IMAGES = [
-  "https://images.unsplash.com/photo-1509440159596-0249088772ff?w=1400&auto=format&fit=crop&q=80", // bread delivery
-  "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=1400&auto=format&fit=crop&q=80", // pizza
-  "https://images.unsplash.com/photo-1567529692333-de9fd6772897?w=1400&auto=format&fit=crop&q=80", // chole kulche
-  "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?w=1400&auto=format&fit=crop&q=80", // food bowl
+  "https://images.unsplash.com/photo-1544717305-2782549b5136?w=1400&auto=format&fit=crop&q=80", // Indian children meal
+  "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1400&auto=format&fit=crop&q=80", // Slum children hunger relief
+  "https://images.unsplash.com/photo-1578357078586-491adf1aa5c7?w=1400&auto=format&fit=crop&q=80", // Child eating meal
+  "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=1400&auto=format&fit=crop&q=80", // Community food relief
 ];
 
 // Volunteer theme: indigo/purple

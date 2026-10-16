@@ -39,10 +39,10 @@ export const Route = createFileRoute("/recipient")({
 type Tab = "dashboard" | "explore" | "reservations" | "history" | "saved" | "profile";
 
 const RECIPIENT_BG_IMAGES = [
-  "https://images.unsplash.com/photo-1567529692333-de9fd6772897?w=1400&auto=format&fit=crop&q=80", // chole kulche
-  "https://images.unsplash.com/photo-1574484284002-952d92456975?w=1400&auto=format&fit=crop&q=80", // dal makhani
-  "https://images.unsplash.com/photo-1585937421612-70a008356fbe?w=1400&auto=format&fit=crop&q=80", // thali
-  "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=1400&auto=format&fit=crop&q=80", // samosa
+  "https://images.unsplash.com/photo-1544717305-2782549b5136?w=1400&auto=format&fit=crop&q=80", // Indian children meal
+  "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=1400&auto=format&fit=crop&q=80", // Slum children hunger relief
+  "https://images.unsplash.com/photo-1578357078586-491adf1aa5c7?w=1400&auto=format&fit=crop&q=80", // Child eating meal
+  "https://images.unsplash.com/photo-1593113598332-cd288d649433?w=1400&auto=format&fit=crop&q=80", // Community food relief
 ];
 
 function RecipientPortalPage() {
