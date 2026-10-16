@@ -616,8 +616,8 @@ function LandingPage() {
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?w=800&auto=format&fit=crop&q=80"
-                    alt="Night Shelter Feeding Drive"
+                    src="/images/hunger/ground1.png"
+                    alt="Bachhe milkar khana kha rahe hain"
                     className="size-full object-cover"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#205C43] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
@@ -642,8 +642,8 @@ function LandingPage() {
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="https://images.unsplash.com/photo-1593113598332-cd288d649433?w=800&auto=format&fit=crop&q=80"
-                    alt="Emergency Ration Kits"
+                    src="/images/hunger/ground2.png"
+                    alt="Chhote bachhe thaliyon se khana kha rahe hain"
                     className="size-full object-cover"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#ED7545] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
@@ -651,7 +651,7 @@ function LandingPage() {
                   </span>
                 </div>
                 <div className="p-4">
-                  <h3 className="font-display text-base font-bold text-[#242923]">Dry Ration & Grain Kits</h3>
+                  <h3 className="font-display text-base font-bold text-[#242923]">Dry Ration &amp; Grain Kits</h3>
                   <p className="mt-1.5 text-xs text-[#656C62] leading-relaxed">
                     Fortified wheat flour, lentils, cooking oil, and high-energy biscuits assembled for distressed families facing acute food insecurity.
                   </p>
@@ -668,8 +668,8 @@ function LandingPage() {
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="https://images.unsplash.com/photo-1578357078586-491adf1aa5c7?w=800&auto=format&fit=crop&q=80"
-                    alt="Child Nutrition Program"
+                    src="/images/hunger/ground3.jpg"
+                    alt="Bachhe school mein khana kha rahe hain"
                     className="size-full object-cover"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#3F8F62] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
@@ -694,8 +694,8 @@ function LandingPage() {
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="https://images.unsplash.com/photo-1544717305-2782549b5136?w=800&auto=format&fit=crop&q=80"
-                    alt="Community Langar Seva"
+                    src="/images/hunger/ground4.jpg"
+                    alt="Baccha thali lekar khushi se dekh raha hai"
                     className="size-full object-cover"
                   />
                   <span className="absolute left-2.5 top-2.5 rounded-full bg-[#242923] px-2.5 py-0.5 text-[10px] font-bold text-white shadow">
