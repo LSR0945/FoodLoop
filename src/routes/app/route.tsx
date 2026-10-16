@@ -18,7 +18,7 @@ function AppShell() {
   if (loading) {
     return (
       <div className="grid min-h-screen place-items-center bg-background">
-        <p className="animate-pulse text-muted-foreground">Loading AnnSetu…</p>
+        <p className="animate-pulse text-muted-foreground">Loading BhojanBandhu…</p>
       </div>
     );
   }

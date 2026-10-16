@@ -1,35 +1,40 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import {
-  Building2,
+  Award,
+  Camera,
+  Check,
   CheckCircle2,
   Clock,
+  Copy,
   Edit3,
   HeartHandshake,
   LogOut,
   MapPin,
+  MessageCircle,
   Package,
   Phone,
   PlusCircle,
+  Printer,
+  Share2,
   ShieldCheck,
-  Sparkles,
-  User,
+  Trash2,
   UtensilsCrossed,
 } from "lucide-react";
 import { toast } from "sonner";
 import { StatusBadge, UrgencyBadge } from "@/components/ListingBits";
 import { useAuth } from "@/lib/auth";
-import { updateProfile, useListings } from "@/lib/db";
+import { compressImage, updateProfile, useListings } from "@/lib/db";
 import { getFirebase } from "@/lib/firebase";
 import type { Role } from "@/lib/types";
 
 export const Route = createFileRoute("/app/profile")({
   head: () => ({
     meta: [
-      { title: "Donor Profile — AnnSetu" },
-      { name: "description", content: "Your AnnSetu Donor profile, active food donations, and community impact." },
-      { property: "og:title", content: "Donor Profile — AnnSetu" },
-      { property: "og:description", content: "Your AnnSetu Donor profile, active food donations, and community impact." },
+      { title: "Donor Profile — BhojanBandhu" },
+      { name: "description", content: "Your BhojanBandhu Donor profile, active food donations, and community impact." },
+      { property: "og:title", content: "Donor Profile — BhojanBandhu" },
+      { property: "og:description", content: "Your BhojanBandhu Donor profile, active food donations, and community impact." },
     ],
   }),
   component: ProfilePage,
@@ -49,8 +54,11 @@ function ProfilePage() {
   const navigate = useNavigate();
   const { data: allListings } = useListings();
 
-  const [activeTab, setActiveTab] = useState<"donations" | "edit" | "role">("donations");
+  const [activeTab, setActiveTab] = useState<"donations" | "edit" | "certificate" | "role">("donations");
   const [filter, setFilter] = useState<"all" | "active" | "reserved" | "completed">("all");
+
+  const fileInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingPic, setUploadingPic] = useState(false);
 
   // Edit form states
   const [name, setName] = useState(profile?.name || user?.displayName || "");
@@ -87,6 +95,31 @@ function ProfilePage() {
     return { total, completed: completed.length, active: active.length, served, wasteSavedKg };
   }, [myDonations]);
 
+  // Profile Picture Upload Handler
+  async function handleAvatarUpload(f?: File) {
+    if (!f || !user) return;
+    setUploadingPic(true);
+    try {
+      const compressed = await compressImage(f, 400, 0.75);
+      await updateProfile(user.uid, { photoURL: compressed });
+      toast.success("Profile photo updated successfully!");
+    } catch {
+      toast.error("Failed to upload photo. Please try a different image.");
+    } finally {
+      setUploadingPic(false);
+    }
+  }
+
+  async function handleRemoveAvatar() {
+    if (!user) return;
+    try {
+      await updateProfile(user.uid, { photoURL: "" });
+      toast.success("Profile photo removed.");
+    } catch {
+      toast.error("Could not remove photo.");
+    }
+  }
+
   async function handleSaveProfile(e: React.FormEvent) {
     e.preventDefault();
     if (!user) return;
@@ -117,9 +150,21 @@ function ProfilePage() {
     try {
       await updateProfile(user.uid, { role: newRole });
       toast.success(`Role changed to ${newRole}!`);
-    } catch (err) {
+    } catch {
       toast.error("Failed to switch role.");
     }
+  }
+
+  function shareOnWhatsApp(l: typeof myDonations[0]) {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    const text = `🚨 *URGENT FOOD DONATION - BhojanBandhu*\n\n🍲 *Item:* ${l.title}\n📦 *Quantity:* ${l.quantity} ${l.unit} (${l.foodType})\n📍 *Location:* ${l.locationText}\n⏰ *Pickup Before:* ${new Date(l.pickupDeadline).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}\n\n👉 *Claim / View Details:* ${origin}/app/listing/${l.id}\n\n_Distributed via BhojanBandhu — Koi Bhookha Na Soye_`;
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+  }
+
+  function copyImpactSummary() {
+    const text = `🌟 Proud to be a Verified Food Donor on BhojanBandhu!\n\n🍲 Total Meals Served: ${stats.served} plates\n🌱 Food Waste Prevented: ${stats.wasteSavedKg} kg\n🙌 Join us in ending food waste: ${typeof window !== "undefined" ? window.location.origin : ""}`;
+    navigator.clipboard.writeText(text);
+    toast.success("Impact summary copied to clipboard!");
   }
 
   async function logout() {
@@ -128,7 +173,7 @@ function ProfilePage() {
       const { signOut } = await import("firebase/auth");
       await signOut(auth);
       navigate({ to: "/auth", replace: true });
-    } catch (err) {
+    } catch {
       toast.error("Logout failed.");
     }
   }
@@ -138,20 +183,52 @@ function ProfilePage() {
 
   return (
     <div className="mx-auto max-w-2xl space-y-6 pb-12">
+      {/* Hidden File Input for Avatar Upload */}
+      <input
+        ref={fileInputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={(e) => handleAvatarUpload(e.target.files?.[0])}
+      />
+
       {/* Donor Card Header */}
       <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-primary via-primary/95 to-hero p-6 text-primary-foreground shadow-lg">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="flex items-start gap-4">
-            <div className="grid size-16 shrink-0 place-items-center rounded-2xl bg-saffron text-2xl font-bold text-saffron-foreground shadow-md">
-              {displayName.slice(0, 1).toUpperCase()}
+            {/* Clickable Profile Avatar */}
+            <div className="group relative shrink-0">
+              {profile?.photoURL ? (
+                <img
+                  src={profile.photoURL}
+                  alt={displayName}
+                  className="size-20 rounded-2xl object-cover ring-2 ring-saffron shadow-md"
+                />
+              ) : (
+                <div className="grid size-20 place-items-center rounded-2xl bg-saffron text-3xl font-bold text-saffron-foreground shadow-md">
+                  {displayName.slice(0, 1).toUpperCase()}
+                </div>
+              )}
+
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploadingPic}
+                className="absolute inset-0 flex flex-col items-center justify-center rounded-2xl bg-black/50 text-[10px] font-semibold text-white opacity-0 transition-opacity group-hover:opacity-100 backdrop-blur-xs"
+                title="Change Photo"
+              >
+                <Camera className="size-5 mb-0.5" />
+                {uploadingPic ? "Saving…" : "Upload"}
+              </button>
             </div>
+
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="inline-flex items-center gap-1 rounded-full bg-saffron/20 px-2.5 py-0.5 text-xs font-bold uppercase tracking-wider text-saffron">
-                  <HeartHandshake className="size-3.5" /> Donor Profile
+                  <HeartHandshake className="size-3.5" /> Food Donor
                 </span>
                 <span className="inline-flex items-center gap-1 rounded-full bg-white/10 px-2.5 py-0.5 text-xs font-medium backdrop-blur">
-                  <ShieldCheck className="size-3.5 text-success" /> Verified Partner
+                  <ShieldCheck className="size-3.5 text-emerald-400" /> BhojanBandhu Partner
                 </span>
               </div>
               <h1 className="mt-1 text-2xl font-bold sm:text-3xl">{displayName}</h1>
@@ -160,13 +237,22 @@ function ProfilePage() {
             </div>
           </div>
 
-          <button
-            onClick={() => setActiveTab(activeTab === "edit" ? "donations" : "edit")}
-            className="inline-flex items-center gap-1.5 self-start rounded-full bg-white/15 px-3.5 py-1.5 text-xs font-semibold backdrop-blur hover:bg-white/25"
-          >
-            <Edit3 className="size-3.5" />
-            {activeTab === "edit" ? "View Profile" : "Edit Profile"}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              className="inline-flex items-center gap-1.5 rounded-full bg-white/15 px-3 py-1.5 text-xs font-semibold backdrop-blur hover:bg-white/25"
+            >
+              <Camera className="size-3.5" />
+              Photo
+            </button>
+            <button
+              onClick={() => setActiveTab(activeTab === "edit" ? "donations" : "edit")}
+              className="inline-flex items-center gap-1.5 rounded-full bg-saffron px-3.5 py-1.5 text-xs font-semibold text-saffron-foreground shadow-sm hover:brightness-105"
+            >
+              <Edit3 className="size-3.5" />
+              {activeTab === "edit" ? "View" : "Edit Details"}
+            </button>
+          </div>
         </div>
 
         {/* Quick Contact & Location Tags */}
@@ -197,43 +283,51 @@ function ProfilePage() {
         </div>
         <div className="rounded-2xl border border-border bg-card p-4 text-center shadow-card">
           <p className="font-display text-3xl font-bold text-saffron">{stats.active}</p>
-          <p className="mt-1 text-xs text-muted-foreground">Active Now</p>
+          <p className="mt-1 text-xs text-muted-foreground">Active Live</p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-4 text-center shadow-card">
-          <p className="font-display text-3xl font-bold text-success">{stats.served}</p>
+          <p className="font-display text-3xl font-bold text-emerald-600">{stats.served}</p>
           <p className="mt-1 text-xs text-muted-foreground">Plates Served</p>
         </div>
         <div className="rounded-2xl border border-border bg-card p-4 text-center shadow-card">
-          <p className="font-display text-3xl font-bold text-chart-4">{stats.wasteSavedKg} kg</p>
-          <p className="mt-1 text-xs text-muted-foreground">Waste Saved</p>
+          <p className="font-display text-3xl font-bold text-amber-600">{stats.wasteSavedKg} kg</p>
+          <p className="mt-1 text-xs text-muted-foreground">Waste Prevented</p>
         </div>
       </div>
 
       {/* Navigation Tabs */}
-      <div className="flex border-b border-border">
+      <div className="flex border-b border-border overflow-x-auto">
         <button
           onClick={() => setActiveTab("donations")}
-          className={`flex-1 border-b-2 py-3 text-sm font-semibold transition-colors ${
+          className={`flex-1 min-w-[110px] border-b-2 py-3 text-sm font-semibold transition-colors ${
             activeTab === "donations" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          My Donations ({myDonations.length})
+          My Food ({myDonations.length})
         </button>
         <button
           onClick={() => setActiveTab("edit")}
-          className={`flex-1 border-b-2 py-3 text-sm font-semibold transition-colors ${
+          className={`flex-1 min-w-[110px] border-b-2 py-3 text-sm font-semibold transition-colors ${
             activeTab === "edit" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          Donor Details
+          Edit Profile
+        </button>
+        <button
+          onClick={() => setActiveTab("certificate")}
+          className={`flex-1 min-w-[120px] border-b-2 py-3 text-sm font-semibold transition-colors ${
+            activeTab === "certificate" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
+          }`}
+        >
+          Impact Certificate
         </button>
         <button
           onClick={() => setActiveTab("role")}
-          className={`flex-1 border-b-2 py-3 text-sm font-semibold transition-colors ${
+          className={`flex-1 min-w-[90px] border-b-2 py-3 text-sm font-semibold transition-colors ${
             activeTab === "role" ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
           }`}
         >
-          Role & Settings
+          Settings
         </button>
       </div>
 
@@ -246,7 +340,7 @@ function ProfilePage() {
                 [
                   ["all", "All"],
                   ["active", "Live / Available"],
-                  ["reserved", "In Progress"],
+                  ["reserved", "In Handover"],
                   ["completed", "Completed"],
                 ] as const
               ).map(([k, label]) => (
@@ -299,7 +393,7 @@ function ProfilePage() {
                       <StatusBadge status={l.status} />
                     </div>
 
-                    <div className="mt-2 flex gap-3">
+                    <div className="mt-2.5 flex gap-3">
                       {l.photo ? (
                         <img src={l.photo} alt={l.title} className="size-16 shrink-0 rounded-xl object-cover" />
                       ) : (
@@ -309,7 +403,7 @@ function ProfilePage() {
                       )}
                       <div className="min-w-0 flex-1">
                         <h4 className="truncate font-semibold text-foreground">{l.title}</h4>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="text-xs font-semibold text-primary">
                           {l.quantity} {l.unit} • <span className="capitalize">{l.foodType}</span>
                         </p>
                         <p className="mt-1 flex items-center gap-1 text-[11px] text-muted-foreground">
@@ -318,17 +412,28 @@ function ProfilePage() {
                       </div>
                     </div>
 
-                    {/* Handover Code if reserved */}
+                    {/* Handover Verification Code */}
                     {l.pickupCode && ["reserved", "assigned"].includes(l.status) && (
                       <div className="mt-3 flex items-center justify-between rounded-xl bg-saffron/15 px-3 py-2 text-xs">
-                        <span className="font-medium text-accent-foreground">Pickup Code for Handover:</span>
-                        <span className="font-mono text-sm font-bold tracking-widest text-primary">{l.pickupCode}</span>
+                        <div>
+                          <p className="font-semibold text-accent-foreground">Handover Code:</p>
+                          <p className="text-[10px] text-muted-foreground">Share with collector at doorstep</p>
+                        </div>
+                        <span className="font-mono text-base font-extrabold tracking-widest text-primary">{l.pickupCode}</span>
                       </div>
                     )}
                   </div>
 
-                  <div className="flex items-center justify-between border-t border-border bg-muted/30 px-4 py-2.5 text-xs">
-                    <UrgencyBadge deadline={l.pickupDeadline} />
+                  {/* Actions Bar */}
+                  <div className="flex items-center justify-between border-t border-border bg-muted/30 px-3.5 py-2.5 text-xs">
+                    <button
+                      type="button"
+                      onClick={() => shareOnWhatsApp(l)}
+                      className="inline-flex items-center gap-1 rounded-full bg-emerald-600/10 px-2.5 py-1 text-[11px] font-semibold text-emerald-700 hover:bg-emerald-600/20"
+                    >
+                      <MessageCircle className="size-3" /> WhatsApp
+                    </button>
+
                     <Link
                       to="/app/listing/$id"
                       params={{ id: l.id }}
@@ -352,6 +457,38 @@ function ProfilePage() {
             <p className="text-xs text-muted-foreground">
               These details help NGOs and volunteers coordinate food pickups smoothly.
             </p>
+          </div>
+
+          {/* Avatar Upload Card inside Edit Tab */}
+          <div className="flex items-center gap-4 rounded-2xl border border-border bg-muted/30 p-4">
+            {profile?.photoURL ? (
+              <img src={profile.photoURL} alt="Avatar preview" className="size-16 rounded-2xl object-cover ring-2 ring-saffron" />
+            ) : (
+              <div className="grid size-16 place-items-center rounded-2xl bg-saffron text-2xl font-bold text-saffron-foreground">
+                {displayName.slice(0, 1).toUpperCase()}
+              </div>
+            )}
+            <div className="space-y-1">
+              <p className="text-xs font-semibold">Donor Profile Picture / Logo</p>
+              <div className="flex gap-2">
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="rounded-full bg-primary px-3 py-1 text-xs font-semibold text-primary-foreground shadow-sm"
+                >
+                  Upload new photo
+                </button>
+                {profile?.photoURL && (
+                  <button
+                    type="button"
+                    onClick={handleRemoveAvatar}
+                    className="inline-flex items-center gap-1 rounded-full border border-destructive/30 px-2.5 py-1 text-xs text-destructive hover:bg-destructive/10"
+                  >
+                    <Trash2 className="size-3" /> Remove
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="grid gap-3 sm:grid-cols-2">
@@ -455,13 +592,87 @@ function ProfilePage() {
         </form>
       )}
 
-      {/* TAB 3: ROLE & SETTINGS */}
+      {/* TAB 3: DIGITAL IMPACT CERTIFICATE */}
+      {activeTab === "certificate" && (
+        <div className="space-y-4">
+          <div className="relative overflow-hidden rounded-3xl border-4 border-amber-400/60 bg-gradient-to-b from-amber-50 via-card to-amber-50/30 p-8 text-center shadow-xl dark:from-card dark:via-card dark:to-card">
+            {/* Ornamental Corners */}
+            <div className="absolute left-3 top-3 size-6 border-l-2 border-t-2 border-amber-500" />
+            <div className="absolute right-3 top-3 size-6 border-r-2 border-t-2 border-amber-500" />
+            <div className="absolute bottom-3 left-3 size-6 border-b-2 border-l-2 border-amber-500" />
+            <div className="absolute bottom-3 right-3 size-6 border-b-2 border-r-2 border-amber-500" />
+
+            <div className="mx-auto flex size-14 items-center justify-center rounded-full bg-gradient-to-tr from-amber-500 to-saffron text-white shadow-md">
+              <Award className="size-8" />
+            </div>
+
+            <p className="mt-3 text-xs font-bold uppercase tracking-widest text-amber-700 dark:text-amber-400">
+              Certificate of Humanitarian Impact
+            </p>
+            <h2 className="mt-1 font-display text-2xl font-bold sm:text-3xl">Community Hunger Hero</h2>
+
+            <p className="mt-4 text-xs text-muted-foreground">This certificate is proudly awarded to</p>
+            <p className="mt-1 font-display text-2xl font-extrabold text-primary underline decoration-saffron underline-offset-4">
+              {displayName}
+            </p>
+
+            <p className="mx-auto mt-4 max-w-md text-xs leading-relaxed text-muted-foreground">
+              In profound appreciation of their unwavering commitment to bridging surplus food with hungry communities,
+              preventing food waste, and championing the mission: <i>“Koi Bhookha Na Soye.”</i>
+            </p>
+
+            {/* Impact Metric Chips on Certificate */}
+            <div className="my-6 grid grid-cols-2 gap-3 sm:grid-cols-3">
+              <div className="rounded-xl border border-amber-300/40 bg-card p-3 shadow-sm">
+                <p className="font-display text-xl font-bold text-primary">{stats.served}</p>
+                <p className="text-[10px] text-muted-foreground">Meals Distributed</p>
+              </div>
+              <div className="rounded-xl border border-amber-300/40 bg-card p-3 shadow-sm">
+                <p className="font-display text-xl font-bold text-saffron">{stats.wasteSavedKg} kg</p>
+                <p className="text-[10px] text-muted-foreground">Waste Prevented</p>
+              </div>
+              <div className="col-span-2 rounded-xl border border-amber-300/40 bg-card p-3 shadow-sm sm:col-span-1">
+                <p className="font-display text-xl font-bold text-emerald-600">{stats.total}</p>
+                <p className="text-[10px] text-muted-foreground">Donations Listed</p>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-between border-t border-border pt-4 text-[11px] text-muted-foreground">
+              <div className="text-left">
+                <p className="font-semibold text-foreground">BhojanBandhu Foundation</p>
+                <p>Verified Community Initiative</p>
+              </div>
+              <div className="text-right">
+                <p className="font-semibold text-foreground">Date: {new Date().toLocaleDateString()}</p>
+                <p className="font-mono text-[10px]">ID: {user?.uid.slice(0, 10).toUpperCase()}</p>
+              </div>
+            </div>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
+            <button
+              onClick={() => window.print()}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-full border border-border bg-card py-2.5 text-xs font-semibold shadow-card hover:bg-muted"
+            >
+              <Printer className="size-3.5" /> Print / Save PDF
+            </button>
+            <button
+              onClick={copyImpactSummary}
+              className="inline-flex flex-1 items-center justify-center gap-2 rounded-full bg-saffron py-2.5 text-xs font-semibold text-saffron-foreground shadow-warm hover:brightness-105"
+            >
+              <Share2 className="size-3.5" /> Share Impact Summary
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* TAB 4: ROLE & SETTINGS */}
       {activeTab === "role" && (
         <div className="space-y-4 rounded-2xl border border-border bg-card p-6 shadow-card">
           <div>
             <h2 className="text-xl font-bold">Account Role & Settings</h2>
             <p className="text-xs text-muted-foreground">
-              Your account currently acts as a <b>{profile?.role?.toUpperCase() || "DONOR"}</b>.
+              Your account currently acts as a <b>{profile?.role?.toUpperCase() || "DONOR"}</b> on BhojanBandhu.
             </p>
           </div>
 
@@ -508,7 +719,7 @@ function ProfilePage() {
         onClick={logout}
         className="flex w-full items-center justify-center gap-2 rounded-full border border-border bg-card py-3 font-semibold text-muted-foreground transition hover:bg-destructive/10 hover:text-destructive"
       >
-        <LogOut className="size-4" /> Log out
+        <LogOut className="size-4" /> Log out from BhojanBandhu
       </button>
     </div>
   );

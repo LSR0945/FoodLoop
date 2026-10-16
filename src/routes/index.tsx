@@ -6,9 +6,9 @@ import hero from "@/assets/hero.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "AnnSetu — Koi bhooke na soye" },
-      { name: "description", content: "AnnSetu connects surplus food from events, hostels, restaurants and homes with nearby NGOs and volunteers — before it goes to waste." },
-      { property: "og:title", content: "AnnSetu — Koi bhooke na soye" },
+      { title: "BhojanBandhu — Koi bhooke na soye" },
+      { name: "description", content: "BhojanBandhu connects surplus food from events, hostels, restaurants and homes with nearby NGOs and volunteers — before it goes to waste." },
+      { property: "og:title", content: "BhojanBandhu — Koi bhooke na soye" },
       { property: "og:description", content: "Surplus food, shared fast. Donors list food in seconds; NGOs and volunteers collect it before the clock runs out." },
     ],
   }),
@@ -49,7 +49,7 @@ function Landing() {
             </h1>
             <p className="mt-4 max-w-xl text-base text-hero-foreground/85 sm:text-lg">
               Every night, tonnes of good food is thrown away while someone nearby sleeps hungry.
-              AnnSetu bridges that gap — connecting surplus food from events, hostels, restaurants
+              BhojanBandhu bridges that gap — connecting surplus food from events, hostels, restaurants
               and homes with the people who need it, before the clock runs out.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
@@ -65,7 +65,7 @@ function Landing() {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 py-16">
-        <h2 className="text-center text-3xl font-bold">How AnnSetu works</h2>
+        <h2 className="text-center text-3xl font-bold">How BhojanBandhu works</h2>
         <p className="mx-auto mt-2 max-w-lg text-center text-muted-foreground">
           From surplus to served in three simple steps — with safety checks at every stage.
         </p>

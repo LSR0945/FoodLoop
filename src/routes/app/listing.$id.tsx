@@ -13,9 +13,9 @@ import { STATUS_LABEL } from "@/lib/types";
 export const Route = createFileRoute("/app/listing/$id")({
   head: () => ({
     meta: [
-      { title: "Donation details — AnnSetu" },
-      { name: "description", content: "Pickup details, safety information and status for a food donation." },
-      { property: "og:title", content: "Donation details — AnnSetu" },
+      { title: "Donation details — BhojanBandhu" },
+      { name: "description", content: "Pickup details, safety information and status for a food donation on BhojanBandhu." },
+      { property: "og:title", content: "Donation details — BhojanBandhu" },
       { property: "og:description", content: "Pickup details, safety information and status for a food donation." },
     ],
   }),

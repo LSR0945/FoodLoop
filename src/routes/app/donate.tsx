@@ -11,9 +11,9 @@ import { ALLERGENS, CATEGORIES, type Category, type Checklist } from "@/lib/type
 export const Route = createFileRoute("/app/donate")({
   head: () => ({
     meta: [
-      { title: "Donate food — AnnSetu" },
-      { name: "description", content: "Snap a photo and list your surplus food for nearby NGOs in under a minute." },
-      { property: "og:title", content: "Donate food — AnnSetu" },
+      { title: "Donate food — BhojanBandhu" },
+      { name: "description", content: "Snap a photo and list your surplus food for nearby NGOs in under a minute on BhojanBandhu." },
+      { property: "og:title", content: "Donate food — BhojanBandhu" },
       { property: "og:description", content: "Snap a photo and list your surplus food for nearby NGOs in under a minute." },
     ],
   }),
@@ -135,6 +135,7 @@ function Donate() {
       const id = await createListing({
         donorId: user.uid,
         donorName,
+        ...(profile?.photoURL ? { donorAvatar: profile.photoURL } : {}),
         ...(profile?.phone ? { donorPhone: profile.phone } : {}),
         title: title.trim(),
         category,
@@ -160,6 +161,24 @@ function Donate() {
     }
   }
 
+  const categoryTips: Record<Category, { tip: string; hours: number; icon: string }> = {
+    "Cooked meals": { tip: "Cooked meals are best distributed within 4–8 hours of preparation (FSSAI guidelines).", hours: 4, icon: "🍲" },
+    "Bakery": { tip: "Fresh bread, buns and baked items have a 12–24 hour safe consumption window.", hours: 12, icon: "🥐" },
+    "Fruits & vegetables": { tip: "Keep fresh and shaded. Distribute within 18 hours before over-ripening.", hours: 18, icon: "🍎" },
+    "Packaged food": { tip: "Check seal integrity and manufacturer expiry date on package.", hours: 24, icon: "📦" },
+    "Dairy": { tip: "Perishable! Keep chilled (<5°C) and list with urgent pickup (2–4 hours).", hours: 3, icon: "🥛" },
+    "Beverages": { tip: "Keep sealed and clean. Distribute chilled if cold drinks/lassi.", hours: 12, icon: "🧃" },
+  };
+
+  const currentTip = categoryTips[category] || categoryTips["Cooked meals"];
+
+  function applyRecommendedWindow() {
+    const prep = new Date(preparedAt).getTime() || Date.now();
+    const newDeadline = prep + currentTip.hours * 3600_000;
+    setDeadline(toLocal(newDeadline));
+    toast.success(`Applied ${currentTip.hours}-hour safety window!`);
+  }
+
   return (
     <form onSubmit={submit} className="mx-auto max-w-xl space-y-5">
       <h1 className="text-3xl font-bold">Donate surplus food</h1>
@@ -180,6 +199,25 @@ function Donate() {
       <Field label="What are you donating?">
         <input className="field" placeholder="e.g. Veg biryani from wedding" value={title} onChange={(e) => setTitle(e.target.value)} />
       </Field>
+
+      {/* Smart Safety Shelf-Life Advisor */}
+      <div className="flex items-start justify-between gap-3 rounded-2xl border border-primary/20 bg-primary/5 p-3.5 text-xs">
+        <div className="flex items-start gap-2.5">
+          <span className="text-xl">{currentTip.icon}</span>
+          <div>
+            <p className="font-semibold text-primary">Smart Safety Advisor ({category})</p>
+            <p className="mt-0.5 text-muted-foreground">{currentTip.tip}</p>
+          </div>
+        </div>
+        <button
+          type="button"
+          onClick={applyRecommendedWindow}
+          className="shrink-0 rounded-full bg-primary px-3 py-1 text-[11px] font-semibold text-primary-foreground shadow-sm hover:opacity-90"
+        >
+          Auto-set {currentTip.hours}h
+        </button>
+      </div>
+
       <div className="grid grid-cols-2 gap-3">
         <Field label="Category">
           <select className="field" value={category} onChange={(e) => setCategory(e.target.value as Category)}>

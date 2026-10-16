@@ -9,10 +9,10 @@ import type { Role, Shift } from "@/lib/types";
 export const Route = createFileRoute("/auth")({
   head: () => ({
     meta: [
-      { title: "Log in or join — AnnSetu" },
-      { name: "description", content: "Sign in as a donor, NGO or volunteer to share and collect surplus food." },
-      { property: "og:title", content: "Log in or join — AnnSetu" },
-      { property: "og:description", content: "Sign in as a donor, NGO or volunteer to share and collect surplus food." },
+      { title: "Log in or join — BhojanBandhu" },
+      { name: "description", content: "Sign in as a donor, NGO or volunteer to share and collect surplus food on BhojanBandhu." },
+      { property: "og:title", content: "Log in or join — BhojanBandhu" },
+      { property: "og:description", content: "Sign in as a donor, NGO or volunteer to share and collect surplus food on BhojanBandhu." },
     ],
   }),
   component: AuthPage,
@@ -69,7 +69,7 @@ function AuthPage() {
           createdAt: Date.now(),
         });
       }
-      toast.success(mode === "login" ? "Welcome back!" : "Account created — welcome to AnnSetu!");
+      toast.success(mode === "login" ? "Welcome back!" : "Account created — welcome to BhojanBandhu!");
       navigate({ to: "/app" });
     } catch (err) {
       toast.error((err as Error).message.replace("Firebase: ", ""));
@@ -84,7 +84,7 @@ function AuthPage() {
         <Logo />
       </header>
       <main className="mx-auto w-full max-w-md flex-1 px-4 pb-10">
-        <h1 className="text-3xl font-bold">{mode === "login" ? "Welcome back" : "Join AnnSetu"}</h1>
+        <h1 className="text-3xl font-bold">{mode === "login" ? "Welcome back" : "Join BhojanBandhu"}</h1>
         <p className="mt-1 text-sm text-muted-foreground">
           {mode === "login" ? "Log in to continue sharing food." : "Create your account — it takes a minute."}
         </p>

@@ -14,6 +14,7 @@ export interface Profile {
   fssaiNumber?: string;
   defaultPickupAddress?: string;
   bio?: string;
+  photoURL?: string;
   createdAt: number;
 }
 
@@ -49,6 +50,7 @@ export interface Listing {
   id: string;
   donorId: string;
   donorName: string;
+  donorAvatar?: string;
   donorPhone?: string;
   title: string;
   category: Category;

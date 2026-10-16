@@ -37,7 +37,7 @@ export function SafetyNote({ compact = false }: { compact?: boolean }) {
     <div className="flex gap-2 rounded-lg border border-warning/40 bg-warning/10 p-3 text-xs text-accent-foreground">
       <ShieldAlert className="size-4 shrink-0" />
       <p>
-        Food is shared by community donors on a good-faith basis. AnnSetu does not guarantee that any item is safe to
+        Food is shared by community donors on a good-faith basis. BhojanBandhu does not guarantee that any item is safe to
         eat.{!compact && " Recipients must inspect food, check allergen information, follow local food-safety rules, and discard anything that looks, smells or feels unsuitable."}
       </p>
     </div>
@@ -69,6 +69,19 @@ export function ListingCard({ l }: { l: Listing }) {
         <h3 className="line-clamp-1 text-lg font-semibold">{l.title}</h3>
         <p className="text-sm font-semibold text-primary">{l.quantity} {l.unit}</p>
         <p className="flex items-center gap-1 text-sm text-muted-foreground"><MapPin className="size-3.5" />{l.locationText}</p>
+        <div className="mt-2 flex items-center justify-between border-t border-border/50 pt-2 text-xs text-muted-foreground">
+          <div className="flex items-center gap-1.5 truncate">
+            {l.donorAvatar ? (
+              <img src={l.donorAvatar} alt={l.donorName} className="size-4 rounded-full object-cover" />
+            ) : (
+              <span className="grid size-4 place-items-center rounded-full bg-saffron/20 text-[9px] font-bold text-accent-foreground">
+                {(l.donorName || "D")[0]?.toUpperCase()}
+              </span>
+            )}
+            <span className="truncate font-medium">{l.donorName}</span>
+          </div>
+          <span className="text-[11px] font-semibold text-primary">Details →</span>
+        </div>
       </div>
     </Link>
   );

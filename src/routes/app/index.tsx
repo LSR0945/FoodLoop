@@ -10,9 +10,9 @@ import { CATEGORIES } from "@/lib/types";
 export const Route = createFileRoute("/app/")({
   head: () => ({
     meta: [
-      { title: "Food feed — AnnSetu" },
+      { title: "Food feed — BhojanBandhu" },
       { name: "description", content: "Live surplus food listings near you, sorted by urgency." },
-      { property: "og:title", content: "Food feed — AnnSetu" },
+      { property: "og:title", content: "Food feed — BhojanBandhu" },
       { property: "og:description", content: "Live surplus food listings near you, sorted by urgency." },
     ],
   }),
