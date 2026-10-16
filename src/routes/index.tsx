@@ -343,19 +343,44 @@ function LandingPage() {
                 </Link>
               </div>
 
-              {/* Trust Badges */}
-              <div className="mt-8 flex flex-wrap items-center gap-6 text-xs font-semibold text-[#656C62]">
-                <div className="flex items-center gap-1.5">
+              {/* Trust Badges: Responsive wrap */}
+              <div className="mt-7 flex flex-wrap items-center gap-x-5 gap-y-2 text-xs font-semibold text-[#656C62]">
+                <div className="flex items-center gap-1.5 whitespace-nowrap">
                   <ShieldCheck className="size-4 text-[#3F8F62]" />
-                  <span>Verified Shelter Network</span>
+                  <span>Verified NGO Network</span>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 whitespace-nowrap">
                   <Clock className="size-4 text-[#ED7545]" />
                   <span>Real-time Expiry Countdown</span>
                 </div>
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 whitespace-nowrap">
                   <CheckCircle2 className="size-4 text-[#205C43]" />
                   <span>4-Digit Secure Handover</span>
+                </div>
+              </div>
+
+              {/* 4 Core Platform Guarantees: Responsive (Horizontal scroll on phone APK, flex wrap on desktop) */}
+              <div className="mt-4">
+                <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-2 px-2 sm:mx-0 sm:px-0 sm:flex-wrap">
+                  <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-[#DDD5C8] bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#242923] shadow-2xs backdrop-blur-sm hover:border-[#205C43]/40 transition-all">
+                    <span className="flex size-4 items-center justify-center rounded-full bg-[#205C43]/10 text-[10px] text-[#205C43] font-bold">✓</span>
+                    <span className="whitespace-nowrap">FSSAI Compliant Checklist</span>
+                  </div>
+
+                  <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-[#DDD5C8] bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#242923] shadow-2xs backdrop-blur-sm hover:border-[#ED7545]/40 transition-all">
+                    <span className="flex size-4 items-center justify-center rounded-full bg-[#ED7545]/10 text-[10px] text-[#ED7545]">🔒</span>
+                    <span className="whitespace-nowrap">Pickup Code Verified</span>
+                  </div>
+
+                  <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-[#DDD5C8] bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#242923] shadow-2xs backdrop-blur-sm hover:border-amber-500/40 transition-all">
+                    <span className="flex size-4 items-center justify-center rounded-full bg-amber-500/10 text-[10px] text-amber-700">⚡</span>
+                    <span className="whitespace-nowrap">Real-time Listings</span>
+                  </div>
+
+                  <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-[#DDD5C8] bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#242923] shadow-2xs backdrop-blur-sm hover:border-emerald-500/40 transition-all">
+                    <span className="flex size-4 items-center justify-center rounded-full bg-emerald-500/10 text-[10px] text-emerald-700">🌱</span>
+                    <span className="whitespace-nowrap">Zero Waste Mission</span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -445,46 +470,46 @@ function LandingPage() {
               </div>
             </div>
 
-            {/* Bottom Hero Trust & Compliance Strip (Spans full 12 columns cleanly) */}
-            <div className="lg:col-span-12 mt-6 pt-6 border-t border-[#DDD5C8]/70">
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4">
-                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3.5 shadow-xs backdrop-blur-sm hover:border-[#205C43]/40 transition-all">
+            {/* Bottom Hero Trust & Compliance Strip: Responsive Phone APK (1-2 cols) vs Desktop (4 cols) */}
+            <div className="lg:col-span-12 mt-8 pt-6 border-t border-[#DDD5C8]/70">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3 sm:p-3.5 shadow-xs backdrop-blur-sm hover:border-[#205C43]/40 transition-all">
                   <div className="grid size-10 place-items-center rounded-xl bg-[#205C43]/10 text-[#205C43] shrink-0 text-lg">
                     🛡️
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#242923]">FSSAI Compliant</p>
-                    <p className="text-[11px] text-[#656C62]">Safety & hygiene checklist</p>
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm font-bold text-[#242923] truncate">FSSAI Compliant</p>
+                    <p className="text-[11px] text-[#656C62] truncate">Safety & hygiene checklist</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3.5 shadow-xs backdrop-blur-sm hover:border-[#ED7545]/40 transition-all">
+                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3 sm:p-3.5 shadow-xs backdrop-blur-sm hover:border-[#ED7545]/40 transition-all">
                   <div className="grid size-10 place-items-center rounded-xl bg-[#ED7545]/10 text-[#ED7545] shrink-0 text-lg">
                     🔒
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#242923]">4-Digit Pickup OTP</p>
-                    <p className="text-[11px] text-[#656C62]">Secure donor handover</p>
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm font-bold text-[#242923] truncate">4-Digit Pickup OTP</p>
+                    <p className="text-[11px] text-[#656C62] truncate">Secure donor handover</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3.5 shadow-xs backdrop-blur-sm hover:border-amber-500/40 transition-all">
+                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3 sm:p-3.5 shadow-xs backdrop-blur-sm hover:border-amber-500/40 transition-all">
                   <div className="grid size-10 place-items-center rounded-xl bg-amber-500/10 text-amber-700 shrink-0 text-lg">
                     ⚡
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#242923]">Live Countdown</p>
-                    <p className="text-[11px] text-[#656C62]">Rapid 45-min volunteer alert</p>
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm font-bold text-[#242923] truncate">Live Countdown</p>
+                    <p className="text-[11px] text-[#656C62] truncate">Rapid 45-min volunteer alert</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3.5 shadow-xs backdrop-blur-sm hover:border-emerald-500/40 transition-all">
+                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3 sm:p-3.5 shadow-xs backdrop-blur-sm hover:border-emerald-500/40 transition-all">
                   <div className="grid size-10 place-items-center rounded-xl bg-emerald-500/10 text-emerald-700 shrink-0 text-lg">
                     🌱
                   </div>
-                  <div>
-                    <p className="text-xs font-bold text-[#242923]">Zero Food Waste</p>
-                    <p className="text-[11px] text-[#656C62]">UN SDG 2 Zero Hunger</p>
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm font-bold text-[#242923] truncate">Zero Food Waste</p>
+                    <p className="text-[11px] text-[#656C62] truncate">UN SDG 2 Zero Hunger</p>
                   </div>
                 </div>
               </div>
