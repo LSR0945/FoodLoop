@@ -493,46 +493,74 @@ function LandingPage() {
               </div>
             </div>
 
-            {/* Bottom Hero Trust & Compliance Strip: Responsive Phone APK (1-2 cols) vs Desktop (4 cols) */}
+            {/* Bottom Hero Impact Photo Cards: Hunger reality strips with label overlay */}
             <div className="lg:col-span-12 mt-8 pt-6 border-t border-[#DDD5C8]/70">
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3 sm:p-3.5 shadow-xs backdrop-blur-sm hover:border-[#205C43]/40 transition-all">
-                  <div className="grid size-10 place-items-center rounded-xl bg-[#205C43]/10 text-[#205C43] shrink-0 text-lg">
-                    🛡️
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-bold text-[#242923] truncate">FSSAI Compliant</p>
-                    <p className="text-[11px] text-[#656C62] truncate">Safety & hygiene checklist</p>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3 sm:p-3.5 shadow-xs backdrop-blur-sm hover:border-[#ED7545]/40 transition-all">
-                  <div className="grid size-10 place-items-center rounded-xl bg-[#ED7545]/10 text-[#ED7545] shrink-0 text-lg">
-                    🔒
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-bold text-[#242923] truncate">4-Digit Pickup OTP</p>
-                    <p className="text-[11px] text-[#656C62] truncate">Secure donor handover</p>
+                {/* Card 1 — Kuposhan */}
+                <div className="relative overflow-hidden rounded-2xl shadow-md group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+                  <img
+                    src="/images/hunger/card1.png"
+                    alt="Bharat mein kuposhan"
+                    className="w-full h-36 sm:h-40 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#205C43] px-2 py-0.5 text-[10px] font-bold text-white mb-1">
+                      🛡️ FSSAI Verified
+                    </span>
+                    <p className="text-xs font-bold text-white drop-shadow leading-tight">Bharat Mein Kuposhan</p>
+                    <p className="text-[10px] text-white/80">Safety &amp; hygiene compliant</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3 sm:p-3.5 shadow-xs backdrop-blur-sm hover:border-amber-500/40 transition-all">
-                  <div className="grid size-10 place-items-center rounded-xl bg-amber-500/10 text-amber-700 shrink-0 text-lg">
-                    ⚡
-                  </div>
-                  <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-bold text-[#242923] truncate">Live Countdown</p>
-                    <p className="text-[11px] text-[#656C62] truncate">Rapid 45-min volunteer alert</p>
+                {/* Card 2 — Bhookha Na Soye Koi */}
+                <div className="relative overflow-hidden rounded-2xl shadow-md group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+                  <img
+                    src="/images/hunger/card2.png"
+                    alt="Bhookha na soye koi"
+                    className="w-full h-36 sm:h-40 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-[#ED7545] px-2 py-0.5 text-[10px] font-bold text-white mb-1">
+                      🔒 Secure Pickup
+                    </span>
+                    <p className="text-xs font-bold text-white drop-shadow leading-tight">Bhookha Na Soye Koi</p>
+                    <p className="text-[10px] text-white/80">4-digit verified handover</p>
                   </div>
                 </div>
 
-                <div className="flex items-center gap-3 rounded-2xl border border-[#DDD5C8] bg-white/90 p-3 sm:p-3.5 shadow-xs backdrop-blur-sm hover:border-emerald-500/40 transition-all">
-                  <div className="grid size-10 place-items-center rounded-xl bg-emerald-500/10 text-emerald-700 shrink-0 text-lg">
-                    🌱
+                {/* Card 3 — Surplus vs Hunger */}
+                <div className="relative overflow-hidden rounded-2xl shadow-md group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+                  <img
+                    src="/images/hunger/card3.png"
+                    alt="Surplus food vs hunger contrast"
+                    className="w-full h-36 sm:h-40 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-amber-500 px-2 py-0.5 text-[10px] font-bold text-white mb-1">
+                      ⚡ Live Alert
+                    </span>
+                    <p className="text-xs font-bold text-white drop-shadow leading-tight">Waste vs Hunger</p>
+                    <p className="text-[10px] text-white/80">45-min rapid response</p>
                   </div>
-                  <div className="min-w-0">
-                    <p className="text-xs sm:text-sm font-bold text-[#242923] truncate">Zero Food Waste</p>
-                    <p className="text-[11px] text-[#656C62] truncate">UN SDG 2 Zero Hunger</p>
+                </div>
+
+                {/* Card 4 — Children Khatai Lene */}
+                <div className="relative overflow-hidden rounded-2xl shadow-md group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
+                  <img
+                    src="/images/hunger/card4.png"
+                    alt="Bachhe khaane ke liye haath failaye hue"
+                    className="w-full h-36 sm:h-40 object-cover"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-3">
+                    <span className="inline-flex items-center gap-1 rounded-full bg-emerald-600 px-2 py-0.5 text-[10px] font-bold text-white mb-1">
+                      🌱 Zero Waste
+                    </span>
+                    <p className="text-xs font-bold text-white drop-shadow leading-tight">Har Bachche Ka Haq</p>
+                    <p className="text-[10px] text-white/80">UN SDG 2 Zero Hunger</p>
                   </div>
                 </div>
               </div>
