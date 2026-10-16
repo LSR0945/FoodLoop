@@ -4,7 +4,7 @@ import { createServerFn } from "@tanstack/react-start";
 // secrets, so the server hands them to the browser at startup.
 export const getFirebaseConfig = createServerFn({ method: "GET" }).handler(async () => {
   return {
-    apiKey: (process.env.GOOGLE_API_KEY ?? "").trim(),
-    measurementId: (process.env.GOOGLE_ANALYTICS_MEASUREMENT_ID ?? "").trim(),
+    apiKey: (process.env["GOOGLE_API_KEY"] ?? "").trim(),
+    measurementId: (process.env["GOOGLE_ANALYTICS_MEASUREMENT_ID"] ?? "").trim(),
   };
 });

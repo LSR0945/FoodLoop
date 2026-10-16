@@ -21,7 +21,7 @@ export function getFirebase(): Promise<Services> {
           storageBucket: "food-app-f3778.firebasestorage.app",
           messagingSenderId: "587598535959",
           appId: "1:587598535959:web:52a6d560705cdd71a26b52",
-          measurementId: cfg.measurementId || undefined,
+          ...(cfg.measurementId ? { measurementId: cfg.measurementId } : {}),
         });
       if (cfg.measurementId) {
         import("firebase/analytics")
