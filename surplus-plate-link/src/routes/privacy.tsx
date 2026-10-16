@@ -51,7 +51,7 @@ function PrivacyPage() {
           <section className="space-y-2">
             <h2 className="text-lg font-bold text-foreground">3. Security & Access</h2>
             <p className="text-xs text-muted-foreground">
-              All credentials are secure through Firebase Authentication and Firestore security rules. Users can request data deletion at any time by contacting privacy@foodloop.org.
+              All credentials are secure through Supabase Authentication and Row Level Security policies. Users can request data deletion at any time by contacting privacy@foodloop.org.
             </p>
           </section>
         </div>

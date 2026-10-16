@@ -26,9 +26,8 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { StatusBadge, UrgencyBadge } from "@/components/ListingBits";
-import { useAuth } from "@/lib/auth";
+import { signOutUser, useAuth } from "@/lib/auth";
 import { compressImage, registerDonor, registerNGO, registerVolunteer, updateProfile, useListings } from "@/lib/db";
-import { getFirebase } from "@/lib/firebase";
 import type { DonorRecord, NGORecord, Profile, Role, Shift, VolunteerRecord } from "@/lib/types";
 
 export const Route = createFileRoute("/app/profile")({
@@ -311,9 +310,7 @@ function ProfilePage() {
 
   async function logout() {
     try {
-      const { auth } = await getFirebase();
-      const { signOut } = await import("firebase/auth");
-      await signOut(auth);
+      await signOutUser();
       navigate({ to: "/auth", replace: true });
     } catch {
       toast.error("Logout failed.");

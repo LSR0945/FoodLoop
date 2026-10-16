@@ -25,16 +25,34 @@ $items = @(
   @{ key = "avatar-3";  id = 57092922 }
 )
 
+function Get-Existing($key) {
+  foreach ($ext in @(".jpg", ".jpeg", ".png")) {
+    $p = Join-Path $dest "$key$ext"
+    if ((Test-Path $p) -and ((Get-Item $p).Length -gt 20000)) { return $p }
+  }
+  return $null
+}
+
+$creditsFile = Join-Path $dest "credits.json"
 $credits = @()
+if (Test-Path $creditsFile) { $credits = Get-Content $creditsFile -Raw | ConvertFrom-Json }
+
 foreach ($it in $items) {
+  $existing = Get-Existing $it.key
+  if ($existing) { Write-Output ("{0,-10} SKIP (exists) {1}" -f $it.key, (Split-Path $existing -Leaf)); continue }
+
   $url = "https://commons.wikimedia.org/w/api.php?action=query&format=json&pageids=$($it.id)&prop=imageinfo&iiprop=url|mime|size|extmetadata&iiurlwidth=1400"
   $json = $null
-  for ($try = 0; $try -lt 4 -and -not $json; $try++) {
+  for ($try = 0; $try -lt 5 -and -not $json; $try++) {
     try {
       $raw = (curl.exe -s -m 30 -A "FoodLoopCardBot/1.0 (hackathon)" $url) -join ""
-      $json = $raw | ConvertFrom-Json
-    } catch { Start-Sleep -Seconds 5 }
+      $parsed = $raw | ConvertFrom-Json
+      if ($parsed.query -and $parsed.query.pages) { $json = $parsed }
+    } catch { }
+    if (-not $json) { Start-Sleep -Seconds 6 }
   }
+  if (-not $json) { Write-Output ("{0,-10} FAILED metadata" -f $it.key); continue }
+
   $page = $json.query.pages.PSObject.Properties.Value
   $ii = $page.imageinfo[0]
   $src = $ii.thumburl
@@ -42,16 +60,26 @@ foreach ($it in $items) {
   $ext = [System.IO.Path]::GetExtension(([uri]$src).AbsolutePath).ToLower()
   if ($ext -notin @(".jpg", ".jpeg", ".png")) { $ext = ".jpg" }
   $out = Join-Path $dest "$($it.key)$ext"
-  curl.exe -s -m 60 -A "FoodLoopCardBot/1.0 (hackathon)" -o $out $src
+
+  for ($try = 0; $try -lt 4; $try++) {
+    curl.exe -s -m 90 -A "FoodLoopCardBot/1.0 (hackathon)" -o $out $src
+    if ((Test-Path $out) -and ((Get-Item $out).Length -gt 20000)) { break }
+    Start-Sleep -Seconds 6
+  }
   $size = (Get-Item $out).Length
   $head = ([System.IO.File]::ReadAllBytes($out)[0..2] | ForEach-Object { $_.ToString('X2') }) -join ' '
-  Write-Output ("{0,-10} {1,8} bytes  head={2}  <- {3}" -f $it.key, $size, $head, $ii.descriptionurl)
+  Write-Output ("{0,-10} {1,8} bytes head={2} <- {3}" -f $it.key, $size, $head, $ii.descriptionurl)
+
   $em = $ii.extmetadata
-  $license = if ($em.LicenseShortName) { $em.LicenseShortName.value } else { "" }
-  $artist = if ($em.Artist) { ($em.Artist.value -replace '<[^>]+>', '') } else { "" }
-  $credits += [pscustomobject]@{ Key = $it.key; Title = $page.title; Page = $ii.descriptionurl; License = $license; Artist = $artist }
-  Start-Sleep -Seconds 1
+  $credits += [pscustomobject]@{
+    Key     = $it.key
+    Title   = $page.title
+    Page    = $ii.descriptionurl
+    License = if ($em.LicenseShortName) { $em.LicenseShortName.value } else { "" }
+    Artist  = if ($em.Artist) { ($em.Artist.value -replace '<[^>]+>', '').Trim() } else { "" }
+  }
+  Start-Sleep -Seconds 3
 }
 
-$credits | ConvertTo-Json | Out-File -FilePath (Join-Path $dest "credits.json") -Encoding utf8
+$credits | ConvertTo-Json | Out-File -FilePath $creditsFile -Encoding utf8
 Write-Output "DONE -> $dest"

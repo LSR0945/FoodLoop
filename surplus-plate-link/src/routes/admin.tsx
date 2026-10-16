@@ -31,7 +31,7 @@ import {
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "@tanstack/react-router";
-import { useListings, generateFirebaseSchema } from "@/lib/db";
+import { useListings, generateSupabaseSchema } from "@/lib/db";
 import { toast } from "sonner";
 import { Database } from "lucide-react";
 import {
@@ -126,22 +126,22 @@ function AdminPage() {
   const navigate = useNavigate();
   const { data: listings } = useListings();
   const [activeTab, setActiveTab] = useState<"dashboard" | "verification" | "moderation" | "users" | "audit">("dashboard");
-  const [seedingFirebase, setSeedingFirebase] = useState(false);
+  const [seedingSupabase, setSeedingSupabase] = useState(false);
 
-  async function handleSeedFirebase() {
-    setSeedingFirebase(true);
-    toast.info("Generating Firebase Schema and seeding collections...");
+  async function handleSeedSupabase() {
+    setSeedingSupabase(true);
+    toast.info("Generating Supabase Schema and seeding tables...");
     try {
-      const res = await generateFirebaseSchema();
+      const res = await generateSupabaseSchema();
       if (res.success) {
         toast.success(res.message);
       } else {
         toast.info(res.message);
       }
     } catch (err: any) {
-      toast.error(err.message || "Failed to generate Firebase schema");
+      toast.error(err.message || "Failed to generate Supabase schema");
     } finally {
-      setSeedingFirebase(false);
+      setSeedingSupabase(false);
     }
   }
 
@@ -244,13 +244,13 @@ function AdminPage() {
 
           <div className="flex items-center gap-3 text-xs font-semibold">
             <button
-              onClick={handleSeedFirebase}
-              disabled={seedingFirebase}
+              onClick={handleSeedSupabase}
+              disabled={seedingSupabase}
               className="inline-flex items-center gap-1.5 rounded-full bg-[#ED7545] px-3.5 py-1 text-white hover:bg-[#d96536] transition-colors shadow-xs"
-              title="Write full schema documents into Firebase Firestore"
+              title="Write full schema rows into Supabase"
             >
               <Database className="size-3.5" />
-              <span>{seedingFirebase ? "Generating..." : "Generate Firebase Schema"}</span>
+              <span>{seedingSupabase ? "Generating..." : "Generate Supabase Schema"}</span>
             </button>
             <Link to="/app" className="rounded-full bg-white/10 px-3 py-1 hover:bg-white/20 transition-colors">
               Go to User App →

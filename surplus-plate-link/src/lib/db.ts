@@ -1,35 +1,25 @@
-import {
-  addDoc,
-  arrayUnion,
-  collection,
-  doc,
-  onSnapshot,
-  orderBy,
-  query,
-  updateDoc,
-  where,
-  writeBatch,
-} from "firebase/firestore";
 import { useEffect, useState } from "react";
-import { getFirebase } from "./firebase";
+import { getSupabase } from "./supabase";
 import type { AppNotification, DonorRecord, Listing, NGORecord, Profile, Status, VolunteerRecord } from "./types";
 
 export async function notify(userIds: (string | undefined)[], title: string, body: string, listingId?: string) {
-  const { db } = await getFirebase();
   const ids = [...new Set(userIds.filter(Boolean) as string[])];
   if (!ids.length) return;
-  const batch = writeBatch(db);
-  ids.forEach((userId) =>
-    batch.set(doc(collection(db, "notifications")), {
-      userId,
-      title,
-      body,
-      listingId: listingId ?? null,
-      read: false,
-      createdAt: Date.now(),
-    }),
-  );
-  await batch.commit().catch(() => {});
+  try {
+    const supabase = getSupabase();
+    await supabase.from("notifications").insert(
+      ids.map((userId) => ({
+        userId,
+        title,
+        body,
+        listingId: listingId ?? null,
+        read: false,
+        createdAt: Date.now(),
+      })),
+    );
+  } catch {
+    /* notifications are best-effort */
+  }
 }
 
 const entry = (status: Status, by: string, note?: string) => ({ status, at: Date.now(), by, ...(note ? { note } : {}) });
@@ -266,8 +256,6 @@ export function setStoredListings(list: Listing[]) {
   } catch {}
 }
 
-
-
 export async function createListing(data: Omit<Listing, "id" | "status" | "createdAt" | "history">, by: string) {
   let id = "lst_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
   const now = Date.now();
@@ -280,17 +268,11 @@ export async function createListing(data: Omit<Listing, "id" | "status" | "creat
   };
 
   try {
-    const { db } = await getFirebase();
-    const ref = await addDoc(collection(db, "listings"), {
-      ...data,
-      status: "available",
-      createdAt: now,
-      history: newListing.history,
-    });
-    id = ref.id;
-    newListing.id = id;
+    const supabase = getSupabase();
+    const { error } = await supabase.from("listings").insert(newListing);
+    if (error) throw error;
   } catch (err) {
-    console.warn("Firestore addDoc failed, using resilient local storage:", err);
+    console.warn("Supabase insert failed, using resilient local storage:", err);
   }
 
   const existing = getStoredListings().filter((l) => l.id !== id);
@@ -314,10 +296,15 @@ async function patch(id: string, data: Record<string, unknown>, status: Status, 
   }
 
   try {
-    const { db } = await getFirebase();
-    await updateDoc(doc(db, "listings", id), { ...data, status, history: arrayUnion(entry(status, by, note)) });
+    const supabase = getSupabase();
+    const { data: row } = await supabase.from("listings").select("history").eq("id", id).maybeSingle();
+    const history = Array.isArray((row as { history?: unknown[] } | null)?.history) ? (row as { history: unknown[] }).history : [];
+    await supabase
+      .from("listings")
+      .update({ ...data, status, history: [...history, entry(status, by, note)] })
+      .eq("id", id);
   } catch (err) {
-    console.warn("Firestore patch failed, local state updated:", err);
+    console.warn("Supabase patch failed, local state updated:", err);
   }
 }
 
@@ -394,6 +381,10 @@ export async function reportListing(listingId: string, reason: string, details: 
       localStorage.setItem("foodloop_reports", JSON.stringify([report, ...list]));
     }
   } catch {}
+  try {
+    const supabase = getSupabase();
+    await supabase.from("reports").insert(report);
+  } catch {}
   return report;
 }
 
@@ -411,11 +402,10 @@ export async function updateProfile(uid: string, data: Partial<Profile>) {
   } catch {}
 
   try {
-    const { db } = await getFirebase();
-    const { setDoc } = await import("firebase/firestore");
-    await setDoc(doc(db, "users", uid), data, { merge: true });
+    const supabase = getSupabase();
+    await supabase.from("profiles").upsert({ ...data, uid }, { onConflict: "uid" });
   } catch (err) {
-    console.warn("Firestore updateProfile failed, saved locally:", err);
+    console.warn("Supabase updateProfile failed, saved locally:", err);
   }
 }
 
@@ -437,12 +427,11 @@ export async function registerDonor(data: DonorRecord) {
   } catch {}
 
   try {
-    const { db } = await getFirebase();
-    const { setDoc } = await import("firebase/firestore");
-    await setDoc(doc(db, "donors", data.uid), data, { merge: true });
-    await setDoc(doc(db, "users", data.uid), { ...data, role: "donor" }, { merge: true });
+    const supabase = getSupabase();
+    await supabase.from("donors").upsert(data, { onConflict: "uid" });
+    await supabase.from("profiles").upsert({ ...data, role: "donor" }, { onConflict: "uid" });
   } catch (err) {
-    console.warn("Firestore donors table save failed, saved locally:", err);
+    console.warn("Supabase donors table save failed, saved locally:", err);
   }
 }
 
@@ -464,13 +453,14 @@ export async function registerNGO(data: NGORecord) {
   } catch {}
 
   try {
-    const { db } = await getFirebase();
-    const { setDoc } = await import("firebase/firestore");
-    await setDoc(doc(db, "recipients", data.uid), data, { merge: true });
-    await setDoc(doc(db, "ngos", data.uid), data, { merge: true });
-    await setDoc(doc(db, "users", data.uid), { ...data, role: "recipient", name: data.name || data.contactPerson }, { merge: true });
+    const supabase = getSupabase();
+    await supabase.from("recipients").upsert(data, { onConflict: "uid" });
+    await supabase.from("ngos").upsert(data, { onConflict: "uid" });
+    await supabase
+      .from("profiles")
+      .upsert({ ...data, role: "recipient", name: data.name || data.contactPerson }, { onConflict: "uid" });
   } catch (err) {
-    console.warn("Firestore recipients table save failed, saved locally:", err);
+    console.warn("Supabase recipients table save failed, saved locally:", err);
   }
 }
 
@@ -492,19 +482,18 @@ export async function registerVolunteer(data: VolunteerRecord) {
   } catch {}
 
   try {
-    const { db } = await getFirebase();
-    const { setDoc } = await import("firebase/firestore");
-    await setDoc(doc(db, "volunteers", data.uid), data, { merge: true });
-    await setDoc(doc(db, "users", data.uid), { ...data, role: "volunteer" }, { merge: true });
+    const supabase = getSupabase();
+    await supabase.from("volunteers").upsert(data, { onConflict: "uid" });
+    await supabase.from("profiles").upsert({ ...data, role: "volunteer" }, { onConflict: "uid" });
   } catch (err) {
-    console.warn("Firestore volunteers table save failed, saved locally:", err);
+    console.warn("Supabase volunteers table save failed, saved locally:", err);
   }
 }
 
 export async function markRead(id: string) {
   try {
-    const { db } = await getFirebase();
-    await updateDoc(doc(db, "notifications", id), { read: true });
+    const supabase = getSupabase();
+    await supabase.from("notifications").update({ read: true }).eq("id", id);
   } catch {}
 }
 
@@ -539,18 +528,29 @@ export function useListings() {
 
   const remote = useLive<Listing[]>(async (cb) => {
     try {
-      const { db } = await getFirebase();
-      return onSnapshot(
-        query(collection(db, "listings"), orderBy("createdAt", "desc")),
-        (s) => {
-          if (!s.empty) {
-            cb(s.docs.map((d) => ({ id: d.id, ...d.data() }) as Listing));
-          } else {
-            cb(getStoredListings());
-          }
-        },
-        () => cb(getStoredListings()),
-      );
+      const supabase = getSupabase();
+      let alive = true;
+
+      const load = async () => {
+        const { data, error } = await supabase.from("listings").select("*").order("createdAt", { ascending: false });
+        if (error) throw error;
+        if (!alive) return;
+        cb(data && data.length ? (data as unknown as Listing[]) : getStoredListings());
+      };
+
+      await load();
+
+      const channel = supabase
+        .channel("listings-live")
+        .on("postgres_changes", { event: "*", schema: "public", table: "listings" }, () => {
+          load().catch(() => cb(getStoredListings()));
+        })
+        .subscribe();
+
+      return () => {
+        alive = false;
+        supabase.removeChannel(channel);
+      };
     } catch {
       cb(getStoredListings());
       return () => {};
@@ -584,18 +584,33 @@ export function useListing(id: string) {
 
   const remote = useLive<Listing | null>(async (cb, err) => {
     try {
-      const { db } = await getFirebase();
-      return onSnapshot(
-        doc(db, "listings", id),
-        (s) => {
-          if (s.exists()) {
-            cb({ id: s.id, ...s.data() } as Listing);
-          } else {
-            cb(getStoredListings().find((l) => l.id === id) || null);
-          }
-        },
-        err,
-      );
+      const supabase = getSupabase();
+      let alive = true;
+
+      const load = async () => {
+        const { data, error } = await supabase.from("listings").select("*").eq("id", id).maybeSingle();
+        if (error) throw error;
+        if (!alive) return;
+        cb(data ? (data as unknown as Listing) : getStoredListings().find((l) => l.id === id) || null);
+      };
+
+      await load();
+
+      const channel = supabase
+        .channel("listing:" + id)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "listings", filter: `id=eq.${id}` },
+          () => {
+            load().catch(err);
+          },
+        )
+        .subscribe();
+
+      return () => {
+        alive = false;
+        supabase.removeChannel(channel);
+      };
     } catch {
       cb(getStoredListings().find((l) => l.id === id) || null);
       return () => {};
@@ -608,8 +623,29 @@ export function useListing(id: string) {
 export function useVolunteers() {
   return useLive<Profile[]>(async (cb, err) => {
     try {
-      const { db } = await getFirebase();
-      return onSnapshot(query(collection(db, "users"), where("role", "==", "volunteer")), (s) => cb(s.docs.map((d) => d.data() as Profile)), err);
+      const supabase = getSupabase();
+      let alive = true;
+
+      const load = async () => {
+        const { data, error } = await supabase.from("profiles").select("*").eq("role", "volunteer");
+        if (error) throw error;
+        if (!alive) return;
+        cb((data as unknown as Profile[]) || []);
+      };
+
+      await load();
+
+      const channel = supabase
+        .channel("volunteers-live")
+        .on("postgres_changes", { event: "*", schema: "public", table: "profiles" }, () => {
+          load().catch(err);
+        })
+        .subscribe();
+
+      return () => {
+        alive = false;
+        supabase.removeChannel(channel);
+      };
     } catch {
       cb([]);
       return () => {};
@@ -621,12 +657,37 @@ export function useNotifications(uid: string | undefined) {
   return useLive<AppNotification[]>(async (cb, err) => {
     if (!uid) return () => {};
     try {
-      const { db } = await getFirebase();
-      return onSnapshot(
-        query(collection(db, "notifications"), where("userId", "==", uid)),
-        (s) => cb(s.docs.map((d) => ({ id: d.id, ...d.data() }) as AppNotification).sort((a, b) => b.createdAt - a.createdAt)),
-        err,
-      );
+      const supabase = getSupabase();
+      let alive = true;
+
+      const load = async () => {
+        const { data, error } = await supabase
+          .from("notifications")
+          .select("*")
+          .eq("userId", uid)
+          .order("createdAt", { ascending: false });
+        if (error) throw error;
+        if (!alive) return;
+        cb((data as unknown as AppNotification[]) || []);
+      };
+
+      await load();
+
+      const channel = supabase
+        .channel("notifications:" + uid)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "notifications", filter: `userId=eq.${uid}` },
+          () => {
+            load().catch(err);
+          },
+        )
+        .subscribe();
+
+      return () => {
+        alive = false;
+        supabase.removeChannel(channel);
+      };
     } catch {
       cb([]);
       return () => {};
@@ -634,7 +695,7 @@ export function useNotifications(uid: string | undefined) {
   }, [], [uid]);
 }
 
-/** Resize + compress a photo to a small JPEG data URL (stored inline in Firestore). */
+/** Resize + compress a photo to a small JPEG data URL (stored inline in Supabase). */
 export function compressImage(file: File, max = 900, quality = 0.7): Promise<string> {
   return new Promise((resolve, reject) => {
     const img = new Image();
@@ -652,18 +713,17 @@ export function compressImage(file: File, max = 900, quality = 0.7): Promise<str
   });
 }
 
-/** Generate and seed full Firebase Firestore Schema */
-export async function generateFirebaseSchema(): Promise<{ success: boolean; message: string; count: number }> {
+/** Generate and seed the full Supabase schema (tables) with starter data */
+export async function generateSupabaseSchema(): Promise<{ success: boolean; message: string; count: number }> {
   let count = 0;
   try {
-    const { db } = await getFirebase();
-    const { setDoc } = await import("firebase/firestore");
+    const supabase = getSupabase();
 
     // 1. Seed Listings
-    for (const l of SEED_LISTINGS) {
-      await setDoc(doc(db, "listings", l.id), l, { merge: true });
-      count++;
-    }
+    const listings = SEED_LISTINGS.map((l) => ({ ...l, donorId: l.donorId || "donor_demo_id" }));
+    const { error: listingsErr } = await supabase.from("listings").upsert(listings, { onConflict: "id" });
+    if (listingsErr) throw listingsErr;
+    count += listings.length;
 
     // 2. Seed Default Profiles / Users
     const users: Partial<Profile>[] = [
@@ -705,16 +765,12 @@ export async function generateFirebaseSchema(): Promise<{ success: boolean; mess
       },
     ];
 
-    for (const u of users) {
-      if (u.uid) {
-        await setDoc(doc(db, "users", u.uid), u, { merge: true });
-        count++;
-      }
-    }
+    const { error: usersErr } = await supabase.from("profiles").upsert(users, { onConflict: "uid" });
+    if (usersErr) throw usersErr;
+    count += users.length;
 
     // 3. Seed Platform Notices
-    await setDoc(
-      doc(db, "platform_notices", "notice_mathura_zero_hunger"),
+    const { error: noticeErr } = await supabase.from("platform_notices").upsert(
       {
         id: "notice_mathura_zero_hunger",
         title: "Mission Zero Hunger Mathura Alert",
@@ -723,8 +779,9 @@ export async function generateFirebaseSchema(): Promise<{ success: boolean; mess
         active: true,
         date: new Date().toISOString().slice(0, 10),
       },
-      { merge: true },
+      { onConflict: "id" },
     );
+    if (noticeErr) throw noticeErr;
     count++;
 
     // Update local cache as well
@@ -732,16 +789,16 @@ export async function generateFirebaseSchema(): Promise<{ success: boolean; mess
 
     return {
       success: true,
-      message: `Firebase Schema successfully generated! ${count} documents written across listings, users, and platform notices.`,
+      message: `Supabase schema successfully generated! ${count} rows written across listings, profiles, and platform notices.`,
       count,
     };
   } catch (err: any) {
-    console.warn("Firestore schema generation warning:", err);
-    // Even if Firestore rules prevent writes, ensure local state is 100% updated with Indian hunger relief data
+    console.warn("Supabase schema generation warning:", err);
+    // Even if RLS policies prevent writes, ensure local state is 100% updated with Indian hunger relief data
     setStoredListings(SEED_LISTINGS);
     return {
       success: false,
-      message: `Local schema generated. Firestore write note: ${err.message || "Permissions required in Firebase Console"}.`,
+      message: `Local schema generated. Supabase write note: ${err.message || "Run the SQL migration in the Supabase SQL editor first"}.`,
       count,
     };
   }

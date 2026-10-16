@@ -22,7 +22,7 @@ import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { registerDonor, registerNGO, registerVolunteer, updateProfile } from "@/lib/db";
-import { getFirebase } from "@/lib/firebase";
+import { sendPasswordResetEmailTo, signInWithEmail, signUpWithEmail } from "@/lib/supabase-auth";
 import type { DonorRecord, NGORecord, Role, Shift, VolunteerRecord } from "@/lib/types";
 
 export const Route = createFileRoute("/auth")({
@@ -189,18 +189,14 @@ function AuthPage() {
       };
 
       const target = demoData[demoRole] || demoData.donor;
-      const { auth, db } = await getFirebase();
-      const { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile: updateAuthProfile } = await import("firebase/auth");
-      const { doc, setDoc } = await import("firebase/firestore");
 
       let uid = "";
       try {
-        const cred = await signInWithEmailAndPassword(auth, target.email, target.pass);
-        uid = cred.user.uid;
+        const authed = await signInWithEmail(target.email, target.pass);
+        uid = authed.uid;
       } catch {
-        const cred = await createUserWithEmailAndPassword(auth, target.email, target.pass);
-        uid = cred.user.uid;
-        await updateAuthProfile(cred.user, { displayName: target.name });
+        const created = await signUpWithEmail(target.email, target.pass, target.name);
+        uid = created.uid;
       }
 
       if (demoRole === "donor") {
@@ -256,17 +252,14 @@ function AuthPage() {
     setBusy(true);
 
     try {
-      const { auth } = await getFirebase();
-      const { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile: updateAuthProfile } = await import("firebase/auth");
-
       if (mode === "login") {
         // Log in to existing account
-        const cred = await signInWithEmailAndPassword(auth, email.trim(), password);
+        const cred = await signInWithEmail(email.trim(), password);
         
         // Check if user already has a registered role in local or database records
         let existingRole: Role | undefined;
         try {
-          const raw = localStorage.getItem("annsetu_profile_" + cred.user.uid);
+          const raw = localStorage.getItem("annsetu_profile_" + cred.uid);
           if (raw) {
             const parsed = JSON.parse(raw);
             if (parsed.role) existingRole = parsed.role;
@@ -276,18 +269,18 @@ function AuthPage() {
         if (!existingRole) {
           try {
             const rawNgos = localStorage.getItem("foodloop_recipients_table") || localStorage.getItem("bhojanbandhu_ngos_table");
-            if (rawNgos && JSON.parse(rawNgos).some((n: any) => n.uid === cred.user.uid || n.email === email.trim())) {
+            if (rawNgos && JSON.parse(rawNgos).some((n: any) => n.uid === cred.uid || n.email === email.trim())) {
               existingRole = "ngo";
             }
             const rawVols = localStorage.getItem("foodloop_volunteers_table") || localStorage.getItem("bhojanbandhu_volunteers_table");
-            if (!existingRole && rawVols && JSON.parse(rawVols).some((v: any) => v.uid === cred.user.uid || v.email === email.trim())) {
+            if (!existingRole && rawVols && JSON.parse(rawVols).some((v: any) => v.uid === cred.uid || v.email === email.trim())) {
               existingRole = "volunteer";
             }
           } catch {}
         }
 
         const finalRole = existingRole || role;
-        await updateProfile(cred.user.uid, { role: finalRole });
+        await updateProfile(cred.uid, { role: finalRole });
         toast.success(`Welcome back to FoodLoop as ${finalRole.toUpperCase()}!`);
         navigate({ to: "/app" });
         return;
@@ -306,9 +299,8 @@ function AuthPage() {
       }
 
       try {
-        const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
-        uid = cred.user.uid;
-        await updateAuthProfile(cred.user, { displayName: userName });
+        const cred = await signUpWithEmail(email.trim(), password, userName);
+        uid = cred.uid;
       } catch (authErr: any) {
         if (authErr.code === "auth/email-already-in-use") {
           toast.error("This email is already registered! Please switch to 'Log in' tab.");
@@ -316,8 +308,8 @@ function AuthPage() {
           setBusy(false);
           return;
         }
-        // Fallback: If offline or Firebase auth restrictions, create reliable unique session UID
-        console.warn("Firebase Auth fallback used:", authErr.message);
+        // Fallback: If offline or Supabase auth restrictions, create reliable unique session UID
+        console.warn("Supabase Auth fallback used:", authErr.message);
         uid = "usr_" + Date.now() + "_" + Math.random().toString(36).slice(2, 7);
       }
 
@@ -386,13 +378,11 @@ function AuthPage() {
     }
     setSendingReset(true);
     try {
-      const { auth } = await getFirebase();
-      const { sendPasswordResetEmail } = await import("firebase/auth");
-      await sendPasswordResetEmail(auth, forgotEmail.trim());
+      await sendPasswordResetEmailTo(forgotEmail.trim());
       toast.success("Password reset instructions sent to your email!");
       setForgotOpen(false);
     } catch (err) {
-      toast.error((err as Error).message.replace("Firebase: ", ""));
+      toast.error((err as Error).message);
     } finally {
       setSendingReset(false);
     }
@@ -527,7 +517,7 @@ function AuthPage() {
         <div className="mt-4 flex items-center justify-between rounded-xl bg-muted/60 px-3.5 py-2 text-xs">
           <span className="font-medium text-muted-foreground">Target Database Table:</span>
           <span className="font-mono text-[11px] font-bold text-primary bg-primary/10 px-2.5 py-0.5 rounded-full">
-            Firestore & Local: `{activeRoleData.tableName}`
+            Supabase & Local: `{activeRoleData.tableName}`
           </span>
         </div>
 

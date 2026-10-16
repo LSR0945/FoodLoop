@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { updateProfile } from "@/lib/db";
-import { getFirebase } from "@/lib/firebase";
+import { signUpWithEmail } from "@/lib/supabase-auth";
 import type { Role } from "@/lib/types";
 
 export const Route = createFileRoute("/signup")({
@@ -48,11 +48,8 @@ function SignupPage() {
 
     setBusy(true);
     try {
-      const { auth } = await getFirebase();
-      const { createUserWithEmailAndPassword, updateProfile: updateAuthProfile } = await import("firebase/auth");
-      const cred = await createUserWithEmailAndPassword(auth, email.trim(), password);
-      await updateAuthProfile(cred.user, { displayName: fullName.trim() });
-      await updateProfile(cred.user.uid, {
+      const cred = await signUpWithEmail(email.trim(), password, fullName.trim());
+      await updateProfile(cred.uid, {
         name: fullName.trim(),
         email: email.trim(),
         role: selectedRole,

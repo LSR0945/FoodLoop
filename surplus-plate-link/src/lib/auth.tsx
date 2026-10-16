@@ -1,10 +1,10 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
-import type { User } from "firebase/auth";
 import type { Profile, Role } from "./types";
-import { getFirebase } from "./firebase";
+import { getSupabase } from "./supabase";
+import { signOutAuth, toAuthUser, type AuthUser } from "./supabase-auth";
 
 interface InternalAuthState {
-  user: User | null;
+  user: AuthUser | null;
   profile: Profile | null;
   loading: boolean;
   error: string | null;
@@ -16,11 +16,9 @@ export interface AuthState extends InternalAuthState {
 
 export async function signOutUser(): Promise<void> {
   try {
-    const { auth } = await getFirebase();
-    const { signOut: fbSignOut } = await import("firebase/auth");
-    await fbSignOut(auth);
+    await signOutAuth();
   } catch (err) {
-    console.warn("Firebase signOut failed:", err);
+    console.warn("Supabase signOut failed:", err);
   }
   try {
     if (typeof window !== "undefined") {
@@ -68,77 +66,115 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     let unsubAuth = () => {};
-    let unsubProfile = () => {};
+    let channel: ReturnType<ReturnType<typeof getSupabase>["channel"]> | null = null;
+
+    const fallbackProfile = (user: AuthUser, saved?: Profile | null): Profile =>
+      saved ?? {
+        uid: user.uid,
+        name: user.displayName || user.email?.split("@")[0] || "User",
+        email: user.email || "",
+        role: (saved as any)?.role as Role,
+        createdAt: Date.now(),
+      } as Profile;
+
+    const readCached = (uid: string): Profile | null => {
+      try {
+        const raw = localStorage.getItem("foodloop_profile_" + uid) || localStorage.getItem("annsetu_profile_" + uid);
+        return raw ? (JSON.parse(raw) as Profile) : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const cacheProfile = (p: Profile) => {
+      try {
+        localStorage.setItem("foodloop_profile_" + p.uid, JSON.stringify(p));
+        localStorage.setItem("annsetu_profile_" + p.uid, JSON.stringify(p));
+      } catch {}
+    };
+
+    const applyProfile = async (user: AuthUser) => {
+      try {
+        const supabase = getSupabase();
+        const { data, error } = await supabase.from("profiles").select("*").eq("uid", user.uid).maybeSingle();
+        if (error) throw error;
+
+        if (data) {
+          const p = data as unknown as Profile;
+          cacheProfile(p);
+          setState({ user, profile: p, loading: false, error: null });
+        } else {
+          const saved = readCached(user.uid);
+          const fallback = fallbackProfile(user, saved);
+          setState({ user, profile: fallback, loading: false, error: null });
+          supabase
+            .from("profiles")
+            .upsert(fallback, { onConflict: "uid" })
+            .then(() => {}, () => {});
+        }
+
+        // Live profile updates (role change, verification, name edits)
+        if (channel) {
+          supabase.removeChannel(channel);
+          channel = null;
+        }
+        channel = supabase
+          .channel("profile:" + user.uid)
+          .on(
+            "postgres_changes",
+            { event: "*", schema: "public", table: "profiles", filter: `uid=eq.${user.uid}` },
+            (payload: any) => {
+              const row = payload.new as Profile | undefined;
+              if (row) {
+                cacheProfile(row);
+                setState((s) => ({ ...s, user, profile: { ...(s.profile || row), ...row }, loading: false, error: null }));
+              }
+            },
+          )
+          .subscribe();
+      } catch {
+        // On error (e.g. permissions or offline), load cached or fallback profile
+        const fallback = fallbackProfile(user, readCached(user.uid));
+        setState({ user, profile: fallback, loading: false, error: null });
+      }
+    };
+
     (async () => {
       try {
-        const { auth, db } = await getFirebase();
-        const { onAuthStateChanged } = await import("firebase/auth");
-        const { doc, onSnapshot } = await import("firebase/firestore");
-        unsubAuth = onAuthStateChanged(auth, (user) => {
-          unsubProfile();
+        const supabase = getSupabase();
+        const { data } = await supabase.auth.getSession();
+        const initial = toAuthUser(data.session?.user);
+        if (initial) {
+          setState((s) => ({ ...s, user: initial, loading: true }));
+          await applyProfile(initial);
+        } else {
+          setState({ user: null, profile: null, loading: false, error: null });
+        }
+
+        const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+          const user = toAuthUser(session?.user);
           if (!user) {
+            if (channel) {
+              supabase.removeChannel(channel);
+              channel = null;
+            }
             setState({ user: null, profile: null, loading: false, error: null });
             return;
           }
           setState((s) => ({ ...s, user, loading: true }));
-          unsubProfile = onSnapshot(
-            doc(db, "users", user.uid),
-            (snap) => {
-              if (snap.exists()) {
-                const p = snap.data() as Profile;
-                try {
-                  localStorage.setItem("foodloop_profile_" + user.uid, JSON.stringify(p));
-                  localStorage.setItem("annsetu_profile_" + user.uid, JSON.stringify(p));
-                } catch {}
-                setState({ user, profile: p, loading: false, error: null });
-              } else {
-                let saved: Profile | null = null;
-                try {
-                  const raw =
-                    localStorage.getItem("foodloop_profile_" + user.uid) ||
-                    localStorage.getItem("annsetu_profile_" + user.uid);
-                  if (raw) saved = JSON.parse(raw);
-                } catch {}
-                const fallback: Profile = saved ?? {
-                  uid: user.uid,
-                  name: user.displayName || user.email?.split("@")[0] || "User",
-                  email: user.email || "",
-                  role: ((saved as any)?.role as Role) || "donor",
-                  createdAt: Date.now(),
-                };
-                setState({ user, profile: fallback, loading: false, error: null });
-                import("firebase/firestore").then(({ setDoc }) => {
-                  setDoc(doc(db, "users", user.uid), fallback, { merge: true }).catch(() => {});
-                });
-              }
-            },
-            () => {
-              // On error (e.g. firestore permissions), load cached or fallback profile
-              let saved: Profile | null = null;
-              try {
-                const raw =
-                  localStorage.getItem("foodloop_profile_" + user.uid) ||
-                  localStorage.getItem("annsetu_profile_" + user.uid);
-                if (raw) saved = JSON.parse(raw);
-              } catch {}
-              const fallback: Profile = saved ?? {
-                uid: user.uid,
-                name: user.displayName || user.email?.split("@")[0] || "Food Donor",
-                email: user.email || "",
-                role: "donor",
-                createdAt: Date.now(),
-              };
-              setState({ user, profile: fallback, loading: false, error: null });
-            },
-          );
+          applyProfile(user);
         });
+        unsubAuth = () => listener.subscription.unsubscribe();
       } catch (e) {
         setState((s) => ({ ...s, loading: false, error: (e as Error).message }));
       }
     })();
+
     return () => {
       unsubAuth();
-      unsubProfile();
+      try {
+        if (channel) getSupabase().removeChannel(channel);
+      } catch {}
     };
   }, []);
 

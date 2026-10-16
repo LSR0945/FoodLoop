@@ -3,7 +3,7 @@ import { useState } from "react";
 import { ArrowLeft, CheckCircle2, KeyRound, Mail } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
-import { getFirebase } from "@/lib/firebase";
+import { sendPasswordResetEmailTo } from "@/lib/supabase-auth";
 
 export const Route = createFileRoute("/forgot-password")({
   head: () => ({
@@ -24,13 +24,11 @@ function ForgotPasswordPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const { auth } = await getFirebase();
-      const { sendPasswordResetEmail } = await import("firebase/auth");
-      await sendPasswordResetEmail(auth, email.trim());
+      await sendPasswordResetEmailTo(email.trim());
       setSubmitted(true);
       toast.success("Password reset instructions sent to your email!");
     } catch (err: any) {
-      // In demo mode or if email not in live Firebase yet
+      // In demo mode or if email is not registered in live Supabase yet
       setSubmitted(true);
       toast.info("Password recovery instructions simulated for " + email);
     } finally {

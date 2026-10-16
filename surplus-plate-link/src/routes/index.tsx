@@ -92,8 +92,8 @@ const COMMUNITY_STORIES = [
     id: "story-1",
     author: "Govind Seva Ashram & Rain Basera",
     role: "Shelter Partner",
-    avatar: "/images/hunger/card2.png",
-    image: "/images/hunger/ground4.jpg",
+    avatar: "/images/cards/avatar-1.jpg",
+    image: "/images/cards/story-1.jpg",
     title: "180 hot meals distributed to daily wagers in winter",
     snippet:
       "When a large wedding banquet concluded at 11 PM, FoodLoop volunteers mobilized within 20 minutes. 180 plates of steaming nutritious pulao, dal, and fresh rotis were handed directly to homeless workers and children with warmth and dignity.",
@@ -105,8 +105,8 @@ const COMMUNITY_STORIES = [
     id: "story-2",
     author: "Prerna Slum School & Nutrition Center",
     role: "Child Welfare NGO",
-    avatar: "/images/food/fruit_crates.jpg",
-    image: "/images/hunger/hunger3.png",
+    avatar: "/images/cards/avatar-2.jpg",
+    image: "/images/cards/story-2.jpg",
     title: "Fresh bakery loaves & fruit baskets for 140 children",
     snippet:
       "Wholesale mandi donors and local bakeries diverted unblemished surplus fruits and bread before expiry. Every child in our morning remedial center received a wholesome, dignified breakfast.",
@@ -118,8 +118,8 @@ const COMMUNITY_STORIES = [
     id: "story-3",
     author: "Mother Teresa Hope Relief Mission",
     role: "Emergency Food Bank",
-    avatar: "/images/hunger/ground1.png",
-    image: "/images/actions/indian_dry_ration_pds_kit.jpg",
+    avatar: "/images/cards/avatar-3.jpg",
+    image: "/images/cards/story-3.jpg",
     title: "75 Emergency ration kits assembled during crisis",
     snippet:
       "Volunteers packed fortified grains, pulses, and cooking essentials for vulnerable families living on the city periphery. 100% verified digital handover with zero food waste.",
@@ -402,8 +402,8 @@ function LandingPage() {
                   {/* Main big hunger relief photo */}
                   <div className="relative aspect-[4/3] w-full overflow-hidden rounded-2xl bg-[#EDE8DE]">
                     <img
-                      src="/images/hunger/hunger3.png"
-                      alt="Bhookh se pidit bhartiya bachhe khana kha rahe hain"
+                      src="/images/cards/hero-main.jpg"
+                      alt="Bharat ke school ke bachhe midday meal scheme ke tahat thali mein khana kha rahe hain"
                       className="size-full object-cover"
                     />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/20 to-transparent" />
@@ -425,7 +425,7 @@ function LandingPage() {
                   <div className="mt-3 grid grid-cols-2 gap-2">
                     <div className="flex items-center gap-2 rounded-xl bg-[#F8F5ED] p-2 border border-[#E2DBD0]">
                       <img
-                        src="/images/hunger/ground1.png"
+                        src="/images/cards/mini-1.jpg"
                         alt="Bhookh se pidit bachhe"
                         className="size-10 rounded-lg object-cover"
                       />
@@ -436,7 +436,7 @@ function LandingPage() {
                     </div>
                     <div className="flex items-center gap-2 rounded-xl bg-[#F8F5ED] p-2 border border-[#E2DBD0]">
                       <img
-                        src="/images/hunger/hunger2.png"
+                        src="/images/cards/mini-2.jpg"
                         alt="Gareeb pariwar khana kha raha hai"
                         className="size-10 rounded-lg object-cover"
                       />
@@ -447,7 +447,7 @@ function LandingPage() {
                     </div>
                     <div className="flex items-center gap-2 rounded-xl bg-[#F8F5ED] p-2 border border-[#E2DBD0]">
                       <img
-                        src="/images/hunger/hunger4.png"
+                        src="/images/cards/mini-3.jpg"
                         alt="Bache roti maang rahe hain"
                         className="size-10 rounded-lg object-cover"
                       />
@@ -458,7 +458,7 @@ function LandingPage() {
                     </div>
                     <div className="flex items-center gap-2 rounded-xl bg-[#F8F5ED] p-2 border border-[#E2DBD0]">
                       <img
-                        src="/images/hunger/hunger5.png"
+                        src="/images/cards/mini-4.jpg"
                         alt="Gareeb log khane ki line mein"
                         className="size-10 rounded-lg object-cover"
                       />
@@ -499,7 +499,7 @@ function LandingPage() {
                 {/* Card 1 — Kuposhan */}
                 <div className="relative overflow-hidden rounded-2xl shadow-md group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
                   <img
-                    src="/images/hunger/card1.png"
+                    src="/images/cards/strip-1.jpg"
                     alt="Bharat mein kuposhan"
                     className="w-full h-36 sm:h-40 object-cover"
                   />
@@ -516,7 +516,7 @@ function LandingPage() {
                 {/* Card 2 — Bhookha Na Soye Koi */}
                 <div className="relative overflow-hidden rounded-2xl shadow-md group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
                   <img
-                    src="/images/hunger/card2.png"
+                    src="/images/cards/strip-2.jpg"
                     alt="Bhookha na soye koi"
                     className="w-full h-36 sm:h-40 object-cover"
                   />
@@ -533,7 +533,7 @@ function LandingPage() {
                 {/* Card 3 — Surplus vs Hunger */}
                 <div className="relative overflow-hidden rounded-2xl shadow-md group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
                   <img
-                    src="/images/hunger/card3.png"
+                    src="/images/cards/strip-3.jpg"
                     alt="Surplus food vs hunger contrast"
                     className="w-full h-36 sm:h-40 object-cover"
                   />
@@ -550,7 +550,7 @@ function LandingPage() {
                 {/* Card 4 — Children Khatai Lene */}
                 <div className="relative overflow-hidden rounded-2xl shadow-md group cursor-pointer hover:scale-[1.02] transition-transform duration-300">
                   <img
-                    src="/images/hunger/card4.png"
+                    src="/images/cards/strip-4.jpg"
                     alt="Bachhe khaane ke liye haath failaye hue"
                     className="w-full h-36 sm:h-40 object-cover"
                   />
@@ -618,7 +618,7 @@ function LandingPage() {
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/hunger/ground2.png"
+                    src="/images/cards/ground-1.jpg"
                     alt="Night shelter Rain Basera mein baithe log steel thaliyon mein garma-garam khana kha rahe hain"
                     className="size-full object-cover object-center"
                   />
@@ -645,7 +645,7 @@ function LandingPage() {
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/actions/indian_dry_ration_pds_kit.jpg"
+                    src="/images/cards/ground-2.jpg"
                     alt="Indian emergency dry ration food kit dal rice packet"
                     className="size-full object-cover object-center"
                   />
@@ -672,7 +672,7 @@ function LandingPage() {
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/actions/indian_midday_meal_served.jpg"
+                    src="/images/cards/ground-3.jpg"
                     alt="Indian bacche school midday meal programme mein khana lete hue"
                     className="size-full object-cover object-center"
                   />
@@ -699,7 +699,7 @@ function LandingPage() {
               <div>
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-gray-100">
                   <img
-                    src="/images/actions/langar_seva_real.jpg"
+                    src="/images/cards/ground-4.jpg"
                     alt="Community Langar seva hall mein log pangat mein baithkar garma garam khana kha rahe hain"
                     className="size-full object-cover object-center"
                   />

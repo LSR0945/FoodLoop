@@ -4,6 +4,7 @@ import { CheckCircle2, Mail, RefreshCw, Send } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
+import { resendVerificationEmailTo } from "@/lib/supabase-auth";
 
 export const Route = createFileRoute("/verify-email")({
   head: () => ({
@@ -24,8 +25,7 @@ function VerifyEmailPage() {
     setBusy(true);
     try {
       if (user) {
-        const { sendEmailVerification } = await import("firebase/auth");
-        await sendEmailVerification(user);
+        await resendVerificationEmailTo(user.email);
         toast.success("Verification link resent to " + user.email);
       } else {
         toast.info("Verification link resent to registered email.");

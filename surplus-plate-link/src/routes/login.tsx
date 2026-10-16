@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { updateProfile } from "@/lib/db";
-import { getFirebase } from "@/lib/firebase";
+import { signInWithEmail, signUpWithEmail } from "@/lib/supabase-auth";
 import type { Role } from "@/lib/types";
 
 export const Route = createFileRoute("/login")({
@@ -30,13 +30,11 @@ function LoginPage() {
     e.preventDefault();
     setBusy(true);
     try {
-      const { auth } = await getFirebase();
-      const { signInWithEmailAndPassword } = await import("firebase/auth");
-      await signInWithEmailAndPassword(auth, email.trim(), password);
+      await signInWithEmail(email.trim(), password);
       toast.success("Welcome back to FoodLoop!");
       navigate({ to: "/app" });
     } catch (err: any) {
-      toast.error(err.message.replace("Firebase: ", "") || "Login failed. Please check credentials.");
+      toast.error(err.message || "Login failed. Please check credentials.");
     } finally {
       setBusy(false);
     }
@@ -55,16 +53,13 @@ function LoginPage() {
       const email = demoEmails[role];
       const pass = "demo123456";
 
-      const { auth } = await getFirebase();
-      const { signInWithEmailAndPassword, createUserWithEmailAndPassword } = await import("firebase/auth");
-
       let uid = "";
       try {
-        const cred = await signInWithEmailAndPassword(auth, email, pass);
-        uid = cred.user.uid;
+        const cred = await signInWithEmail(email, pass);
+        uid = cred.uid;
       } catch {
-        const cred = await createUserWithEmailAndPassword(auth, email, pass);
-        uid = cred.user.uid;
+        const cred = await signUpWithEmail(email, pass, role);
+        uid = cred.uid;
       }
       await updateProfile(uid, { role });
       toast.success(`Logged in as demo ${role.toUpperCase()}!`);
