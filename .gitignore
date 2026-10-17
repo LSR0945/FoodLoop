@@ -39,3 +39,7 @@ local.properties
 
 # APK builds (root APK stays tracked once added)
 *.apk
+
+# temp diagnostic
+shot_*.png
+find-overflow.cjs

@@ -391,10 +391,12 @@ export async function reportListing(listingId: string, reason: string, details: 
 }
 
 export async function updateProfile(uid: string, data: Partial<Profile>) {
+  let role: string | undefined = data.role;
   try {
     const raw = typeof window !== "undefined" ? localStorage.getItem("foodloop_profile_" + uid) || localStorage.getItem("annsetu_profile_" + uid) : null;
     const existing = raw ? JSON.parse(raw) : {};
     const updated = { ...existing, ...data, uid };
+    role = updated.role || role;
     if (typeof window !== "undefined") {
       localStorage.setItem("foodloop_profile_" + uid, JSON.stringify(updated));
       localStorage.setItem("annsetu_profile_" + uid, JSON.stringify(updated));
@@ -409,6 +411,27 @@ export async function updateProfile(uid: string, data: Partial<Profile>) {
     if (error) throw error;
   } catch (err) {
     console.warn("Supabase updateProfile failed, saved locally:", err);
+  }
+
+  // Keep the role-specific table in sync so donor / recipient / volunteer / admin
+  // data always lands in its own table (not only in the shared profiles table).
+  if (role) {
+    try {
+      const supabase = getSupabase();
+      const base: Record<string, unknown> = { ...data, uid };
+      delete base["role"];
+      let table: string | null = null;
+      if (role === "donor") table = "donors";
+      else if (role === "recipient" || role === "ngo") table = "recipients";
+      else if (role === "volunteer") table = "volunteers";
+      else if (role === "admin") table = "admins";
+      if (table) {
+        const { error } = await supabase.from(table).upsert(base, { onConflict: "uid" });
+        if (error) throw error;
+      }
+    } catch (err) {
+      console.warn("Supabase role-table sync failed:", err);
+    }
   }
 }
 
@@ -497,6 +520,34 @@ export async function registerVolunteer(data: VolunteerRecord) {
     if (e2) throw e2;
   } catch (err) {
     console.warn("Supabase volunteers table save failed, saved locally:", err);
+  }
+}
+
+/** Guaranteed Registration for Admins (stored in its own admins table) */
+export async function registerAdmin(data: { uid: string; name: string; email: string; phone?: string; area?: string; photoURL?: string; createdAt: number }) {
+  try {
+    if (typeof window !== "undefined") {
+      localStorage.setItem("foodloop_admin_" + data.uid, JSON.stringify(data));
+      localStorage.setItem("foodloop_profile_" + data.uid, JSON.stringify({ ...data, role: "admin" }));
+      localStorage.setItem("annsetu_profile_" + data.uid, JSON.stringify({ ...data, role: "admin" }));
+      window.dispatchEvent(new CustomEvent("foodloop_profile_updated", { detail: { ...data, role: "admin" } }));
+      window.dispatchEvent(new CustomEvent("annsetu_profile_updated", { detail: { ...data, role: "admin" } }));
+
+      const rawList = localStorage.getItem("foodloop_admins_table");
+      const list = rawList ? JSON.parse(rawList) : [];
+      const updatedList = [data, ...list.filter((a: { uid: string }) => a.uid !== data.uid)];
+      localStorage.setItem("foodloop_admins_table", JSON.stringify(updatedList));
+    }
+  } catch {}
+
+  try {
+    const supabase = getSupabase();
+    const { error: e1 } = await supabase.from("admins").upsert(data, { onConflict: "uid" });
+    if (e1) throw e1;
+    const { error: e2 } = await supabase.from("profiles").upsert({ ...data, role: "admin" }, { onConflict: "uid" });
+    if (e2) throw e2;
+  } catch (err) {
+    console.warn("Supabase admins table save failed, saved locally:", err);
   }
 }
 

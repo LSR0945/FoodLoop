@@ -145,6 +145,20 @@ create table if not exists public.volunteers (
 );
 
 -- ---------------------------------------------------------------------------
+-- 5b. Admins
+-- ---------------------------------------------------------------------------
+create table if not exists public.admins (
+  uid text primary key,
+  name text not null default '',
+  email text not null default '',
+  phone text,
+  area text,
+  "photoURL" text,
+  verified boolean not null default false,
+  "createdAt" bigint not null default (extract(epoch from now()) * 1000)::bigint
+);
+
+-- ---------------------------------------------------------------------------
 -- 6. Notifications
 -- ---------------------------------------------------------------------------
 create table if not exists public.notifications (
@@ -195,6 +209,7 @@ alter table public.donors enable row level security;
 alter table public.recipients enable row level security;
 alter table public.ngos enable row level security;
 alter table public.volunteers enable row level security;
+alter table public.admins enable row level security;
 alter table public.notifications enable row level security;
 alter table public.reports enable row level security;
 alter table public.platform_notices enable row level security;
@@ -202,7 +217,7 @@ alter table public.platform_notices enable row level security;
 do $$
 declare t text;
 begin
-  foreach t in array array['profiles','listings','donors','recipients','ngos','volunteers','notifications','reports','platform_notices']
+  foreach t in array array['profiles','listings','donors','recipients','ngos','volunteers','admins','notifications','reports','platform_notices']
   loop
     execute format('drop policy if exists "foodloop_demo_all" on public.%I', t);
     execute format('create policy "foodloop_demo_all" on public.%I for all to anon, authenticated using (true) with check (true)', t);
