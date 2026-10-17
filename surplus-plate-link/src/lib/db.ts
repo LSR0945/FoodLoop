@@ -7,7 +7,7 @@ export async function notify(userIds: (string | undefined)[], title: string, bod
   if (!ids.length) return;
   try {
     const supabase = getSupabase();
-    await supabase.from("notifications").insert(
+    const { error } = await supabase.from("notifications").insert(
       ids.map((userId) => ({
         userId,
         title,
@@ -17,6 +17,7 @@ export async function notify(userIds: (string | undefined)[], title: string, bod
         createdAt: Date.now(),
       })),
     );
+    if (error) throw error;
   } catch {
     /* notifications are best-effort */
   }
@@ -299,10 +300,11 @@ async function patch(id: string, data: Record<string, unknown>, status: Status, 
     const supabase = getSupabase();
     const { data: row } = await supabase.from("listings").select("history").eq("id", id).maybeSingle();
     const history = Array.isArray((row as { history?: unknown[] } | null)?.history) ? (row as { history: unknown[] }).history : [];
-    await supabase
+    const { error } = await supabase
       .from("listings")
       .update({ ...data, status, history: [...history, entry(status, by, note)] })
       .eq("id", id);
+    if (error) throw error;
   } catch (err) {
     console.warn("Supabase patch failed, local state updated:", err);
   }
@@ -403,7 +405,8 @@ export async function updateProfile(uid: string, data: Partial<Profile>) {
 
   try {
     const supabase = getSupabase();
-    await supabase.from("profiles").upsert({ ...data, uid }, { onConflict: "uid" });
+    const { error } = await supabase.from("profiles").upsert({ ...data, uid }, { onConflict: "uid" });
+    if (error) throw error;
   } catch (err) {
     console.warn("Supabase updateProfile failed, saved locally:", err);
   }
@@ -428,8 +431,10 @@ export async function registerDonor(data: DonorRecord) {
 
   try {
     const supabase = getSupabase();
-    await supabase.from("donors").upsert(data, { onConflict: "uid" });
-    await supabase.from("profiles").upsert({ ...data, role: "donor" }, { onConflict: "uid" });
+    const { error: e1 } = await supabase.from("donors").upsert(data, { onConflict: "uid" });
+    if (e1) throw e1;
+    const { error: e2 } = await supabase.from("profiles").upsert({ ...data, role: "donor" }, { onConflict: "uid" });
+    if (e2) throw e2;
   } catch (err) {
     console.warn("Supabase donors table save failed, saved locally:", err);
   }
@@ -454,11 +459,14 @@ export async function registerNGO(data: NGORecord) {
 
   try {
     const supabase = getSupabase();
-    await supabase.from("recipients").upsert(data, { onConflict: "uid" });
-    await supabase.from("ngos").upsert(data, { onConflict: "uid" });
-    await supabase
+    const { error: e1 } = await supabase.from("recipients").upsert(data, { onConflict: "uid" });
+    if (e1) throw e1;
+    const { error: e2 } = await supabase.from("ngos").upsert(data, { onConflict: "uid" });
+    if (e2) throw e2;
+    const { error: e3 } = await supabase
       .from("profiles")
       .upsert({ ...data, role: "recipient", name: data.name || data.contactPerson }, { onConflict: "uid" });
+    if (e3) throw e3;
   } catch (err) {
     console.warn("Supabase recipients table save failed, saved locally:", err);
   }
@@ -483,8 +491,10 @@ export async function registerVolunteer(data: VolunteerRecord) {
 
   try {
     const supabase = getSupabase();
-    await supabase.from("volunteers").upsert(data, { onConflict: "uid" });
-    await supabase.from("profiles").upsert({ ...data, role: "volunteer" }, { onConflict: "uid" });
+    const { error: e1 } = await supabase.from("volunteers").upsert(data, { onConflict: "uid" });
+    if (e1) throw e1;
+    const { error: e2 } = await supabase.from("profiles").upsert({ ...data, role: "volunteer" }, { onConflict: "uid" });
+    if (e2) throw e2;
   } catch (err) {
     console.warn("Supabase volunteers table save failed, saved locally:", err);
   }
@@ -493,7 +503,8 @@ export async function registerVolunteer(data: VolunteerRecord) {
 export async function markRead(id: string) {
   try {
     const supabase = getSupabase();
-    await supabase.from("notifications").update({ read: true }).eq("id", id);
+    const { error } = await supabase.from("notifications").update({ read: true }).eq("id", id);
+    if (error) throw error;
   } catch {}
 }
 
@@ -507,7 +518,8 @@ function useLive<T>(subscribe: (cb: (v: T) => void, err: (e: Error) => void) => 
     subscribe(
       (v) => { if (alive) { setData(v); setLoading(false); } },
       (e) => { if (alive) { setError(e.message); setLoading(false); } },
-    ).then((u) => (alive ? (unsub = u) : u()));
+    ).then((u) => (alive ? (unsub = u) : u()))
+     .catch((e) => { if (alive) { setError(e?.message || "Subscription failed"); setLoading(false); } });
     return () => { alive = false; unsub(); };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);
@@ -655,7 +667,10 @@ export function useVolunteers() {
 
 export function useNotifications(uid: string | undefined) {
   return useLive<AppNotification[]>(async (cb, err) => {
-    if (!uid) return () => {};
+    if (!uid) {
+      cb([]);
+      return () => {};
+    }
     try {
       const supabase = getSupabase();
       let alive = true;

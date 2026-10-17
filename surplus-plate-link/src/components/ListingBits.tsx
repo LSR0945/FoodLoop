@@ -68,9 +68,6 @@ export function ListingCard({ l }: { l: Listing }) {
           <span className="absolute right-2.5 top-2.5 rounded-full bg-white/90 px-2.5 py-0.5 text-[11px] font-bold shadow-xs backdrop-blur-sm">
             {l.foodType === "non-veg" ? "🔴 Non-veg" : l.foodType === "vegan" ? "🌱 Vegan" : "🟢 Veg"}
           </span>
-          <span className="absolute bottom-2.5 left-2.5 rounded-full bg-black/60 text-white backdrop-blur-xs px-2 py-0.5 text-[10px] font-bold">
-            📍 0.4 - 2.5 miles away
-          </span>
         </div>
         <div className="space-y-1.5 p-4">
           <div className="flex items-center justify-between">
@@ -84,12 +81,13 @@ export function ListingCard({ l }: { l: Listing }) {
             <MapPin className="size-3 shrink-0 text-primary" /> {l.locationText}
           </p>
 
-          {/* Food Community Rating (matching user's uploaded mockup: 4.7 stars) */}
-          <div className="flex items-center gap-1.5 text-xs text-amber-500 font-bold pt-0.5">
-            <span>★★★★★</span>
-            <span className="text-[11px] text-[#242923] font-bold">4.8</span>
-            <span className="text-[10px] text-muted-foreground font-normal">(Verified Kitchen)</span>
-          </div>
+          {l.storage && (
+            <p className="flex items-center gap-1 text-[11px] text-muted-foreground">
+              <Package className="size-3 shrink-0" />
+              {l.storage === "hot" ? "Keep hot" : l.storage === "chilled" ? "Keep chilled" : "Room temperature"}
+              {l.allergens && l.allergens.length > 0 ? ` • Allergens: ${l.allergens.join(", ")}` : ""}
+            </p>
+          )}
         </div>
       </div>
 

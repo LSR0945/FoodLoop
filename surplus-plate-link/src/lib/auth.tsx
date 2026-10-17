@@ -50,10 +50,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     const onProfileUpdated = (e: any) => {
       if (e.detail) {
-        setState((s) => ({
-          ...s,
-          profile: s.profile ? { ...s.profile, ...e.detail } : (e.detail as Profile),
-        }));
+        // Only update profile when a user is actually signed in.
+        setState((s) =>
+          s.user
+            ? { ...s, profile: s.profile ? { ...s.profile, ...e.detail } : (e.detail as Profile) }
+            : s,
+        );
       }
     };
     window.addEventListener("foodloop_profile_updated", onProfileUpdated);
@@ -68,12 +70,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     let unsubAuth = () => {};
     let channel: ReturnType<ReturnType<typeof getSupabase>["channel"]> | null = null;
 
+    const inferRole = (uid: string): Role => {
+      try {
+        if (localStorage.getItem("foodloop_donor_" + uid)) return "donor";
+        if (localStorage.getItem("foodloop_recipient_" + uid)) return "recipient";
+        if (localStorage.getItem("foodloop_volunteer_" + uid)) return "volunteer";
+        const cached = readCached(uid);
+        if (cached?.role) return cached.role;
+      } catch {}
+      return "donor";
+    };
+
     const fallbackProfile = (user: AuthUser, saved?: Profile | null): Profile =>
       saved ?? {
         uid: user.uid,
         name: user.displayName || user.email?.split("@")[0] || "User",
         email: user.email || "",
-        role: (saved as any)?.role as Role,
+        role: inferRole(user.uid),
         createdAt: Date.now(),
       } as Profile;
 

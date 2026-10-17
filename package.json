@@ -1,0 +1,13 @@
+{
+  "name": "foodloop-workspace",
+  "private": true,
+  "description": "FoodLoop — surplus food sharing app workspace. The actual app lives in surplus-plate-link/.",
+  "scripts": {
+    "dev": "npm run dev --prefix surplus-plate-link",
+    "build": "npm run build --prefix surplus-plate-link",
+    "build:capacitor": "npm run build:capacitor --prefix surplus-plate-link",
+    "preview": "npm run preview --prefix surplus-plate-link",
+    "lint": "npm run lint --prefix surplus-plate-link",
+    "test": "npm run test --prefix surplus-plate-link"
+  }
+}

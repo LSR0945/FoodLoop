@@ -28,9 +28,8 @@ function ForgotPasswordPage() {
       setSubmitted(true);
       toast.success("Password reset instructions sent to your email!");
     } catch (err: any) {
-      // In demo mode or if email is not registered in live Supabase yet
-      setSubmitted(true);
-      toast.info("Password recovery instructions simulated for " + email);
+      // Show the real error instead of masking it as success.
+      toast.error((err as Error).message || "Could not send reset email. Please try again.");
     } finally {
       setBusy(false);
     }

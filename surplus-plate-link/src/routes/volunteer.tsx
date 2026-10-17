@@ -80,27 +80,6 @@ function VolunteerPortalPage() {
   const [busyId, setBusyId] = useState<string | null>(null);
   const [heroBgIdx] = useState(() => Math.floor(Math.random() * VOLUNTEER_BG_IMAGES.length));
 
-  // ── Role guard ────────────────────────────────────────────────────────────
-  const currentVolRole = profile?.role as string | undefined;
-  if (!authLoading && profile && currentVolRole !== "volunteer" && currentVolRole !== "admin") {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8" style={{ background: "#EEF2FF" }}>
-        <Logo size="lg" />
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm text-center border" style={{ borderColor: THEME.border }}>
-          <Bike size={48} className="mx-auto mb-4" style={{ color: THEME.primary }} />
-          <h2 className="text-xl font-bold mb-2" style={{ color: "var(--color-ink)" }}>Volunteer Portal</h2>
-          <p className="text-gray-500 mb-6 text-sm">This portal is for Delivery Volunteers only. Your role is <strong className="capitalize">{profile.role}</strong>.</p>
-          <button
-            onClick={() => navigate({ to: currentVolRole === "donor" ? "/donor" : currentVolRole === "admin" ? "/admin" : "/recipient" })}
-            className="w-full py-3 rounded-xl font-bold text-white"
-            style={{ background: THEME.primary }}>
-            Go to {currentVolRole === "donor" ? "Donor" : currentVolRole === "admin" ? "Admin" : "Recipient"} Portal
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   // ── Derived data ─────────────────────────────────────────────────────────
   const availableTasks = useMemo(
     () => listings.filter((l) => l.status === "reserved" && !l.volunteerId),
@@ -169,7 +148,27 @@ function VolunteerPortalPage() {
     finally { setProfileBusy(false); }
   }
 
+  // ── Role guard (placed AFTER all hooks to satisfy Rules of Hooks) ────────
+  const currentVolRole = profile?.role as string | undefined;
   if (authLoading) return <PortalLoader />;
+  if (profile && currentVolRole !== "volunteer" && currentVolRole !== "admin") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8" style={{ background: "#EEF2FF" }}>
+        <Logo size="lg" />
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm text-center border" style={{ borderColor: THEME.border }}>
+          <Bike size={48} className="mx-auto mb-4" style={{ color: THEME.primary }} />
+          <h2 className="text-xl font-bold mb-2" style={{ color: "var(--color-ink)" }}>Volunteer Portal</h2>
+          <p className="text-gray-500 mb-6 text-sm">This portal is for Delivery Volunteers only. Your role is <strong className="capitalize">{profile.role}</strong>.</p>
+          <button
+            onClick={() => navigate({ to: currentVolRole === "donor" ? "/donor" : currentVolRole === "admin" ? "/admin" : "/recipient" })}
+            className="w-full py-3 rounded-xl font-bold text-white"
+            style={{ background: THEME.primary }}>
+            Go to {currentVolRole === "donor" ? "Donor" : currentVolRole === "admin" ? "Admin" : "Recipient"} Portal
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const navItems: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
     { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },

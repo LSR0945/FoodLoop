@@ -12,8 +12,8 @@ export function getSupabase(): SupabaseClient {
       auth: {
         persistSession: true,
         autoRefreshToken: true,
-        // The Capacitor app uses hash routing, so email-link auto detection is handled by the browser.
-        detectSessionInUrl: false,
+        // Needed so the password-recovery ?code= / #access_token= in the URL is exchanged for a session.
+        detectSessionInUrl: true,
       },
     });
   }

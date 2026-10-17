@@ -58,7 +58,8 @@ function LoginPage() {
         const cred = await signInWithEmail(email, pass);
         uid = cred.uid;
       } catch {
-        const cred = await signUpWithEmail(email, pass, role);
+        // Create the demo account; role is applied via updateProfile below (not as a display name).
+        const cred = await signUpWithEmail(email, pass);
         uid = cred.uid;
       }
       await updateProfile(uid, { role });

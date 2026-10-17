@@ -1,7 +1,7 @@
 import type { User } from "@supabase/supabase-js";
 import { getSupabase } from "./supabase";
 
-/** Supabase user mapped to a Firestore-like shape so existing UI code keeps working. */
+/** Supabase user mapped to a simple shape so existing UI code keeps working. */
 export interface AuthUser {
   uid: string;
   email: string;
@@ -60,7 +60,7 @@ function mapAuthError(error: AuthErrorLike | null, fallback: string): AuthError 
   if ((error?.status ?? 0) === 429) {
     return new AuthError("Too many attempts. Please try again in a minute.", "auth/too-many-requests");
   }
-  return new AuthError(message.replace(/^Firebase:\s*/, ""), error?.code || "auth/error");
+  return new AuthError(message, error?.code || "auth/error");
 }
 
 export async function signInWithEmail(email: string, password: string): Promise<AuthUser> {
@@ -91,11 +91,26 @@ export async function signOutAuth(): Promise<void> {
 export async function sendPasswordResetEmailTo(email: string): Promise<void> {
   const supabase = getSupabase();
   const origin = typeof window !== "undefined" ? window.location.origin : undefined;
-  const { error } = await supabase.auth.resetPasswordForEmail(
-    email.trim(),
-    origin ? { redirectTo: `${origin}/#/login` } : undefined,
-  );
+  const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+    ...(origin ? { redirectTo: `${origin}/reset-password` } : {}),
+  });
   if (error) throw mapAuthError(error, "Could not send reset email.");
+}
+
+export async function updatePassword(newPassword: string): Promise<void> {
+  const supabase = getSupabase();
+  const { error } = await supabase.auth.updateUser({ password: newPassword });
+  if (error) throw mapAuthError(error, "Could not update password.");
+}
+
+export async function hasRecoverySession(): Promise<boolean> {
+  try {
+    const supabase = getSupabase();
+    const { data } = await supabase.auth.getSession();
+    return Boolean(data.session);
+  } catch {
+    return false;
+  }
 }
 
 export async function resendVerificationEmailTo(email?: string): Promise<void> {

@@ -73,27 +73,6 @@ function RecipientPortalPage() {
   const [busy, setBusy] = useState<string | null>(null);
   const [heroBgIdx] = useState(() => Math.floor(Math.random() * RECIPIENT_BG_IMAGES.length));
 
-  // ── Role guard ────────────────────────────────────────────────────────────
-  const currentRole = profile?.role as string | undefined;
-  if (!authLoading && profile && currentRole !== "recipient" && currentRole !== "ngo" && currentRole !== "admin") {
-    return (
-      <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8" style={{ background: "var(--color-cream)" }}>
-        <Logo size="lg" />
-        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm text-center border" style={{ borderColor: "var(--color-border)" }}>
-          <UtensilsCrossed size={48} className="mx-auto mb-4" style={{ color: "#0284C7" }} />
-          <h2 className="text-xl font-bold mb-2" style={{ color: "var(--color-ink)" }}>Recipient Portal</h2>
-          <p className="text-gray-500 mb-6 text-sm">This portal is for Food Recipients and NGOs only. Your role is <strong className="capitalize">{profile.role}</strong>.</p>
-          <button
-            onClick={() => navigate({ to: currentRole === "volunteer" ? "/volunteer" : currentRole === "admin" ? "/admin" : "/donor" })}
-            className="w-full py-3 rounded-xl font-bold text-white"
-            style={{ background: "var(--color-forest)" }}>
-            Go to {currentRole === "volunteer" ? "Volunteer" : currentRole === "admin" ? "Admin" : "Donor"} Portal
-          </button>
-        </div>
-      </div>
-    );
-  }
-
   // ── Derived data ─────────────────────────────────────────────────────────
   const availableListings = useMemo(() => listings.filter((l) => l.status === "available"), [listings]);
 
@@ -168,7 +147,27 @@ function RecipientPortalPage() {
     finally { setProfileBusy(false); }
   }
 
+  // ── Role guard (placed AFTER all hooks to satisfy Rules of Hooks) ────────
+  const currentRole = profile?.role as string | undefined;
   if (authLoading) return <PortalLoader />;
+  if (profile && currentRole !== "recipient" && currentRole !== "ngo" && currentRole !== "admin") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center gap-6 p-8" style={{ background: "var(--color-cream)" }}>
+        <Logo size="lg" />
+        <div className="bg-white rounded-2xl shadow-lg p-8 max-w-sm text-center border" style={{ borderColor: "var(--color-border)" }}>
+          <UtensilsCrossed size={48} className="mx-auto mb-4" style={{ color: "#0284C7" }} />
+          <h2 className="text-xl font-bold mb-2" style={{ color: "var(--color-ink)" }}>Recipient Portal</h2>
+          <p className="text-gray-500 mb-6 text-sm">This portal is for Food Recipients and NGOs only. Your role is <strong className="capitalize">{profile.role}</strong>.</p>
+          <button
+            onClick={() => navigate({ to: currentRole === "volunteer" ? "/volunteer" : currentRole === "admin" ? "/admin" : "/donor" })}
+            className="w-full py-3 rounded-xl font-bold text-white"
+            style={{ background: "var(--color-forest)" }}>
+            Go to {currentRole === "volunteer" ? "Volunteer" : currentRole === "admin" ? "Admin" : "Donor"} Portal
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const navItems: { id: Tab; label: string; icon: React.ReactNode; badge?: number }[] = [
     { id: "dashboard", label: "Dashboard", icon: <LayoutDashboard size={20} /> },
