@@ -4,7 +4,7 @@ import { Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
-import { updateProfile } from "@/lib/db";
+import { registerDonor, registerNGO, registerVolunteer, updateProfile } from "@/lib/db";
 import { getLocalSession, signInWithEmail, signUpWithEmail } from "@/lib/supabase-auth";
 import type { Role } from "@/lib/types";
 
@@ -88,6 +88,46 @@ function LoginPage() {
         const cred = await signUpWithEmail(email, pass);
         uid = cred.uid;
       }
+
+      // Also seed the role-specific table so Supabase has a row per role.
+      const now = Date.now();
+      if (role === "donor") {
+        await registerDonor({
+          uid,
+          name: "Campus Dining Services",
+          orgName: "Campus Dining Hall",
+          donorType: "restaurant",
+          email,
+          phone: "+91 98765 43210",
+          area: "GLA Campus, Mathura",
+          defaultPickupAddress: "Kitchen Gate 2, Campus Road",
+          createdAt: now,
+        });
+      } else if (role === "recipient" || role === "ngo") {
+        await registerNGO({
+          uid,
+          name: "Asha Children Shelter",
+          orgName: "Asha Hope Foundation",
+          contactPerson: "Rajesh Kumar",
+          email,
+          phone: "+91 98765 43210",
+          area: "Mathura City",
+          dailyCapacity: 250,
+          createdAt: now,
+        });
+      } else if (role === "volunteer") {
+        await registerVolunteer({
+          uid,
+          name: "Aman Sharma",
+          email,
+          phone: "+91 98765 43210",
+          area: "Mathura Region",
+          shifts: ["morning", "evening"],
+          vehicleType: "bike",
+          createdAt: now,
+        });
+      }
+
       await updateProfile(uid, { role });
       toast.success(`Logged in as demo ${role.toUpperCase()}!`);
       const targetPortal = role === "donor" ? "/donor" : role === "volunteer" ? "/volunteer" : role === "admin" ? "/admin" : "/recipient";

@@ -16,7 +16,7 @@ import {
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
-import { updateProfile } from "@/lib/db";
+import { registerDonor, registerNGO, registerVolunteer, updateProfile } from "@/lib/db";
 import { getLocalSession, signUpWithEmail } from "@/lib/supabase-auth";
 import type { Role } from "@/lib/types";
 
@@ -126,12 +126,50 @@ function SignupPage() {
     setBusy(true);
     try {
       const cred = await signUpWithEmail(email.trim(), password, fullName.trim());
+      const now = Date.now();
+      const phoneVal = phone.trim();
+
+      // Write to the role-specific Supabase table AND the shared profiles table.
+      if (selectedRole === "donor") {
+        await registerDonor({
+          uid: cred.uid,
+          name: fullName.trim(),
+          donorType: "household",
+          email: email.trim(),
+          phone: phoneVal,
+          area: "",
+          createdAt: now,
+        });
+      } else if (selectedRole === "recipient") {
+        await registerNGO({
+          uid: cred.uid,
+          name: fullName.trim(),
+          orgName: fullName.trim(),
+          contactPerson: fullName.trim(),
+          email: email.trim(),
+          phone: phoneVal,
+          area: "",
+          createdAt: now,
+        });
+      } else if (selectedRole === "volunteer") {
+        await registerVolunteer({
+          uid: cred.uid,
+          name: fullName.trim(),
+          email: email.trim(),
+          phone: phoneVal,
+          area: "",
+          shifts: ["evening"],
+          createdAt: now,
+        });
+      }
+
+      // Also upsert profiles so AuthProvider can load role immediately.
       const profileUpdate: { name: string; email: string; role: Role; phone?: string } = {
         name: fullName.trim(),
         email: email.trim(),
         role: selectedRole,
       };
-      if (phone.trim()) profileUpdate.phone = phone.trim();
+      if (phoneVal) profileUpdate.phone = phoneVal;
       await updateProfile(cred.uid, profileUpdate);
 
       toast.success("Account created successfully! Welcome to FoodLoop.");

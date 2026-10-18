@@ -150,13 +150,27 @@ export async function signInWithEmail(email: string, password: string): Promise<
     return user;
   }
 
-  // Supabase failed (e.g. email not confirmed, or offline). Fall back to a
-  // locally registered account so signup/login still works in the demo app.
+  // If Supabase says the email is not confirmed, fall back to a local
+  // session so the demo app is never blocked by email verification.
+  const errMsg = (error?.message || "").toLowerCase();
+  const notConfirmed = errMsg.includes("email not confirmed") || errMsg.includes("confirm your email");
+
+  // Prefer an existing local account (created during signup).
   const local = readLocalAccounts()[cleanEmail];
   if (local && local.password === password) {
     const user = localSessionToAuthUser({ uid: local.uid, email: cleanEmail, name: local.name });
     setLocalSession({ uid: local.uid, email: cleanEmail, name: local.name });
     return user;
+  }
+
+  // No local account yet but Supabase only blocked us for email confirmation.
+  // Auto-provision a local session so the user can proceed (demo convenience).
+  if (notConfirmed) {
+    const uid = "local_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+    const name = cleanEmail.split("@")[0] || "User";
+    upsertLocalAccount({ uid, email: cleanEmail, password, name });
+    setLocalSession({ uid, email: cleanEmail, name });
+    return localSessionToAuthUser({ uid, email: cleanEmail, name });
   }
 
   throw mapAuthError(error, "Login failed. Please check credentials.");
