@@ -8,6 +8,10 @@ dist-capacitor/
 build/
 out/
 
+# Nitro / Cloudflare dev + build outputs
+.output/
+.wrangler/
+
 # Logs
 logs/
 *.log

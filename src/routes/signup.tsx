@@ -226,6 +226,14 @@ function SignupPage() {
         <div className="absolute -top-40 -left-40 size-[26rem] rounded-full bg-[#205C43]/12 blur-3xl" />
         <div className="absolute top-1/3 -right-40 size-[30rem] rounded-full bg-[#ED7545]/10 blur-3xl" />
         <div className="absolute -bottom-32 left-1/4 size-[22rem] rounded-full bg-[#3F8F62]/10 blur-3xl" />
+        <div className="absolute left-1/3 top-0 h-72 w-72 -translate-y-1/2 rounded-full bg-[#3F8F62]/8 blur-3xl" />
+        <div
+          className="absolute inset-0 opacity-[0.04]"
+          style={{
+            backgroundImage: "radial-gradient(#205C43 0.6px, transparent 0.6px)",
+            backgroundSize: "22px 22px",
+          }}
+        />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.75),transparent_55%)]" />
       </div>
 
@@ -252,7 +260,7 @@ function SignupPage() {
       <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12 flex-1">
         {/* ============ WELCOME + AUTO-REDIRECT SCREEN ============ */}
         {registered ? (
-          <div className="mx-auto max-w-lg text-center py-8">
+          <div className="mx-auto max-w-lg rounded-3xl border border-[#DDD5C8] bg-white/95 px-6 py-12 text-center shadow-xl ring-1 ring-white/60 backdrop-blur-sm">
             {/* Animated check + name */}
             <div className="mx-auto grid size-20 place-items-center rounded-full bg-gradient-to-br from-[#205C43] to-[#3F8F62] text-white shadow-2xl animate-bounce">
               <CheckCircle2 className="size-10" />
@@ -288,12 +296,18 @@ function SignupPage() {
             </button>
           </div>
         ) : (
-        <div className="overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white/95 backdrop-blur-sm shadow-lg grid lg:grid-cols-12">
+        <div className="grid overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white/95 shadow-xl ring-1 ring-white/60 backdrop-blur-sm lg:grid-cols-12">
           {/* Left Hero Column */}
-          <div className="lg:col-span-5 min-w-0 bg-gradient-to-b from-[#EBF3ED] to-[#F8F5ED] p-8 sm:p-10 flex flex-col justify-between border-b lg:border-b-0 lg:border-r border-[#DDD5C8] relative overflow-hidden">
-            <div className="absolute -top-16 -right-16 size-48 rounded-full bg-[#205C43]/8 blur-2xl" aria-hidden />
+          <div className="relative min-w-0 overflow-hidden border-b border-[#DDD5C8] bg-gradient-to-b from-[#EBF3ED] to-[#F8F5ED] p-8 sm:p-10 flex flex-col justify-between lg:col-span-5 lg:border-b-0 lg:border-r">
+            <div className="absolute -top-16 -right-16 size-48 rounded-full bg-[#205C43]/10 blur-2xl" aria-hidden />
+            <div className="absolute -bottom-20 -left-16 size-56 rounded-full bg-[#ED7545]/10 blur-3xl" aria-hidden />
+            <div className="absolute right-8 top-1/2 size-40 -translate-y-1/2 rounded-full bg-[#3F8F62]/8 blur-3xl" aria-hidden />
             <div className="relative">
               <div className="inline-flex items-center gap-1.5 rounded-full bg-[#205C43]/10 px-3 py-1 text-xs font-bold text-[#205C43]">
+                <span className="relative flex size-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3F8F62] opacity-60" />
+                  <span className="relative inline-flex size-2 rounded-full bg-[#205C43]" />
+                </span>
                 🌱 FoodLoop Community Movement
               </div>
               <h2 className="mt-4 font-display text-3xl sm:text-4xl font-extrabold text-[#164330] leading-tight">

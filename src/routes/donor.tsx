@@ -108,9 +108,35 @@ function DonorPortalPage() {
   const activeDonations = myDonations.filter((l) => isOpen(l));
   const reservedDonations = myDonations.filter((l) => ["reserved", "assigned"].includes(l.status));
   const completedDonations = myDonations.filter((l) => l.status === "completed");
-  const totalPortions = myDonations.reduce((s, l) => s + (l.quantity || 0), 0) || 185;
+  const totalPortions = myDonations.reduce((s, l) => s + (l.quantity || 0), 0);
+  const servedPortions = completedDonations.reduce((s, l) => s + (l.quantity || 0), 0);
+  const co2SavedKg = Math.round(servedPortions * 1.8);
+  const peopleFed = Math.round(servedPortions * 0.8);
   const unreadCount = notifs.filter((n) => !n.read).length;
-  const co2SavedKg = Math.round(completedDonations.reduce((s, l) => s + (l.quantity || 0), 0) * 1.8) || 148;
+
+  // Donor level progress (Bronze → Silver at 5, Gold at 10 completed pickups)
+  const level = completedDonations.length >= 10
+    ? { name: "Gold", emoji: "🥇", next: null as number | null }
+    : completedDonations.length >= 5
+      ? { name: "Silver", emoji: "🥈", next: 10 }
+      : { name: "Bronze", emoji: "🥉", next: 5 };
+  const levelProgress = level.next ? Math.min(100, Math.round((completedDonations.length / level.next) * 100)) : 100;
+
+  // Last 7 days activity (portions listed per day)
+  const weekly = useMemo(() => {
+    const out: { label: string; value: number }[] = [];
+    const now = new Date();
+    for (let i = 6; i >= 0; i--) {
+      const d = new Date(now.getFullYear(), now.getMonth(), now.getDate() - i);
+      const start = d.getTime();
+      const val = myDonations
+        .filter((l) => l.createdAt >= start && l.createdAt < start + 86400_000)
+        .reduce((s, l) => s + (l.quantity || 0), 0);
+      out.push({ label: d.toLocaleDateString([], { weekday: "short" }), value: val });
+    }
+    return out;
+  }, [myDonations]);
+  const maxWeek = Math.max(...weekly.map((w) => w.value), 1);
   const filteredDonations = useMemo(() => {
     let list = myDonations;
     if (donationFilter !== "all") list = list.filter((l) => l.status === donationFilter);
@@ -313,12 +339,24 @@ function DonorPortalPage() {
                   <div>
                     <p className="text-amber-100 text-sm font-medium">Welcome back 🍲</p>
                     <h2 className="text-3xl font-bold mt-1">{profile?.orgName || profile?.name || "Food Donor"}</h2>
-                    <p className="text-amber-100 text-sm mt-1">Your generosity has fed <strong>{totalPortions}</strong> people so far.</p>
+                    <p className="text-amber-100 text-sm mt-1">
+                      {servedPortions > 0
+                        ? <>Your generosity has fed <strong>{peopleFed}</strong> people so far.</>
+                        : <>List your first surplus food and feed people today — it takes 30 seconds.</>}
+                    </p>
                   </div>
-                  <button onClick={() => setActiveTab("new")}
-                    className="self-start flex items-center gap-2 bg-white text-amber-700 font-bold px-5 py-2 rounded-xl shadow-lg hover:bg-amber-50 transition-all">
-                    <PlusCircle size={18} /> List Surplus Food
-                  </button>
+                  <div className="flex flex-wrap items-center gap-2.5">
+                    <button onClick={() => setActiveTab("new")}
+                      className="flex items-center gap-2 bg-white text-amber-700 font-bold px-5 py-2 rounded-xl shadow-lg hover:bg-amber-50 transition-all">
+                      <PlusCircle size={18} /> List Surplus Food
+                    </button>
+                    <span className="rounded-xl bg-white/15 backdrop-blur-sm border border-white/25 px-3.5 py-2 text-xs font-bold">
+                      📦 {totalPortions} portions listed
+                    </span>
+                    <span className="rounded-xl bg-white/15 backdrop-blur-sm border border-white/25 px-3.5 py-2 text-xs font-bold">
+                      🔴 {activeDonations.length} live now
+                    </span>
+                  </div>
                 </div>
               </div>
 
@@ -339,6 +377,85 @@ function DonorPortalPage() {
                 ))}
               </div>
 
+              {/* Quick Actions */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                {([
+                  { label: "List Surplus Food", desc: "Post in 30 seconds", icon: "🍲", tab: "new" as Tab, bg: "linear-gradient(135deg,#D97706,#F59E0B)" },
+                  { label: "My Donations", desc: "Track every listing", icon: "📦", tab: "donations" as Tab, bg: "linear-gradient(135deg,#205C43,#3F8F62)" },
+                  { label: "Reservations", desc: "Pickup codes & status", icon: "🔑", tab: "reservations" as Tab, bg: "linear-gradient(135deg,#ED7545,#F59E0B)" },
+                  { label: "Impact Report", desc: "Meals & CO₂ saved", icon: "🏆", tab: "impact" as Tab, bg: "linear-gradient(135deg,#164330,#205C43)" },
+                ]).map((a) => (
+                  <button key={a.label} onClick={() => setActiveTab(a.tab)}
+                    className="group text-left rounded-2xl p-4 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transition-all cursor-pointer"
+                    style={{ background: a.bg }}>
+                    <span className="text-2xl">{a.icon}</span>
+                    <p className="mt-2 font-bold text-sm">{a.label}</p>
+                    <p className="text-[11px] opacity-80">{a.desc}</p>
+                  </button>
+                ))}
+              </div>
+
+              {/* Live platform pulse */}
+              <div className="rounded-2xl border bg-white px-5 py-4 shadow-sm flex flex-wrap items-center gap-x-6 gap-y-2" style={{ borderColor: "#F59E0B20" }}>
+                <p className="flex items-center gap-2 text-xs font-bold" style={{ color: "var(--color-ink)" }}>
+                  <span className="relative flex h-2.5 w-2.5">
+                    <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+                    <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500" />
+                  </span>
+                  Live on FoodLoop
+                </p>
+                <p className="text-xs text-gray-500">🍛 <strong className="text-gray-700">{listings.filter(isOpen).length}</strong> open listings right now</p>
+                <p className="text-xs text-gray-500">✅ <strong className="text-gray-700">{listings.filter((l) => l.status === "completed").length}</strong> pickups completed</p>
+                <p className="text-xs text-gray-500">🌍 <strong className="text-gray-700">{Math.round(listings.filter((l) => l.status === "completed").reduce((s, l) => s + (l.quantity || 0), 0) * 0.8)}</strong> people fed community-wide</p>
+              </div>
+
+              {/* Weekly activity + Donor level */}
+              <div className="grid lg:grid-cols-2 gap-4">
+                <div className="bg-white rounded-2xl border p-5 shadow-sm" style={{ borderColor: "#F59E0B20" }}>
+                  <h3 className="font-bold text-sm" style={{ color: "var(--color-ink)" }}>📊 This Week's Activity</h3>
+                  <p className="text-[11px] text-gray-400 mb-4 mt-0.5">Portions you listed in the last 7 days</p>
+                  <div className="flex items-end justify-between gap-2 h-28">
+                    {weekly.map((d) => (
+                      <div key={d.label} className="flex-1 flex flex-col items-center gap-1.5">
+                        <span className="text-[10px] font-bold" style={{ color: d.value > 0 ? "#D97706" : "transparent" }}>{d.value}</span>
+                        <div className="w-full rounded-t-lg transition-all"
+                          style={{ height: `${Math.max(6, (d.value / maxWeek) * 72)}px`, background: d.value > 0 ? "linear-gradient(180deg,#F59E0B,#D97706)" : "#F3F0E8" }} />
+                        <span className="text-[10px] text-gray-400 font-medium">{d.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="bg-white rounded-2xl border p-5 shadow-sm" style={{ borderColor: "#F59E0B20" }}>
+                  <h3 className="font-bold text-sm" style={{ color: "var(--color-ink)" }}>{level.emoji} Donor Level — {level.name}</h3>
+                  <p className="text-[11px] text-gray-400 mb-4 mt-0.5">
+                    {level.next
+                      ? `${level.next - completedDonations.length} more completed donation${level.next - completedDonations.length === 1 ? "" : "s"} to reach ${level.next === 5 ? "Silver 🥈" : "Gold 🥇"}`
+                      : "You've reached the top level — thank you! 🎉"}
+                  </p>
+                  <div className="h-3 rounded-full bg-gray-100 overflow-hidden">
+                    <div className="h-full rounded-full transition-all" style={{ width: `${levelProgress}%`, background: "linear-gradient(90deg,#D97706,#F59E0B)" }} />
+                  </div>
+                  <div className="mt-2 flex justify-between text-[10px] text-gray-400 font-medium">
+                    <span>🥉 Bronze</span><span>🥈 Silver</span><span>🥇 Gold</span>
+                  </div>
+                  <div className="mt-4 grid grid-cols-3 gap-2 text-center">
+                    <div className="rounded-xl py-2" style={{ background: "#FFFBEB" }}>
+                      <p className="text-lg font-bold" style={{ color: "#D97706" }}>{completedDonations.length}</p>
+                      <p className="text-[10px] text-gray-500 font-semibold">Completed</p>
+                    </div>
+                    <div className="rounded-xl py-2" style={{ background: "#F0F9F4" }}>
+                      <p className="text-lg font-bold" style={{ color: "#205C43" }}>{peopleFed}</p>
+                      <p className="text-[10px] text-gray-500 font-semibold">People Fed</p>
+                    </div>
+                    <div className="rounded-xl py-2" style={{ background: "#FEF3F0" }}>
+                      <p className="text-lg font-bold" style={{ color: "#ED7545" }}>{co2SavedKg}</p>
+                      <p className="text-[10px] text-gray-500 font-semibold">kg CO₂ Saved</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               {/* Recent Donations */}
               <section>
                 <div className="flex items-center justify-between mb-3">
@@ -351,10 +468,38 @@ function DonorPortalPage() {
                   </button>
                 </div>
                 {myDonations.length === 0 ? (
-                  <div className="text-center py-12 text-gray-400">
-                    <UtensilsCrossed size={40} className="mx-auto mb-3 opacity-40" />
-                    <p className="font-medium">No donations yet</p>
-                    <button onClick={() => setActiveTab("new")} className="mt-4 px-5 py-2 rounded-xl text-sm font-bold text-white" style={{ background: "#D97706" }}>Create your first listing</button>
+                  <div className="bg-white rounded-2xl border p-6 shadow-sm" style={{ borderColor: "#F59E0B20" }}>
+                    <div className="flex items-center gap-3">
+                      <div className="flex size-11 items-center justify-center rounded-2xl text-xl" style={{ background: "#FEF3C7" }}>🚀</div>
+                      <div>
+                        <p className="font-bold text-lg" style={{ color: "var(--color-ink)" }}>Getting Started</p>
+                        <p className="text-xs text-gray-500">Complete these steps to make your first food rescue happen.</p>
+                      </div>
+                    </div>
+                    <div className="mt-5 space-y-2.5">
+                      {([
+                        { done: Boolean(profile?.phone && (profile?.area || profile?.orgName)), label: "Complete your donor profile", desc: "Add phone, area & organisation", tab: "profile" as Tab },
+                        { done: false, label: "List your first surplus food", desc: "Takes less than a minute", tab: "new" as Tab },
+                        { done: completedDonations.length > 0, label: "Complete your first pickup", desc: "A recipient reserves & collects it", tab: "reservations" as Tab },
+                        { done: false, label: "Check your impact report", desc: "See the meals & CO₂ you've saved", tab: "impact" as Tab },
+                      ]).map((s) => (
+                        <button key={s.label} onClick={() => setActiveTab(s.tab)}
+                          className="w-full flex items-center gap-3 rounded-xl border p-3 text-left hover:bg-amber-50/60 hover:border-amber-300 transition-all cursor-pointer" style={{ borderColor: "#F59E0B30" }}>
+                          <span className={`flex size-6 shrink-0 items-center justify-center rounded-full text-xs font-bold ${s.done ? "bg-green-100 text-green-700" : "bg-amber-100 text-amber-700"}`}>
+                            {s.done ? "✓" : "→"}
+                          </span>
+                          <span className="min-w-0">
+                            <span className={`block text-sm font-semibold ${s.done ? "text-gray-400 line-through" : ""}`} style={s.done ? {} : { color: "var(--color-ink)" }}>{s.label}</span>
+                            <span className="block text-[11px] text-gray-400">{s.desc}</span>
+                          </span>
+                        </button>
+                      ))}
+                    </div>
+                    <button onClick={() => setActiveTab("new")}
+                      className="mt-5 w-full py-3 rounded-xl font-bold text-white hover:brightness-105 transition-all"
+                      style={{ background: "linear-gradient(135deg,#D97706,#F59E0B)" }}>
+                      🍲 Create Your First Listing
+                    </button>
                   </div>
                 ) : (
                   <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
@@ -606,16 +751,18 @@ function DonorPortalPage() {
                 <img src="/images/hunger/hunger5.png" className="absolute inset-0 w-full h-full object-cover" alt="impact" />
                 <div className="absolute inset-0 flex flex-col justify-center p-6" style={{ background: "rgba(217,119,6,0.85)" }}>
                   <p className="text-amber-100 text-sm">Your FoodLoop Impact</p>
-                  <p className="text-4xl font-black text-white">{totalPortions} portions</p>
-                  <p className="text-amber-100 text-sm">shared with {Math.round(totalPortions * 0.8)} people</p>
+                  <p className="text-4xl font-black text-white">{servedPortions} portions</p>
+                  <p className="text-amber-100 text-sm">shared with {peopleFed} people</p>
                 </div>
               </div>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 lg:grid-cols-3 gap-4">
                 {[
                   { label: "Total Listings", value: myDonations.length, icon: <FileText size={20} />, color: "#D97706" },
                   { label: "Completed", value: completedDonations.length, icon: <CheckCircle2 size={20} />, color: "#205C43" },
                   { label: "Active Now", value: activeDonations.length, icon: <Clock size={20} />, color: "#3F8F62" },
-                  { label: "People Fed", value: Math.round(totalPortions * 0.8), icon: <HeartHandshake size={20} />, color: "#ED7545" },
+                  { label: "People Fed", value: peopleFed, icon: <HeartHandshake size={20} />, color: "#ED7545" },
+                  { label: "Portions Listed", value: totalPortions, icon: <Package size={20} />, color: "#B45309" },
+                  { label: "CO₂ Saved (kg)", value: co2SavedKg, icon: <TrendingUp size={20} />, color: "#166534" },
                 ].map(s => (
                   <div key={s.label} className="bg-white rounded-2xl p-4 border shadow-sm" style={{ borderColor: "#F59E0B20" }}>
                     <div className="rounded-xl p-2 w-fit mb-2" style={{ background: s.color + "15", color: s.color }}>{s.icon}</div>
