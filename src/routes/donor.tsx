@@ -24,7 +24,7 @@ import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { ListingCard, StatusBadge, UrgencyBadge } from "@/components/ListingBits";
 import { useAuth } from "@/lib/auth";
-import { cancelListing, createListing, updateProfile, useListings, useNotifications } from "@/lib/db";
+import { cancelListing, createListing, markNotificationsRead, updateProfile, useListings, useNotifications } from "@/lib/db";
 import { isOpen } from "@/lib/priority";
 import { getLocalSession } from "@/lib/supabase-auth";
 import type { Category, Listing } from "@/lib/types";
@@ -71,6 +71,9 @@ function DonorPortalPage() {
 
   const [activeTab, setActiveTab] = useState<Tab>("dashboard");
   const [heroBgIdx] = useState(() => Math.floor(Math.random() * DONOR_BG_IMAGES.length));
+  const [notifOpen, setNotifOpen] = useState(false);
+  const [donationFilter, setDonationFilter] = useState<string>("all");
+  const [donationSearch, setDonationSearch] = useState("");
 
   // ── New listing form ─────────────────────────────────────────────────────
   const [newTitle, setNewTitle] = useState("");
@@ -107,6 +110,16 @@ function DonorPortalPage() {
   const completedDonations = myDonations.filter((l) => l.status === "completed");
   const totalPortions = myDonations.reduce((s, l) => s + (l.quantity || 0), 0) || 185;
   const unreadCount = notifs.filter((n) => !n.read).length;
+  const co2SavedKg = Math.round(completedDonations.reduce((s, l) => s + (l.quantity || 0), 0) * 1.8) || 148;
+  const filteredDonations = useMemo(() => {
+    let list = myDonations;
+    if (donationFilter !== "all") list = list.filter((l) => l.status === donationFilter);
+    if (donationSearch.trim()) {
+      const q = donationSearch.trim().toLowerCase();
+      list = list.filter((l) => l.title.toLowerCase().includes(q) || l.category.toLowerCase().includes(q));
+    }
+    return list;
+  }, [myDonations, donationFilter, donationSearch]);
 
   // ── Role guard ────────────────────────────────────────────────────────────
   const nonDonorRole = profile?.role as string | undefined;
@@ -247,10 +260,34 @@ function DonorPortalPage() {
             <p className="text-xs text-gray-500">FoodLoop — Donor Portal 🍲</p>
           </div>
           <div className="flex items-center gap-3">
-            <button className="relative p-2 rounded-xl hover:bg-gray-100">
-              <Bell size={20} className="text-gray-600" />
-              {unreadCount > 0 && <span className="absolute top-1 right-1 h-2 w-2 rounded-full bg-amber-500" />}
-            </button>
+            <div className="relative">
+              <button onClick={() => { setNotifOpen(o => !o); if (!notifOpen && user && unreadCount > 0) markNotificationsRead(user.uid); }}
+                className="relative p-2 rounded-xl hover:bg-amber-50 transition-colors">
+                <Bell size={20} className="text-gray-600" />
+                {unreadCount > 0 && <span className="absolute -top-0.5 -right-0.5 h-4 w-4 rounded-full text-[9px] font-bold text-white flex items-center justify-center" style={{ background: "#ED7545" }}>{unreadCount}</span>}
+              </button>
+              {notifOpen && (
+                <div className="absolute right-0 mt-2 w-80 bg-white rounded-2xl border shadow-xl z-50 overflow-hidden" style={{ borderColor: "#F59E0B30" }}>
+                  <div className="px-4 py-3 border-b flex items-center justify-between" style={{ borderColor: "#F59E0B20", background: "#FFFBEB" }}>
+                    <p className="text-sm font-bold" style={{ color: "#92400E" }}>🔔 Notifications</p>
+                    <button onClick={() => setNotifOpen(false)} className="text-gray-400 hover:text-gray-600 text-xs">✕</button>
+                  </div>
+                  <div className="max-h-72 overflow-y-auto">
+                    {notifs.length === 0 ? (
+                      <p className="p-6 text-center text-sm text-gray-400">No notifications yet</p>
+                    ) : (
+                      notifs.slice(0, 8).map((n) => (
+                        <div key={n.id} className={`px-4 py-3 border-b last:border-0 ${n.read ? "" : "bg-amber-50/60"}`} style={{ borderColor: "#F59E0B10" }}>
+                          <p className="text-sm font-semibold" style={{ color: "var(--color-ink)" }}>{n.title}</p>
+                          <p className="text-xs text-gray-500 mt-0.5">{n.body}</p>
+                          <p className="text-[10px] text-gray-400 mt-1">{new Date(n.createdAt).toLocaleString()}</p>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
             <div className="h-8 w-8 rounded-full flex items-center justify-center text-white font-bold text-sm" style={{ background: "#D97706" }}>
               {(profile?.name?.[0] || "D").toUpperCase()}
             </div>
@@ -291,7 +328,7 @@ function DonorPortalPage() {
                   { label: "Active Listings", value: activeDonations.length, icon: <UtensilsCrossed size={22} />, color: "#D97706" },
                   { label: "Awaiting Pickup", value: reservedDonations.length, icon: <QrCode size={22} />, color: "#ED7545" },
                   { label: "Completed", value: completedDonations.length, icon: <CheckCircle2 size={22} />, color: "#205C43" },
-                  { label: "Portions Shared", value: totalPortions, icon: <TrendingUp size={22} />, color: "#3F8F62" },
+                  { label: "CO₂ Saved (kg)", value: co2SavedKg, icon: <TrendingUp size={22} />, color: "#3F8F62" },
                 ].map((s) => (
                   <div key={s.label} className="bg-white rounded-2xl p-4 shadow-sm border" style={{ borderColor: "#F59E0B20" }}>
                     <div className="flex items-start justify-between">
@@ -331,14 +368,20 @@ function DonorPortalPage() {
           {/* ── MY DONATIONS ──────────────────────────────────────── */}
           {activeTab === "donations" && (
             <div className="space-y-4">
-              <div className="flex flex-wrap gap-2 mb-2">
-                {(["all", "available", "reserved", "assigned", "picked_up", "completed", "cancelled"] as const).map((s) => (
-                  <span key={s} className={`px-3 py-1 rounded-full text-xs font-medium border cursor-pointer`} style={{ borderColor: "#F59E0B40" }}>
-                    {s === "all" ? "All" : s}
-                  </span>
-                ))}
+              <div className="flex flex-col sm:flex-row gap-3 sm:items-center justify-between">
+                <div className="flex flex-wrap gap-2">
+                  {(["all", "available", "reserved", "assigned", "picked_up", "completed", "cancelled"] as const).map((s) => (
+                    <button key={s} onClick={() => setDonationFilter(s)}
+                      className={`px-3 py-1 rounded-full text-xs font-semibold border transition-all ${donationFilter === s ? "text-white shadow-sm" : "text-gray-600"}`}
+                      style={donationFilter === s ? { background: "#D97706", borderColor: "#D97706" } : { borderColor: "#F59E0B40" }}>
+                      {s === "all" ? "All" : s.replace("_", " ")}
+                    </button>
+                  ))}
+                </div>
+                <input value={donationSearch} onChange={e => setDonationSearch(e.target.value)} placeholder="🔍 Search by name or category…"
+                  className="w-full sm:w-64 px-4 py-2 rounded-xl border text-sm focus:outline-none focus:ring-2 focus:ring-amber-400" style={{ borderColor: "#F59E0B40" }} />
               </div>
-              {myDonations.length === 0 ? (
+              {filteredDonations.length === 0 ? (
                 <div className="text-center py-20 text-gray-400">
                   <UtensilsCrossed size={48} className="mx-auto mb-4 opacity-30" />
                   <p className="font-medium text-lg">No donations yet</p>
@@ -357,7 +400,7 @@ function DonorPortalPage() {
                       </tr>
                     </thead>
                     <tbody>
-                      {myDonations.map((l, i) => (
+                      {filteredDonations.map((l, i) => (
                         <tr key={l.id} className={`border-b hover:bg-amber-50/40 transition-colors ${i % 2 === 0 ? "" : "bg-amber-50/20"}`} style={{ borderColor: "#F59E0B15" }}>
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-3">

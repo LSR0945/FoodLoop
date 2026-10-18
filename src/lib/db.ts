@@ -761,6 +761,17 @@ export function useNotifications(uid: string | undefined) {
   }, [], [uid]);
 }
 
+export async function markNotificationsRead(uid: string) {
+  try {
+    const supabase = getSupabase();
+    const { error } = await supabase.from("notifications").update({ read: true }).eq("userId", uid).eq("read", false);
+    if (error) throw error;
+  } catch (err) {
+    console.warn("Supabase notification update failed:", err);
+  }
+  window.dispatchEvent(new CustomEvent("foodloop_notifs_updated"));
+}
+
 /** Resize + compress a photo to a small JPEG data URL (stored inline in Supabase). */
 export function compressImage(file: File, max = 900, quality = 0.7): Promise<string> {
   return new Promise((resolve, reject) => {

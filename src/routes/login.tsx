@@ -4,8 +4,9 @@ import { Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
-import { registerDonor, registerNGO, registerVolunteer, updateProfile } from "@/lib/db";
+import { createListing, registerDonor, registerNGO, registerVolunteer, updateProfile } from "@/lib/db";
 import { getLocalSession, signInWithEmail, signUpWithEmail } from "@/lib/supabase-auth";
+import { getSupabase } from "@/lib/supabase";
 import type { Role } from "@/lib/types";
 
 export const Route = createFileRoute("/login")({
@@ -105,6 +106,33 @@ function LoginPage() {
           defaultPickupAddress: "Kitchen Gate 2, Campus Road",
           createdAt: now,
         });
+        // Seed a few sample listings so the dashboard/table isn't empty on first visit.
+        try {
+          const { data: existing } = await getSupabase()
+            .from("listings").select("id").eq("donorId", uid).limit(1);
+          if (!existing || existing.length === 0) {
+            const samples = [
+              { title: "Vegetable Pulao & Raita", description: "Freshly prepared lunch surplus from campus mess, packed in biodegradable containers.", category: "Cooked meals" as const, foodType: "veg" as const, quantity: 40, unit: "plates", storage: "hot" as const, photo: "/images/food/dal_khichdi_roti.jpg", deadlineH: 3, locationText: "Kitchen Gate 2, GLA Campus", instructions: "Ask for Chef Ramesh at service dock" },
+              { title: "Assorted Bread & Buns", description: "End-of-day bakery surplus — loaves, burger buns, dinner rolls.", category: "Bakery" as const, foodType: "veg" as const, quantity: 25, unit: "pieces", storage: "room" as const, photo: "/images/food/wheat_bread_buns.jpg", deadlineH: 5, locationText: "Campus Bakery, Block C", instructions: "Collect from bakery counter" },
+              { title: "Fresh Fruit Crates", description: "Slightly overripe bananas and apples — perfect for shelters.", category: "Fruits & vegetables" as const, foodType: "veg" as const, quantity: 15, unit: "kg", storage: "room" as const, photo: "/images/food/fruit_crates.jpg", deadlineH: 6, locationText: "Central Store, GLA Campus", instructions: "Gate pass required at security" },
+            ];
+            for (const s of samples) {
+              const { deadlineH, locationText, instructions, ...rest } = s;
+              await createListing({
+                donorId: uid,
+                donorName: "Campus Dining Services",
+                donorPhone: "+91 98765 43210",
+                preparedAt: now - 3600_000,
+                pickupDeadline: now + deadlineH * 3600_000,
+                locationText,
+                pickupInstructions: instructions,
+                allergens: [],
+                checklist: { covered: true, temperature: true, hygienic: true, notExpired: true },
+                ...rest,
+              }, "Campus Dining Services");
+            }
+          }
+        } catch { /* seeding is best-effort */ }
       } else if (role === "recipient" || role === "ngo") {
         await registerNGO({
           uid,
