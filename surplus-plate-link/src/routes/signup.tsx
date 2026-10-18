@@ -56,7 +56,8 @@ function SignupPage() {
       });
 
       toast.success("Account created successfully! Welcome to FoodLoop.");
-      navigate({ to: "/onboarding/profile" });
+      // Go straight to the role dashboard (skip the onboarding form).
+      navigate({ to: "/app" });
     } catch (err: any) {
       if (err.code === "auth/email-already-in-use") {
         toast.error("This email is already registered. Please log in.");
@@ -70,7 +71,7 @@ function SignupPage() {
           role: selectedRole,
         });
         toast.success("Account registered locally!");
-        navigate({ to: "/onboarding/profile" });
+        navigate({ to: "/app" });
       }
     } finally {
       setBusy(false);

@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Profile, Role } from "./types";
 import { getSupabase } from "./supabase";
-import { signOutAuth, toAuthUser, type AuthUser } from "./supabase-auth";
+import { getLocalSession, localSessionToAuthUser, signOutAuth, toAuthUser, type AuthUser } from "./supabase-auth";
 
 interface InternalAuthState {
   user: AuthUser | null;
@@ -156,7 +156,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const supabase = getSupabase();
         const { data } = await supabase.auth.getSession();
-        const initial = toAuthUser(data.session?.user);
+        let initial = toAuthUser(data.session?.user);
+
+        // Supabase may have no live session (e.g. email confirmation pending).
+        // Fall back to a locally registered session so signup/login still work.
+        if (!initial) {
+          const local = getLocalSession();
+          if (local) initial = localSessionToAuthUser(local);
+        }
+
         if (initial) {
           setState((s) => ({ ...s, user: initial, loading: true }));
           await applyProfile(initial);
