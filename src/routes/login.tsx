@@ -5,7 +5,7 @@ import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { updateProfile } from "@/lib/db";
-import { signInWithEmail, signUpWithEmail } from "@/lib/supabase-auth";
+import { getLocalSession, signInWithEmail, signUpWithEmail } from "@/lib/supabase-auth";
 import type { Role } from "@/lib/types";
 
 export const Route = createFileRoute("/login")({
@@ -54,6 +54,11 @@ function LoginPage() {
       }
 
       toast.success(`Welcome back to FoodLoop${existingRole ? ` as ${existingRole.toUpperCase()}` : ""}!`);
+      // Wait for AuthProvider to pick up the session before navigating.
+      for (let i = 0; i < 20; i++) {
+        if (getLocalSession()) break;
+        await new Promise((r) => setTimeout(r, 50));
+      }
       navigate({ to: "/app" });
     } catch (err: any) {
       toast.error(err.message || "Login failed. Please check credentials.");
@@ -86,6 +91,11 @@ function LoginPage() {
       await updateProfile(uid, { role });
       toast.success(`Logged in as demo ${role.toUpperCase()}!`);
       const targetPortal = role === "donor" ? "/donor" : role === "volunteer" ? "/volunteer" : role === "admin" ? "/admin" : "/recipient";
+      // Wait for AuthProvider to pick up the session before navigating.
+      for (let i = 0; i < 20; i++) {
+        if (getLocalSession()) break;
+        await new Promise((r) => setTimeout(r, 50));
+      }
       navigate({ to: targetPortal });
     } catch (err: any) {
       toast.error(err.message || "Could not log in as demo.");

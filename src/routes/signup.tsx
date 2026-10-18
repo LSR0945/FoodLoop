@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { updateProfile } from "@/lib/db";
-import { signUpWithEmail } from "@/lib/supabase-auth";
+import { getLocalSession, signUpWithEmail } from "@/lib/supabase-auth";
 import type { Role } from "@/lib/types";
 
 export const Route = createFileRoute("/signup")({
@@ -157,9 +157,16 @@ function SignupPage() {
     }
   }
 
-  function handleGoToDashboard() {
+  async function handleGoToDashboard() {
     if (!registered) return;
     const meta = ROLE_META[registered.role];
+    // Wait briefly so AuthProvider can pick up the fresh local session
+    // (the foodloop_auth_changed event triggers an async re-bootstrap).
+    for (let i = 0; i < 20; i++) {
+      const sess = getLocalSession();
+      if (sess) break;
+      await new Promise((r) => setTimeout(r, 50));
+    }
     navigate({ to: meta.portal });
   }
 

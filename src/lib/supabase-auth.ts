@@ -69,6 +69,8 @@ function setLocalSession(sess: LocalSession | null) {
     if (typeof window === "undefined") return;
     if (sess) localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(sess));
     else localStorage.removeItem(LOCAL_SESSION_KEY);
+    // Notify AuthProvider so it re-reads the session immediately.
+    window.dispatchEvent(new CustomEvent("foodloop_auth_changed", { detail: sess }));
   } catch {}
 }
 

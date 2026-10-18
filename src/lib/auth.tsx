@@ -69,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     let unsubAuth = () => {};
     let channel: ReturnType<ReturnType<typeof getSupabase>["channel"]> | null = null;
+    let disposed = false;
 
     const inferRole = (uid: string): Role => {
       try {
@@ -115,11 +116,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (data) {
           const p = data as unknown as Profile;
           cacheProfile(p);
-          setState({ user, profile: p, loading: false, error: null });
+          if (!disposed) setState({ user, profile: p, loading: false, error: null });
         } else {
           const saved = readCached(user.uid);
           const fallback = fallbackProfile(user, saved);
-          setState({ user, profile: fallback, loading: false, error: null });
+          if (!disposed) setState({ user, profile: fallback, loading: false, error: null });
           supabase
             .from("profiles")
             .upsert(fallback, { onConflict: "uid" })
@@ -140,7 +141,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
               const row = payload.new as Profile | undefined;
               if (row) {
                 cacheProfile(row);
-                setState((s) => ({ ...s, user, profile: { ...(s.profile || row), ...row }, loading: false, error: null }));
+                if (!disposed) setState((s) => ({ ...s, user, profile: { ...(s.profile || row), ...row }, loading: false, error: null }));
               }
             },
           )
@@ -148,51 +149,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch {
         // On error (e.g. permissions or offline), load cached or fallback profile
         const fallback = fallbackProfile(user, readCached(user.uid));
-        setState({ user, profile: fallback, loading: false, error: null });
+        if (!disposed) setState({ user, profile: fallback, loading: false, error: null });
       }
     };
 
-    (async () => {
+    // Resolve the current user: Supabase session first, then local fallback.
+    const resolveUser = async (): Promise<AuthUser | null> => {
       try {
         const supabase = getSupabase();
         const { data } = await supabase.auth.getSession();
-        let initial = toAuthUser(data.session?.user);
+        const fromSupabase = toAuthUser(data.session?.user);
+        if (fromSupabase) return fromSupabase;
+      } catch {}
+      const local = getLocalSession();
+      return local ? localSessionToAuthUser(local) : null;
+    };
 
-        // Supabase may have no live session (e.g. email confirmation pending).
-        // Fall back to a locally registered session so signup/login still work.
-        if (!initial) {
-          const local = getLocalSession();
-          if (local) initial = localSessionToAuthUser(local);
-        }
-
-        if (initial) {
-          setState((s) => ({ ...s, user: initial, loading: true }));
-          await applyProfile(initial);
-        } else {
-          setState({ user: null, profile: null, loading: false, error: null });
-        }
-
-        const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
-          const user = toAuthUser(session?.user);
-          if (!user) {
-            if (channel) {
-              supabase.removeChannel(channel);
-              channel = null;
-            }
-            setState({ user: null, profile: null, loading: false, error: null });
-            return;
-          }
-          setState((s) => ({ ...s, user, loading: true }));
-          applyProfile(user);
-        });
-        unsubAuth = () => listener.subscription.unsubscribe();
-      } catch (e) {
-        setState((s) => ({ ...s, loading: false, error: (e as Error).message }));
+    const bootstrap = async () => {
+      const initial = await resolveUser();
+      if (disposed) return;
+      if (initial) {
+        setState((s) => ({ ...s, user: initial, loading: true }));
+        await applyProfile(initial);
+      } else {
+        if (!disposed) setState({ user: null, profile: null, loading: false, error: null });
       }
-    })();
+    };
+
+    bootstrap();
+
+    // Re-bootstrap whenever Supabase auth state changes.
+    const { data: listener } = getSupabase().auth.onAuthStateChange(() => {
+      bootstrap();
+    });
+    unsubAuth = () => listener.subscription.unsubscribe();
+
+    // Re-bootstrap when a local session is created/destroyed (signup/login/signout).
+    const onLocalAuth = () => {
+      bootstrap();
+    };
+    window.addEventListener("foodloop_auth_changed", onLocalAuth);
 
     return () => {
+      disposed = true;
       unsubAuth();
+      window.removeEventListener("foodloop_auth_changed", onLocalAuth);
       try {
         if (channel) getSupabase().removeChannel(channel);
       } catch {}
