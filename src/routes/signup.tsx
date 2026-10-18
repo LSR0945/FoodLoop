@@ -215,41 +215,57 @@ function SignupPage() {
 
   return (
     <div className="min-h-screen text-[#242923] flex flex-col justify-between relative overflow-x-hidden">
-      {/* Professional layered background */}
+      {/* ── Background: fixed cream base + dotted texture ───────────────── */}
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-[#F8F5ED]" />
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage: "radial-gradient(#205C43 0.7px, transparent 0.7px)",
+            backgroundSize: "20px 20px",
+          }}
+        />
+      </div>
+      {/* ── Background: deep-green branded sky fading into cream (scrolls with page) ── */}
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px] overflow-hidden">
+        <div
+          className="absolute inset-0"
+          style={{
+            background:
+              "linear-gradient(180deg, #0E3323 0%, #164330 38%, rgba(32,92,67,0.6) 70%, rgba(248,245,237,0) 100%)",
+          }}
+        />
         <img
           src="/images/hunger/hunger1.png"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.07]"
+          className="absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-soft-light"
         />
-        <div className="absolute -top-40 -left-40 size-[26rem] rounded-full bg-[#205C43]/12 blur-3xl" />
-        <div className="absolute top-1/3 -right-40 size-[30rem] rounded-full bg-[#ED7545]/10 blur-3xl" />
-        <div className="absolute -bottom-32 left-1/4 size-[22rem] rounded-full bg-[#3F8F62]/10 blur-3xl" />
-        <div className="absolute left-1/3 top-0 h-72 w-72 -translate-y-1/2 rounded-full bg-[#3F8F62]/8 blur-3xl" />
+        <div className="absolute -top-24 -right-24 size-[24rem] rounded-full bg-[#ED7545]/25 blur-3xl" />
+        <div className="absolute top-40 -left-32 size-[22rem] rounded-full bg-[#F59E0B]/20 blur-3xl" />
+        <div className="absolute top-16 right-1/4 size-[16rem] rounded-full bg-[#3F8F62]/25 blur-3xl" />
+        {/* subtle grain sparkle */}
         <div
-          className="absolute inset-0 opacity-[0.04]"
+          className="absolute inset-0 opacity-[0.10]"
           style={{
-            backgroundImage: "radial-gradient(#205C43 0.6px, transparent 0.6px)",
-            backgroundSize: "22px 22px",
+            backgroundImage: "radial-gradient(rgba(248,245,237,0.9) 0.8px, transparent 0.8px)",
+            backgroundSize: "26px 26px",
           }}
         />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.75),transparent_55%)]" />
       </div>
 
-      <header className="border-b border-[#E2DBD0]/80 bg-white/90 backdrop-blur-md px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
+      <header className="border-b border-white/10 bg-[#0E3323]/90 backdrop-blur-md px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
-          <Logo size="sm" showTagline={false} />
+          <Logo light size="sm" showTagline={false} />
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#DDD5C8] bg-[#F8F5ED] px-3.5 py-1.5 text-xs font-bold text-[#205C43] shadow-xs hover:bg-white hover:border-[#205C43] transition-all"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-[#F8F5ED] shadow-xs hover:bg-white/20 transition-all"
             >
               ← Back to Home
             </Link>
             <Link
               to="/login"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#205C43] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:brightness-105 transition-all"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#ED7545] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:brightness-110 transition-all"
             >
               Sign In
             </Link>
@@ -296,7 +312,9 @@ function SignupPage() {
             </button>
           </div>
         ) : (
-        <div className="grid overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white/95 shadow-xl ring-1 ring-white/60 backdrop-blur-sm lg:grid-cols-12">
+        <div className="grid overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white/95 shadow-2xl ring-1 ring-white/60 backdrop-blur-sm lg:grid-cols-12">
+          {/* Brand accent bar */}
+          <div className="lg:col-span-12 h-1.5 w-full bg-gradient-to-r from-[#164330] via-[#3F8F62] to-[#ED7545]" />
           {/* Left Hero Column */}
           <div className="relative min-w-0 overflow-hidden border-b border-[#DDD5C8] bg-gradient-to-b from-[#EBF3ED] to-[#F8F5ED] p-8 sm:p-10 flex flex-col justify-between lg:col-span-5 lg:border-b-0 lg:border-r">
             <div className="absolute -top-16 -right-16 size-48 rounded-full bg-[#205C43]/10 blur-2xl" aria-hidden />
@@ -565,7 +583,7 @@ function SignupPage() {
               <button
                 type="submit"
                 disabled={busy}
-                className="w-full rounded-full bg-[#205C43] py-3 text-xs font-bold text-white shadow-xs hover:brightness-105 disabled:opacity-50 transition-all cursor-pointer"
+                className="w-full rounded-full bg-gradient-to-r from-[#164330] via-[#205C43] to-[#3F8F62] py-3 text-xs font-bold text-white shadow-md hover:shadow-lg hover:brightness-110 disabled:opacity-50 transition-all cursor-pointer"
               >
                 {busy ? "Registering…" : "Create Free Account"}
               </button>
