@@ -138,66 +138,74 @@ function SignupPage() {
     setBusy(true);
     let cred: Awaited<ReturnType<typeof signUpWithEmail>>;
     try {
-      cred = await signUpWithEmail(email.trim(), password, fullName.trim());
+      // Never let a slow/hanging network delay the welcome screen: race the
+      // real signup against an 8s timeout, then fall back to a local account.
+      cred = await Promise.race([
+        signUpWithEmail(email.trim(), password, fullName.trim()),
+        new Promise<never>((_, reject) => setTimeout(() => reject(new Error("signup-timeout")), 8000)),
+      ]);
     } catch {
       // Last-resort fallback: create a local account + session so signup
       // ALWAYS lands in the dashboard — never bounce back to /login.
       cred = createLocalAccountAndSession(email.trim(), password, fullName.trim());
     }
 
-    try {
-      const now = Date.now();
-      const phoneVal = phone.trim();
-
-      // Write to the role-specific Supabase table AND the shared profiles table.
-      if (selectedRole === "donor") {
-        await registerDonor({
-          uid: cred.uid,
-          name: fullName.trim(),
-          donorType: "household",
-          email: email.trim(),
-          phone: phoneVal,
-          area: "",
-          createdAt: now,
-        });
-      } else if (selectedRole === "recipient") {
-        await registerNGO({
-          uid: cred.uid,
-          name: fullName.trim(),
-          orgName: fullName.trim(),
-          contactPerson: fullName.trim(),
-          email: email.trim(),
-          phone: phoneVal,
-          area: "",
-          createdAt: now,
-        });
-      } else if (selectedRole === "volunteer") {
-        await registerVolunteer({
-          uid: cred.uid,
-          name: fullName.trim(),
-          email: email.trim(),
-          phone: phoneVal,
-          area: "",
-          shifts: ["evening"],
-          createdAt: now,
-        });
-      }
-
-      // Also upsert profiles so AuthProvider can load role immediately.
-      const profileUpdate: { name: string; email: string; role: Role; phone?: string } = {
-        name: fullName.trim(),
-        email: email.trim(),
-        role: selectedRole,
-      };
-      if (phoneVal) profileUpdate.phone = phoneVal;
-      await updateProfile(cred.uid, profileUpdate);
-    } catch (err) {
-      console.warn("Role data sync failed (kept locally):", err);
-    }
-
-    toast.success("Account created successfully! Welcome to FoodLoop.");
+    // 🎉 Show the welcome celebration screen IMMEDIATELY — role-table syncing
+    // runs in the background so it can never block the celebration.
+    toast.success(`Welcome to FoodLoop, ${fullName.trim().split(" ")[0]}! 🎉`);
     setRegistered({ name: fullName.trim(), email: email.trim(), role: selectedRole });
     setBusy(false);
+
+    const now = Date.now();
+    const phoneVal = phone.trim();
+    void (async () => {
+      try {
+        // Write to the role-specific Supabase table AND the shared profiles table.
+        if (selectedRole === "donor") {
+          await registerDonor({
+            uid: cred.uid,
+            name: fullName.trim(),
+            donorType: "household",
+            email: email.trim(),
+            phone: phoneVal,
+            area: "",
+            createdAt: now,
+          });
+        } else if (selectedRole === "recipient") {
+          await registerNGO({
+            uid: cred.uid,
+            name: fullName.trim(),
+            orgName: fullName.trim(),
+            contactPerson: fullName.trim(),
+            email: email.trim(),
+            phone: phoneVal,
+            area: "",
+            createdAt: now,
+          });
+        } else if (selectedRole === "volunteer") {
+          await registerVolunteer({
+            uid: cred.uid,
+            name: fullName.trim(),
+            email: email.trim(),
+            phone: phoneVal,
+            area: "",
+            shifts: ["evening"],
+            createdAt: now,
+          });
+        }
+
+        // Also upsert profiles so AuthProvider can load role immediately.
+        const profileUpdate: { name: string; email: string; role: Role; phone?: string } = {
+          name: fullName.trim(),
+          email: email.trim(),
+          role: selectedRole,
+        };
+        if (phoneVal) profileUpdate.phone = phoneVal;
+        await updateProfile(cred.uid, profileUpdate);
+      } catch (err) {
+        console.warn("Role data sync failed (kept locally):", err);
+      }
+    })();
   }
 
   async function handleGoToDashboard() {
@@ -259,13 +267,13 @@ function SignupPage() {
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-[#F8F5ED] shadow-xs hover:bg-white/20 transition-all"
+              className="group inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-[#F8F5ED] shadow-xs hover:bg-white/20 hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
             >
-              ← Back to Home
+              <span className="inline-block transition-transform duration-200 group-hover:-translate-x-1">←</span> Back to Home
             </Link>
             <Link
               to="/login"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#ED7545] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:brightness-110 transition-all"
+              className="group inline-flex items-center gap-1.5 rounded-full bg-[#ED7545] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:brightness-110 hover:-translate-y-0.5 hover:shadow-md active:scale-95 transition-all duration-200"
             >
               Sign In
             </Link>
@@ -278,13 +286,16 @@ function SignupPage() {
         {registered ? (
           <div className="mx-auto max-w-lg rounded-3xl border border-[#DDD5C8] bg-white/95 px-6 py-12 text-center shadow-xl ring-1 ring-white/60 backdrop-blur-sm">
             {/* Animated check + name */}
-            <div className="mx-auto grid size-20 place-items-center rounded-full bg-gradient-to-br from-[#205C43] to-[#3F8F62] text-white shadow-2xl animate-bounce">
-              <CheckCircle2 className="size-10" />
+            <div className="relative mx-auto w-fit">
+              <span className="absolute inset-0 rounded-full bg-[#3F8F62]/40 animate-ping" aria-hidden />
+              <div className="relative grid size-20 place-items-center rounded-full bg-gradient-to-br from-[#205C43] to-[#3F8F62] text-white shadow-2xl animate-in zoom-in-50 duration-500">
+                <CheckCircle2 className="size-10" />
+              </div>
             </div>
-            <h1 className="mt-6 font-display text-3xl sm:text-4xl font-extrabold text-[#164330]">
+            <h1 className="mt-6 font-display text-3xl sm:text-4xl font-extrabold text-[#164330] animate-in fade-in slide-in-from-bottom-4 duration-500">
               Welcome, {registered.name.split(" ")[0]}! 🎉
             </h1>
-            <p className="mt-2 text-sm font-semibold text-[#3F8F62]">
+            <p className="mt-2 text-sm font-semibold text-[#3F8F62] animate-in fade-in slide-in-from-bottom-4 duration-700">
               {ROLE_META[registered.role].emoji} Your {ROLE_META[registered.role].label} account is ready.
             </p>
 
@@ -306,9 +317,10 @@ function SignupPage() {
               type="button"
               onClick={handleGoToDashboard}
               disabled={redirecting}
-              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#205C43] px-8 py-3 text-sm font-bold text-white shadow-md hover:brightness-110 transition-all cursor-pointer disabled:opacity-50"
+              className="group mt-8 inline-flex items-center gap-2 rounded-full bg-[#205C43] px-8 py-3 text-sm font-bold text-white shadow-md hover:brightness-110 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-50"
             >
-              Open {ROLE_META[registered.role].label} Dashboard Now <ArrowRight className="size-4" />
+              Open {ROLE_META[registered.role].label} Dashboard Now{" "}
+              <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
             </button>
           </div>
         ) : (
@@ -402,7 +414,7 @@ function SignupPage() {
                   <button
                     type="button"
                     onClick={() => navigate({ to: profile?.role === "donor" ? "/donor" : profile?.role === "volunteer" ? "/volunteer" : profile?.role === "admin" ? "/admin" : "/recipient" })}
-                    className="rounded-lg bg-[#205C43] px-3 py-1 text-[11px] font-bold text-white hover:brightness-110"
+                    className="rounded-lg bg-[#205C43] px-3 py-1 text-[11px] font-bold text-white hover:brightness-110 hover:-translate-y-0.5 active:scale-95 transition-all duration-200 cursor-pointer"
                   >
                     Go to Portal →
                   </button>
@@ -412,7 +424,7 @@ function SignupPage() {
                       await signOut();
                       toast.success("Signed out. You can now register a new account.");
                     }}
-                    className="rounded-lg border border-red-300 bg-white px-3 py-1 text-[11px] font-bold text-red-600 hover:bg-red-50"
+                    className="rounded-lg border border-red-300 bg-white px-3 py-1 text-[11px] font-bold text-red-600 hover:bg-red-50 hover:-translate-y-0.5 active:scale-95 transition-all duration-200 cursor-pointer"
                   >
                     Sign Out First
                   </button>
@@ -425,21 +437,29 @@ function SignupPage() {
               <label className="text-xs font-bold uppercase tracking-wider text-[#656C62]">Select Your Role</label>
               <div className="mt-2 grid grid-cols-3 gap-2">
                 {[
-                  { r: "donor", label: "🍲 Food Donor", desc: "Kitchens & banquets" },
-                  { r: "recipient", label: "🏢 Recipient", desc: "Shelters & NGOs" },
-                  { r: "volunteer", label: "🚴 Volunteer", desc: "Delivery Heroes" },
-                ].map(({ r, label, desc }) => (
+                  { r: "donor", emoji: "🍲", label: "Food Donor", desc: "Kitchens & banquets" },
+                  { r: "recipient", emoji: "🏢", label: "Recipient", desc: "Shelters & NGOs" },
+                  { r: "volunteer", emoji: "🚴", label: "Volunteer", desc: "Delivery Heroes" },
+                ].map(({ r, emoji, label, desc }) => (
                   <button
                     key={r}
                     type="button"
                     onClick={() => setSelectedRole(r as Role)}
-                    className={`rounded-2xl border p-2.5 text-center transition-all cursor-pointer ${
+                    className={`group relative rounded-2xl border-2 p-2.5 text-center transition-all duration-200 cursor-pointer active:scale-95 ${
                       selectedRole === r
-                        ? "border-[#205C43] bg-[#205C43]/10 ring-2 ring-[#205C43]/20"
-                        : "border-[#DDD5C8] hover:bg-[#F8F5ED]"
+                        ? "border-[#205C43] bg-gradient-to-b from-[#205C43]/12 to-[#205C43]/5 ring-2 ring-[#205C43]/20 scale-[1.03] shadow-md"
+                        : "border-[#DDD5C8] hover:border-[#205C43]/40 hover:bg-[#F8F5ED] hover:scale-[1.02] hover:shadow-sm"
                     }`}
                   >
-                    <p className="text-xs font-bold text-[#242923]">{label}</p>
+                    {selectedRole === r && (
+                      <span className="absolute -top-2 -right-2 grid size-5 place-items-center rounded-full bg-[#205C43] text-[10px] font-bold text-white shadow-md animate-in zoom-in-50 duration-200">
+                        ✓
+                      </span>
+                    )}
+                    <span className="block text-lg leading-none transition-transform duration-200 group-hover:scale-125 group-active:scale-95">
+                      {emoji}
+                    </span>
+                    <p className="mt-1 text-xs font-bold text-[#242923]">{label}</p>
                     <p className="text-[10px] text-[#656C62] mt-0.5">{desc}</p>
                   </button>
                 ))}
@@ -457,7 +477,7 @@ function SignupPage() {
                     placeholder="e.g. Ramesh Kumar or Grand Banquet"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
-                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:outline-none"
+                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                   />
                 </div>
               </div>
@@ -473,7 +493,7 @@ function SignupPage() {
                       placeholder="you@domain.org"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:outline-none"
+                      className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -489,7 +509,7 @@ function SignupPage() {
                       placeholder="+91 98765 43210"
                       value={phone}
                       onChange={(e) => setPhone(e.target.value)}
-                      className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:outline-none"
+                      className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -505,7 +525,7 @@ function SignupPage() {
                     placeholder="Minimum 6 characters"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-10 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:outline-none"
+                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-10 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                   />
                   <button
                     type="button"
@@ -548,7 +568,7 @@ function SignupPage() {
                     placeholder="Confirm password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:outline-none"
+                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                   />
                   {confirmPassword.length > 0 && confirmPassword === password && (
                     <Check className="absolute right-3 top-3 size-4 text-[#205C43]" />
@@ -583,9 +603,16 @@ function SignupPage() {
               <button
                 type="submit"
                 disabled={busy}
-                className="w-full rounded-full bg-gradient-to-r from-[#164330] via-[#205C43] to-[#3F8F62] py-3 text-xs font-bold text-white shadow-md hover:shadow-lg hover:brightness-110 disabled:opacity-50 transition-all cursor-pointer"
+                className="group w-full rounded-full bg-gradient-to-r from-[#164330] via-[#205C43] to-[#3F8F62] py-3 text-xs font-bold text-white shadow-md hover:shadow-lg hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-50 disabled:hover:translate-y-0 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5"
               >
-                {busy ? "Registering…" : "Create Free Account"}
+                {busy ? (
+                  "Registering…"
+                ) : (
+                  <>
+                    Create Free Account
+                    <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-1" />
+                  </>
+                )}
               </button>
             </form>
 
@@ -607,9 +634,9 @@ function SignupPage() {
                     setAcceptedTerms(true);
                     toast.success("Filled demo credentials!");
                   }}
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-[#DDD5C8] bg-white py-2.5 px-3 text-xs font-bold text-[#242923] hover:border-[#205C43] hover:bg-[#F8F5ED] transition-all"
+                  className="group flex items-center justify-center gap-2 rounded-2xl border border-[#DDD5C8] bg-white py-2.5 px-3 text-xs font-bold text-[#242923] hover:border-[#205C43] hover:bg-[#F8F5ED] hover:-translate-y-0.5 hover:shadow-md active:scale-95 transition-all duration-200 cursor-pointer"
                 >
-                  <span className="text-red-500 font-extrabold">G</span> Continue with Google
+                  <span className="text-red-500 font-extrabold inline-block transition-transform duration-200 group-hover:scale-125 group-active:rotate-12">G</span> Continue with Google
                 </button>
                 <button
                   type="button"
@@ -621,9 +648,9 @@ function SignupPage() {
                     setAcceptedTerms(true);
                     toast.success("Filled demo credentials!");
                   }}
-                  className="flex items-center justify-center gap-2 rounded-2xl border border-[#DDD5C8] bg-white py-2.5 px-3 text-xs font-bold text-[#242923] hover:border-[#205C43] hover:bg-[#F8F5ED] transition-all"
+                  className="group flex items-center justify-center gap-2 rounded-2xl border border-[#DDD5C8] bg-white py-2.5 px-3 text-xs font-bold text-[#242923] hover:border-[#205C43] hover:bg-[#F8F5ED] hover:-translate-y-0.5 hover:shadow-md active:scale-95 transition-all duration-200 cursor-pointer"
                 >
-                  <span></span> Continue with Apple
+                  <span className="inline-block transition-transform duration-200 group-hover:scale-125">&#63743;</span> Continue with Apple
                 </button>
               </div>
             </div>
@@ -632,9 +659,10 @@ function SignupPage() {
               <span>Already registered?</span>
               <Link
                 to="/login"
-                className="inline-flex items-center rounded-full bg-[#205C43]/10 px-3 py-1 font-bold text-[#205C43] hover:bg-[#205C43] hover:text-white transition-all shadow-2xs"
+                className="group inline-flex items-center gap-1 rounded-full bg-[#205C43]/10 px-3 py-1 font-bold text-[#205C43] hover:bg-[#205C43] hover:text-white hover:scale-105 active:scale-95 transition-all shadow-2xs"
               >
-                Sign In Here →
+                Sign In Here
+                <span className="inline-block transition-transform duration-200 group-hover:translate-x-1">→</span>
               </Link>
             </div>
           </div>
