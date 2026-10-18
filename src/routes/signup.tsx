@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
   Check,
@@ -103,6 +103,18 @@ function SignupPage() {
   const [acceptedTerms, setAcceptedTerms] = useState(false);
   const [busy, setBusy] = useState(false);
   const [registered, setRegistered] = useState<{ name: string; email: string; role: Role } | null>(null);
+  const [redirecting, setRedirecting] = useState(false);
+
+  // Auto-redirect to the portal after 3 seconds on the success screen.
+  useEffect(() => {
+    if (!registered) return;
+    const timer = setTimeout(() => {
+      setRedirecting(true);
+      handleGoToDashboard();
+    }, 3000);
+    return () => clearTimeout(timer);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [registered]);
 
   const score = passwordScore(password);
   const strengthLabel = ["Too short", "Weak", "Fair", "Good", "Strong"][score];
@@ -208,16 +220,6 @@ function SignupPage() {
     navigate({ to: meta.portal });
   }
 
-  function handleRegisterAnother() {
-    setRegistered(null);
-    setFullName("");
-    setEmail("");
-    setPhone("");
-    setPassword("");
-    setConfirmPassword("");
-    setAcceptedTerms(false);
-  }
-
   return (
     <div className="min-h-screen text-[#242923] flex flex-col justify-between relative overflow-x-hidden">
       {/* Professional layered background */}
@@ -255,58 +257,42 @@ function SignupPage() {
       </header>
 
       <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12 flex-1">
-        {/* ============ SUCCESS SCREEN ============ */}
+        {/* ============ WELCOME + AUTO-REDIRECT SCREEN ============ */}
         {registered ? (
-          <div className="mx-auto max-w-lg overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white shadow-2xl text-center">
-            <div className="bg-gradient-to-b from-[#EBF3ED] to-white px-8 pt-10 pb-6">
-              <div className="mx-auto grid size-16 place-items-center rounded-full bg-[#205C43] text-white shadow-lg">
-                <CheckCircle2 className="size-8" />
-              </div>
-              <h1 className="mt-5 font-display text-2xl sm:text-3xl font-extrabold text-[#164330]">
-                Account Created Successfully!
-              </h1>
-              <p className="mt-2 text-sm text-[#656C62]">
-                Welcome aboard,{" "}
-                <strong className="text-[#242923]">{registered.name}</strong>. Your{" "}
-                {ROLE_META[registered.role].label} account is ready.
-              </p>
-              <div className="mt-4 inline-flex items-center gap-2 rounded-full border border-[#DDD5C8] bg-[#F8F5ED] px-4 py-1.5 text-xs font-bold text-[#205C43]">
-                <span>{ROLE_META[registered.role].emoji}</span> {ROLE_META[registered.role].label} Portal
+          <div className="mx-auto max-w-lg text-center py-8">
+            {/* Animated check + name */}
+            <div className="mx-auto grid size-20 place-items-center rounded-full bg-gradient-to-br from-[#205C43] to-[#3F8F62] text-white shadow-2xl animate-bounce">
+              <CheckCircle2 className="size-10" />
+            </div>
+            <h1 className="mt-6 font-display text-3xl sm:text-4xl font-extrabold text-[#164330]">
+              Welcome, {registered.name.split(" ")[0]}! 🎉
+            </h1>
+            <p className="mt-2 text-sm font-semibold text-[#3F8F62]">
+              {ROLE_META[registered.role].emoji} Your {ROLE_META[registered.role].label} account is ready.
+            </p>
+
+            {/* Progress bar for auto-redirect */}
+            <div className="mx-auto mt-8 max-w-xs">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-[#DDD5C8]">
+                <div
+                  className="h-full rounded-full bg-gradient-to-r from-[#205C43] to-[#3F8F62] transition-all duration-[2800ms] ease-linear"
+                  style={{ width: redirecting ? "100%" : "0%" }}
+                />
               </div>
               <p className="mt-3 text-xs text-[#656C62]">
-                Confirmation sent to <strong>{registered.email}</strong>
+                {redirecting ? "Taking you to your dashboard…" : "Redirecting to your dashboard in 3 seconds…"}
               </p>
             </div>
 
-            <div className="border-t border-[#DDD5C8] px-8 py-6 text-left">
-              <p className="text-xs font-bold uppercase tracking-wider text-[#656C62]">What happens next</p>
-              <ul className="mt-3 space-y-2.5">
-                {ROLE_META[registered.role].next.map((step, i) => (
-                  <li key={i} className="flex items-start gap-2.5 text-xs text-[#242923]">
-                    <span className="mt-0.5 grid size-5 shrink-0 place-items-center rounded-full bg-[#205C43]/10 text-[10px] font-bold text-[#205C43]">
-                      {i + 1}
-                    </span>
-                    <span className="font-medium">{step}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <button
-                type="button"
-                onClick={handleGoToDashboard}
-                className="mt-6 w-full rounded-full bg-[#205C43] py-3 text-sm font-bold text-white shadow-sm hover:brightness-105 transition-all flex items-center justify-center gap-2 cursor-pointer"
-              >
-                Open My {ROLE_META[registered.role].label} Dashboard{" "}
-                <ArrowRight className="size-4" />
-              </button>
-              <button
-                type="button"
-                onClick={handleRegisterAnother}
-                className="mt-2 w-full rounded-full border border-[#DDD5C8] bg-white py-2.5 text-xs font-bold text-[#656C62] hover:border-[#205C43] hover:text-[#205C43] transition-all cursor-pointer"
-              >
-                Register Another Account
-              </button>
-            </div>
+            {/* Manual skip button (optional) */}
+            <button
+              type="button"
+              onClick={handleGoToDashboard}
+              disabled={redirecting}
+              className="mt-8 inline-flex items-center gap-2 rounded-full bg-[#205C43] px-8 py-3 text-sm font-bold text-white shadow-md hover:brightness-110 transition-all cursor-pointer disabled:opacity-50"
+            >
+              Open {ROLE_META[registered.role].label} Dashboard Now <ArrowRight className="size-4" />
+            </button>
           </div>
         ) : (
         <div className="overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white/95 backdrop-blur-sm shadow-lg grid lg:grid-cols-12">
