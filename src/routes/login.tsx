@@ -82,10 +82,12 @@ function LoginPage() {
 
       let uid = "";
       try {
-        const cred = await signInWithEmail(email, pass);
+        // Sign up (or reuse via sign-in) so the demo account is REAL in
+        // Supabase with a real uid — never a local-only ghost account.
+        const cred = await signUpWithEmail(email, pass);
         uid = cred.uid;
       } catch {
-        const cred = await signUpWithEmail(email, pass);
+        const cred = await signInWithEmail(email, pass);
         uid = cred.uid;
       }
 

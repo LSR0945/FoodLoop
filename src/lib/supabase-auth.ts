@@ -203,8 +203,19 @@ export async function signUpWithEmail(email: string, password: string, displayNa
   if (error) {
     const lower = (error.message || "").toLowerCase();
     // The Supabase account already exists (e.g. from an earlier attempt).
-    // Never dead-end at login — provision a local account + session instead.
+    // Try to sign in with the given password so we reuse the REAL account
+    // (and its real uid) instead of creating a local-only one.
     if (lower.includes("already registered") || lower.includes("already been registered")) {
+      const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+        email: cleanEmail,
+        password,
+      });
+      if (!signInError && signInData.user) {
+        const user = toAuthUser(signInData.user)!;
+        upsertLocalAccount({ uid: user.uid, email: cleanEmail, password, name: displayName || user.displayName || undefined });
+        setLocalSession({ uid: user.uid, email: cleanEmail, name: displayName || user.displayName || undefined });
+        return user;
+      }
       return createLocalAccountAndSession(cleanEmail, password, displayName);
     }
     throw mapAuthError(error, "Registration failed. Please check details.");

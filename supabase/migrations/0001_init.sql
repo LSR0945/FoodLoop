@@ -277,6 +277,33 @@ create trigger on_auth_user_created
   for each row execute function public.handle_new_user();
 
 -- ---------------------------------------------------------------------------
+-- 11b. Cascade cleanup — deleting an auth user removes all of their public
+--      data too (profiles, donors, recipients, ngos, volunteers, admins,
+--      notifications and their listings).
+-- ---------------------------------------------------------------------------
+create or replace function public.handle_deleted_user()
+returns trigger
+language plpgsql
+security definer set search_path = public
+as $$
+begin
+  delete from public.profiles where uid = old.id::text;
+  delete from public.donors where uid = old.id::text;
+  delete from public.recipients where uid = old.id::text;
+  delete from public.ngos where uid = old.id::text;
+  delete from public.volunteers where uid = old.id::text;
+  delete from public.admins where uid = old.id::text;
+  delete from public.notifications where "userId" = old.id::text;
+  delete from public.listings where "donorId" = old.id::text;
+  return old;
+end $$;
+
+drop trigger if exists on_auth_user_deleted on auth.users;
+create trigger on_auth_user_deleted
+  after delete on auth.users
+  for each row execute function public.handle_deleted_user();
+
+-- ---------------------------------------------------------------------------
 -- Done. The app also works offline via its built-in local fallback, but
 -- running this migration unlocks live data, realtime sync and multi-device use.
 -- ---------------------------------------------------------------------------
