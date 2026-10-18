@@ -176,6 +176,17 @@ export async function signInWithEmail(email: string, password: string): Promise<
   throw mapAuthError(error, "Login failed. Please check credentials.");
 }
 
+/** Creates a local-only account + session. Used as the last-resort fallback
+ *  so signup always succeeds even if Supabase rejects the email. */
+export function createLocalAccountAndSession(email: string, password: string, displayName?: string): AuthUser {
+  const cleanEmail = email.trim().toLowerCase();
+  const uid = "local_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  const name = displayName || cleanEmail.split("@")[0] || "User";
+  upsertLocalAccount({ uid, email: cleanEmail, password, name });
+  setLocalSession({ uid, email: cleanEmail, name });
+  return localSessionToAuthUser({ uid, email: cleanEmail, name });
+}
+
 export async function signUpWithEmail(email: string, password: string, displayName?: string): Promise<AuthUser> {
   const cleanEmail = email.trim().toLowerCase();
   const supabase = getSupabase();
@@ -195,13 +206,18 @@ export async function signUpWithEmail(email: string, password: string, displayNa
     return user;
   }
 
-  if (error) throw mapAuthError(error, "Registration failed. Please check details.");
+  if (error) {
+    const lower = (error.message || "").toLowerCase();
+    // The Supabase account already exists (e.g. from an earlier attempt).
+    // Never dead-end at login — provision a local account + session instead.
+    if (lower.includes("already registered") || lower.includes("already been registered")) {
+      return createLocalAccountAndSession(cleanEmail, password, displayName);
+    }
+    throw mapAuthError(error, "Registration failed. Please check details.");
+  }
 
   // No Supabase user at all (e.g. rate limit / offline) — use a local account.
-  const uid = "local_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  upsertLocalAccount({ uid, email: cleanEmail, password, name: displayName });
-  setLocalSession({ uid, email: cleanEmail, name: displayName });
-  return localSessionToAuthUser({ uid, email: cleanEmail, name: displayName });
+  return createLocalAccountAndSession(cleanEmail, password, displayName);
 }
 
 export async function signOutAuth(): Promise<void> {

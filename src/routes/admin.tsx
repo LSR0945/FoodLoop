@@ -32,6 +32,7 @@ import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { useNavigate } from "@tanstack/react-router";
 import { useListings, generateSupabaseSchema } from "@/lib/db";
+import { getLocalSession } from "@/lib/supabase-auth";
 import { toast } from "sonner";
 import { Database } from "lucide-react";
 import {
@@ -153,7 +154,7 @@ function AdminPage() {
 
   // ── Auth guard: redirect to login when signed out ───────────────────────
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (!authLoading && !user && !getLocalSession()) {
       navigate({ to: "/login", replace: true });
     }
   }, [authLoading, user, navigate]);

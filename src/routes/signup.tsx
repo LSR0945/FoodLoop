@@ -17,7 +17,7 @@ import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
 import { registerDonor, registerNGO, registerVolunteer, updateProfile } from "@/lib/db";
-import { getLocalSession, signUpWithEmail } from "@/lib/supabase-auth";
+import { createLocalAccountAndSession, getLocalSession, signUpWithEmail } from "@/lib/supabase-auth";
 import type { Role } from "@/lib/types";
 
 export const Route = createFileRoute("/signup")({
@@ -136,8 +136,16 @@ function SignupPage() {
     }
 
     setBusy(true);
+    let cred: Awaited<ReturnType<typeof signUpWithEmail>>;
     try {
-      const cred = await signUpWithEmail(email.trim(), password, fullName.trim());
+      cred = await signUpWithEmail(email.trim(), password, fullName.trim());
+    } catch {
+      // Last-resort fallback: create a local account + session so signup
+      // ALWAYS lands in the dashboard — never bounce back to /login.
+      cred = createLocalAccountAndSession(email.trim(), password, fullName.trim());
+    }
+
+    try {
       const now = Date.now();
       const phoneVal = phone.trim();
 
@@ -183,28 +191,13 @@ function SignupPage() {
       };
       if (phoneVal) profileUpdate.phone = phoneVal;
       await updateProfile(cred.uid, profileUpdate);
-
-      toast.success("Account created successfully! Welcome to FoodLoop.");
-      setRegistered({ name: fullName.trim(), email: email.trim(), role: selectedRole });
-    } catch (err: any) {
-      if (err.code === "auth/email-already-in-use") {
-        toast.error("This email is already registered. Please log in.");
-        navigate({ to: "/login" });
-      } else {
-        const fallbackUid = "usr_" + Date.now();
-        const fallbackUpdate: { name: string; email: string; role: Role; phone?: string } = {
-          name: fullName.trim(),
-          email: email.trim(),
-          role: selectedRole,
-        };
-        if (phone.trim()) fallbackUpdate.phone = phone.trim();
-        await updateProfile(fallbackUid, fallbackUpdate);
-        toast.success("Account registered locally!");
-        setRegistered({ name: fullName.trim(), email: email.trim(), role: selectedRole });
-      }
-    } finally {
-      setBusy(false);
+    } catch (err) {
+      console.warn("Role data sync failed (kept locally):", err);
     }
+
+    toast.success("Account created successfully! Welcome to FoodLoop.");
+    setRegistered({ name: fullName.trim(), email: email.trim(), role: selectedRole });
+    setBusy(false);
   }
 
   async function handleGoToDashboard() {

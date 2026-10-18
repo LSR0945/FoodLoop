@@ -186,6 +186,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     // Re-bootstrap when a local session is created/destroyed (signup/login/signout).
     const onLocalAuth = () => {
+      const local = getLocalSession();
+      if (local) {
+        // Set the user synchronously so auth guards never bounce back to
+        // /login while the async bootstrap is still resolving.
+        setState((s) => ({ ...s, user: localSessionToAuthUser(local), loading: true }));
+      }
       bootstrap();
     };
     window.addEventListener("foodloop_auth_changed", onLocalAuth);

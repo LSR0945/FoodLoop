@@ -26,6 +26,7 @@ import { ListingCard, StatusBadge, UrgencyBadge } from "@/components/ListingBits
 import { useAuth } from "@/lib/auth";
 import { cancelListing, createListing, updateProfile, useListings, useNotifications } from "@/lib/db";
 import { isOpen } from "@/lib/priority";
+import { getLocalSession } from "@/lib/supabase-auth";
 import type { Category, Listing } from "@/lib/types";
 
 export const Route = createFileRoute("/donor")({
@@ -60,7 +61,7 @@ function DonorPortalPage() {
 
   // ── Auth guard: redirect to login when signed out ───────────────────────
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (!authLoading && !user && !getLocalSession()) {
       navigate({ to: "/login", replace: true });
     }
   }, [authLoading, user, navigate]);

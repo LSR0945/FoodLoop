@@ -24,6 +24,7 @@ import { Logo } from "@/components/Logo";
 import { ListingCard, StatusBadge } from "@/components/ListingBits";
 import { useAuth } from "@/lib/auth";
 import { reserveListing, updateProfile, useListings, useNotifications } from "@/lib/db";
+import { getLocalSession } from "@/lib/supabase-auth";
 import type { Listing, Profile } from "@/lib/types";
 
 export const Route = createFileRoute("/recipient")({
@@ -57,7 +58,7 @@ function RecipientPortalPage() {
 
   // ── Auth guard: redirect to login when signed out ───────────────────────
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (!authLoading && !user && !getLocalSession()) {
       navigate({ to: "/login", replace: true });
     }
   }, [authLoading, user, navigate]);

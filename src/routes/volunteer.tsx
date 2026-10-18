@@ -25,6 +25,7 @@ import { Logo } from "@/components/Logo";
 import { StatusBadge } from "@/components/ListingBits";
 import { useAuth } from "@/lib/auth";
 import { assignVolunteer, markPickedUp, updateProfile, useListings, useNotifications } from "@/lib/db";
+import { getLocalSession } from "@/lib/supabase-auth";
 import type { Listing, Shift } from "@/lib/types";
 
 export const Route = createFileRoute("/volunteer")({
@@ -68,7 +69,7 @@ function VolunteerPortalPage() {
 
   // ── Auth guard: redirect to login when signed out ───────────────────────
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (!authLoading && !user && !getLocalSession()) {
       navigate({ to: "/login", replace: true });
     }
   }, [authLoading, user, navigate]);
