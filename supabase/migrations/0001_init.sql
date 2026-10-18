@@ -224,6 +224,11 @@ begin
   end loop;
 end $$;
 
+-- Make sure the public (publishable) key can actually read/write these tables.
+grant usage on schema public to anon, authenticated;
+grant all on all tables in schema public to anon, authenticated;
+grant all on all sequences in schema public to anon, authenticated;
+
 -- ---------------------------------------------------------------------------
 -- 10. Realtime (listings, notifications, profiles live updates)
 -- ---------------------------------------------------------------------------

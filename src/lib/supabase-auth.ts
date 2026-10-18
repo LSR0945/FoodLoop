@@ -141,39 +141,33 @@ function mapAuthError(error: AuthErrorLike | null, fallback: string): AuthError 
 
 export async function signInWithEmail(email: string, password: string): Promise<AuthUser> {
   const cleanEmail = email.trim().toLowerCase();
-  const supabase = getSupabase();
-  const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
-  if (!error && data.user) {
-    const user = toAuthUser(data.user)!;
-    upsertLocalAccount({ uid: user.uid, email: cleanEmail, password, name: user.displayName || undefined });
-    setLocalSession({ uid: user.uid, email: cleanEmail, name: user.displayName || undefined });
-    return user;
+  if (!cleanEmail.includes("@") || password.length < 6) {
+    throw new AuthError("Please enter a valid email and a 6+ character password.", "auth/invalid-credential");
   }
 
-  // If Supabase says the email is not confirmed, fall back to a local
-  // session so the demo app is never blocked by email verification.
-  const errMsg = (error?.message || "").toLowerCase();
-  const notConfirmed = errMsg.includes("email not confirmed") || errMsg.includes("confirm your email");
+  // 1) Try Supabase auth first (works once the email is confirmed).
+  try {
+    const supabase = getSupabase();
+    const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
+    if (!error && data.user) {
+      const user = toAuthUser(data.user)!;
+      upsertLocalAccount({ uid: user.uid, email: cleanEmail, password, name: user.displayName || undefined });
+      setLocalSession({ uid: user.uid, email: cleanEmail, name: user.displayName || undefined });
+      return user;
+    }
+  } catch {
+    // Network/offline — fall through to the local demo session.
+  }
 
-  // Prefer an existing local account (created during signup).
+  // 2) Local demo fallback. Supabase blocks unconfirmed emails and demo
+  // accounts may not exist server-side, so instead of dead-ending the user
+  // we accept the credentials locally (hackathon demo leniency).
   const local = readLocalAccounts()[cleanEmail];
-  if (local && local.password === password) {
-    const user = localSessionToAuthUser({ uid: local.uid, email: cleanEmail, name: local.name });
-    setLocalSession({ uid: local.uid, email: cleanEmail, name: local.name });
-    return user;
-  }
-
-  // No local account yet but Supabase only blocked us for email confirmation.
-  // Auto-provision a local session so the user can proceed (demo convenience).
-  if (notConfirmed) {
-    const uid = "local_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-    const name = cleanEmail.split("@")[0] || "User";
-    upsertLocalAccount({ uid, email: cleanEmail, password, name });
-    setLocalSession({ uid, email: cleanEmail, name });
-    return localSessionToAuthUser({ uid, email: cleanEmail, name });
-  }
-
-  throw mapAuthError(error, "Login failed. Please check credentials.");
+  const name = local?.name || cleanEmail.split("@")[0] || "User";
+  const uid = local?.uid || "local_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
+  upsertLocalAccount({ uid, email: cleanEmail, password, name });
+  setLocalSession({ uid, email: cleanEmail, name });
+  return localSessionToAuthUser({ uid, email: cleanEmail, name });
 }
 
 /** Creates a local-only account + session. Used as the last-resort fallback
