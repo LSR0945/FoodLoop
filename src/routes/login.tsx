@@ -27,6 +27,10 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [busy, setBusy] = useState(false);
+  const [selectedRole, setSelectedRole] = useState<Role>("donor");
+
+  const portalForRole = (r: Role) =>
+    r === "donor" ? "/donor" : r === "volunteer" ? "/volunteer" : r === "admin" ? "/admin" : "/recipient";
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -34,33 +38,22 @@ function LoginPage() {
     try {
       const cred = await signInWithEmail(email.trim(), password);
 
-      // Prefer the role stored on the profile over any page-level picker.
-      let existingRole: Role | undefined;
-      try {
-        const raw = localStorage.getItem("annsetu_profile_" + cred.uid) || localStorage.getItem("foodloop_profile_" + cred.uid);
-        if (raw) {
-          const parsed = JSON.parse(raw);
-          if (parsed.role) existingRole = parsed.role;
-        }
-      } catch {}
-
       if (rememberMe) {
         localStorage.setItem("foodloop_remember_email", email.trim());
       } else {
         localStorage.removeItem("foodloop_remember_email");
       }
 
-      if (existingRole) {
-        await updateProfile(cred.uid, { role: existingRole });
-      }
+      // The role selected on this screen decides where the user lands.
+      await updateProfile(cred.uid, { role: selectedRole });
 
-      toast.success(`Welcome back to FoodLoop${existingRole ? ` as ${existingRole.toUpperCase()}` : ""}!`);
+      toast.success(`Welcome back to FoodLoop as ${selectedRole.toUpperCase()}!`);
       // Wait for AuthProvider to pick up the session before navigating.
       for (let i = 0; i < 20; i++) {
         if (getLocalSession()) break;
         await new Promise((r) => setTimeout(r, 50));
       }
-      navigate({ to: "/app" });
+      navigate({ to: portalForRole(selectedRole) });
     } catch (err: any) {
       toast.error(err.message || "Login failed. Please check credentials.");
     } finally {
@@ -70,6 +63,7 @@ function LoginPage() {
 
   async function handleFastDemo(role: Role) {
     setBusy(true);
+    setSelectedRole(role);
     try {
       const demoEmails: Record<Role, string> = {
         donor: "donor.demo@foodloop.org",
@@ -160,7 +154,7 @@ function LoginPage() {
 
       await updateProfile(uid, { role });
       toast.success(`Logged in as demo ${role.toUpperCase()}!`);
-      const targetPortal = role === "donor" ? "/donor" : role === "volunteer" ? "/volunteer" : role === "admin" ? "/admin" : "/recipient";
+      const targetPortal = portalForRole(role);
       // Wait for AuthProvider to pick up the session before navigating.
       for (let i = 0; i < 20; i++) {
         if (getLocalSession()) break;
@@ -300,41 +294,46 @@ function LoginPage() {
               </div>
             )}
 
-            {/* Quick Evaluator 1-Tap Login */}
-            <div className="mt-5 rounded-2xl bg-[#205C43]/5 p-3.5 border border-[#205C43]/15">
-              <p className="flex items-center gap-1.5 text-[11px] font-bold text-[#205C43] uppercase tracking-wider">
-                <Sparkles className="size-3.5 text-[#ED7545]" /> 1-Tap Demo Access:
-              </p>
-              <div className="mt-2 grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => handleFastDemo("donor")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
-                >
-                  🍲 Donor
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => handleFastDemo("recipient")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
-                >
-                  🏢 Shelter NGO
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => handleFastDemo("volunteer")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
-                >
-                  🚴 Volunteer
-                </button>
-              </div>
-            </div>
-
-            {/* Email / Password Form */}
+            {/* Role Selection + Login Form */}
             <form onSubmit={handleLogin} className="mt-5 space-y-4">
+              <div>
+                <label className="text-xs font-bold text-[#242923]">
+                  I am signing in as <span className="text-[#ED7545]">*</span>
+                </label>
+                <div className="mt-1.5 grid grid-cols-3 gap-2">
+                  {([
+                    { id: "donor" as Role, icon: "🍲", label: "Donor" },
+                    { id: "recipient" as Role, icon: "🏢", label: "Shelter NGO" },
+                    { id: "volunteer" as Role, icon: "🚴", label: "Volunteer" },
+                  ]).map((r) => (
+                    <button
+                      key={r.id}
+                      type="button"
+                      disabled={busy}
+                      onClick={() => setSelectedRole(r.id)}
+                      className={`relative rounded-xl border-2 px-2 py-2.5 text-center transition-all cursor-pointer disabled:opacity-50 ${
+                        selectedRole === r.id
+                          ? "border-[#205C43] bg-[#205C43]/10 shadow-xs"
+                          : "border-[#DDD5C8] bg-white hover:border-[#205C43]/50"
+                      }`}
+                    >
+                      {selectedRole === r.id && (
+                        <span className="absolute -top-2 -right-2 flex size-4.5 items-center justify-center rounded-full bg-[#205C43] text-[9px] font-bold text-white shadow-xs">
+                          ✓
+                        </span>
+                      )}
+                      <span className="block text-lg leading-none">{r.icon}</span>
+                      <span className={`mt-1 block text-[11px] font-bold ${selectedRole === r.id ? "text-[#205C43]" : "text-[#656C62]"}`}>
+                        {r.label}
+                      </span>
+                    </button>
+                  ))}
+                </div>
+                <p className="mt-1.5 text-[10px] text-[#656C62]/80">
+                  Your selected role decides which portal dashboard opens after sign in.
+                </p>
+              </div>
+
               <div>
                 <label className="text-xs font-bold text-[#242923]">Email Address</label>
                 <div className="relative mt-1">
@@ -396,9 +395,49 @@ function LoginPage() {
                 disabled={busy}
                 className="w-full rounded-full bg-[#205C43] py-3 text-xs font-bold text-white shadow-xs hover:brightness-105 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                {busy ? "Signing In…" : "Sign In to FoodLoop"}
+                {busy ? "Signing In…" : `Sign In as ${selectedRole === "recipient" ? "Shelter NGO" : selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}
               </button>
             </form>
+
+            {/* Divider */}
+            <div className="mt-5 flex items-center gap-3">
+              <div className="h-px flex-1 bg-[#DDD5C8]" />
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#656C62]/80">or try instantly — no password</span>
+              <div className="h-px flex-1 bg-[#DDD5C8]" />
+            </div>
+
+            {/* Quick Evaluator 1-Tap Demo Login (below sign-in) */}
+            <div className="mt-4 rounded-2xl bg-[#205C43]/5 p-3.5 border border-[#205C43]/15">
+              <p className="flex items-center gap-1.5 text-[11px] font-bold text-[#205C43] uppercase tracking-wider">
+                <Sparkles className="size-3.5 text-[#ED7545]" /> 1-Tap Demo Access:
+              </p>
+              <div className="mt-2 grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => handleFastDemo("donor")}
+                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
+                >
+                  🍲 Donor
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => handleFastDemo("recipient")}
+                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
+                >
+                  🏢 Shelter NGO
+                </button>
+                <button
+                  type="button"
+                  disabled={busy}
+                  onClick={() => handleFastDemo("volunteer")}
+                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
+                >
+                  🚴 Volunteer
+                </button>
+              </div>
+            </div>
 
             <div className="mt-6 border-t border-[#DDD5C8] pt-4 text-center text-xs text-[#656C62] space-y-2">
               <div className="flex items-center justify-center gap-2">
