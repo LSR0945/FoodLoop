@@ -24,14 +24,36 @@ function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [busy, setBusy] = useState(false);
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
     setBusy(true);
     try {
-      await signInWithEmail(email.trim(), password);
-      toast.success("Welcome back to FoodLoop!");
+      const cred = await signInWithEmail(email.trim(), password);
+
+      // Prefer the role stored on the profile over any page-level picker.
+      let existingRole: Role | undefined;
+      try {
+        const raw = localStorage.getItem("annsetu_profile_" + cred.uid) || localStorage.getItem("foodloop_profile_" + cred.uid);
+        if (raw) {
+          const parsed = JSON.parse(raw);
+          if (parsed.role) existingRole = parsed.role;
+        }
+      } catch {}
+
+      if (rememberMe) {
+        localStorage.setItem("foodloop_remember_email", email.trim());
+      } else {
+        localStorage.removeItem("foodloop_remember_email");
+      }
+
+      if (existingRole) {
+        await updateProfile(cred.uid, { role: existingRole });
+      }
+
+      toast.success(`Welcome back to FoodLoop${existingRole ? ` as ${existingRole.toUpperCase()}` : ""}!`);
       navigate({ to: "/app" });
     } catch (err: any) {
       toast.error(err.message || "Login failed. Please check credentials.");
@@ -58,7 +80,6 @@ function LoginPage() {
         const cred = await signInWithEmail(email, pass);
         uid = cred.uid;
       } catch {
-        // Create the demo account; role is applied via updateProfile below (not as a display name).
         const cred = await signUpWithEmail(email, pass);
         uid = cred.uid;
       }
@@ -73,27 +94,58 @@ function LoginPage() {
     }
   }
 
+  // Prefill remembered email once on mount.
+  const [emailTouched, setEmailTouched] = useState(false);
+  if (!emailTouched && !email) {
+    const remembered = localStorage.getItem("foodloop_remember_email");
+    if (remembered) {
+      setEmail(remembered);
+    }
+    setEmailTouched(true);
+  }
+
   return (
-    <div className="min-h-screen bg-[#F8F5ED] text-[#242923] flex flex-col justify-between">
+    <div className="min-h-screen text-[#242923] flex flex-col justify-between relative overflow-x-hidden">
+      {/* Professional layered background */}
+      <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
+        <div className="absolute inset-0 bg-[#F8F5ED]" />
+        <img
+          src="/images/hunger/hunger3.png"
+          alt=""
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.08]"
+        />
+        <div className="absolute -top-40 -right-40 size-[26rem] rounded-full bg-[#205C43]/12 blur-3xl" />
+        <div className="absolute top-1/3 -left-40 size-[30rem] rounded-full bg-[#ED7545]/10 blur-3xl" />
+        <div className="absolute -bottom-32 right-1/4 size-[22rem] rounded-full bg-[#3F8F62]/10 blur-3xl" />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.75),transparent_55%)]" />
+      </div>
+
       {/* Top Mobile-Safe Header */}
-      <header className="border-b border-[#E2DBD0] bg-white px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
+      <header className="border-b border-[#E2DBD0]/80 bg-white/90 backdrop-blur-md px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <Logo size="sm" showTagline={false} />
-          <Link
-            to="/"
-            className="inline-flex items-center gap-1.5 rounded-full border border-[#DDD5C8] bg-[#F8F5ED] px-3.5 py-1.5 text-xs font-bold text-[#205C43] shadow-xs hover:bg-white hover:border-[#205C43] transition-all"
-          >
-            ← Back to Home
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link
+              to="/"
+              className="inline-flex items-center gap-1.5 rounded-full border border-[#DDD5C8] bg-[#F8F5ED] px-3.5 py-1.5 text-xs font-bold text-[#205C43] shadow-xs hover:bg-white hover:border-[#205C43] transition-all"
+            >
+              ← Back to Home
+            </Link>
+            <Link
+              to="/signup"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#205C43] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:brightness-105 transition-all"
+            >
+              Sign Up
+            </Link>
+          </div>
         </div>
       </header>
 
       <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:py-10 flex-1 flex items-center justify-center">
-        <div className="w-full overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white shadow-xl grid lg:grid-cols-12">
-          
+        <div className="w-full overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white/95 backdrop-blur-sm shadow-xl grid lg:grid-cols-12">
+
           {/* Left Column: Hunger Relief & Community Impact Imagery */}
-          <div className="lg:col-span-5 relative bg-[#164330] p-6 sm:p-8 text-white flex flex-col justify-between overflow-hidden">
-            {/* Background image showing warm meals being shared with community */}
+          <div className="lg:col-span-5 min-w-0 relative bg-[#164330] p-6 sm:p-8 text-white flex flex-col justify-between overflow-hidden">
             <div className="absolute inset-0 z-0">
               <img
                 src="/images/hunger/hunger3.png"
@@ -133,7 +185,7 @@ function LoginPage() {
           </div>
 
           {/* Right Column: Sign In Form */}
-          <div className="lg:col-span-7 p-6 sm:p-10 flex flex-col justify-center">
+          <div className="lg:col-span-7 min-w-0 p-6 sm:p-10 flex flex-col justify-center">
             <div className="text-left">
               <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-[#242923]">Welcome Back</h1>
               <p className="mt-1 text-xs text-[#656C62]">Sign in to access your surplus food dashboard or active collections</p>
@@ -178,7 +230,7 @@ function LoginPage() {
                   type="button"
                   disabled={busy}
                   onClick={() => handleFastDemo("donor")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs"
+                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
                 >
                   🍲 Donor
                 </button>
@@ -186,7 +238,7 @@ function LoginPage() {
                   type="button"
                   disabled={busy}
                   onClick={() => handleFastDemo("recipient")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs"
+                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
                 >
                   🏢 Shelter NGO
                 </button>
@@ -194,7 +246,7 @@ function LoginPage() {
                   type="button"
                   disabled={busy}
                   onClick={() => handleFastDemo("volunteer")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs"
+                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
                 >
                   🚴 Volunteer
                 </button>
@@ -248,10 +300,21 @@ function LoginPage() {
                 </div>
               </div>
 
+              {/* Remember me */}
+              <label className="flex items-center gap-2 cursor-pointer text-xs text-[#656C62]">
+                <input
+                  type="checkbox"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                  className="size-3.5 accent-[#205C43]"
+                />
+                <span>Remember my email on this device</span>
+              </label>
+
               <button
                 type="submit"
                 disabled={busy}
-                className="w-full rounded-full bg-[#205C43] py-3 text-xs font-bold text-white shadow-xs hover:brightness-105 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
+                className="w-full rounded-full bg-[#205C43] py-3 text-xs font-bold text-white shadow-xs hover:brightness-105 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
               >
                 {busy ? "Signing In…" : "Sign In to FoodLoop"}
               </button>
@@ -267,6 +330,12 @@ function LoginPage() {
                   Create Account →
                 </Link>
               </div>
+              <p className="text-[10px] text-[#656C62]/80">
+                Want a dedicated donor/NGO/volunteer form?{" "}
+                <Link to="/auth" className="font-bold text-[#205C43] hover:underline">
+                  Open detailed registration →
+                </Link>
+              </p>
             </div>
           </div>
         </div>

@@ -292,7 +292,7 @@ function LandingPage() {
         <div className="mx-auto max-w-6xl px-4">
           <div className="grid items-center gap-12 lg:grid-cols-12">
             {/* Left Content */}
-            <div className="lg:col-span-7">
+            <div className="lg:col-span-7 min-w-0">
               <div className="inline-flex items-center gap-2 rounded-full border border-[#3F8F62]/30 bg-white/80 px-3.5 py-1 text-xs font-bold text-[#205C43] shadow-xs backdrop-blur-sm">
                 <span className="size-2 rounded-full bg-[#ED7545] animate-ping" />
                 <span>Zero Hunger Mission · Free Community Food Relief</span>
@@ -360,7 +360,7 @@ function LandingPage() {
               </div>
 
               {/* 4 Core Platform Guarantees: Responsive (Horizontal scroll on phone APK, flex wrap on desktop) */}
-              <div className="mt-4">
+              <div className="mt-4 min-w-0">
                 <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 -mx-2 px-2 sm:mx-0 sm:px-0 sm:flex-wrap">
                   <div className="shrink-0 inline-flex items-center gap-1.5 rounded-full border border-[#DDD5C8] bg-white/95 px-3 py-1.5 text-xs font-semibold text-[#242923] shadow-2xs backdrop-blur-sm hover:border-[#205C43]/40 transition-all">
                     <span className="flex size-4 items-center justify-center rounded-full bg-[#205C43]/10 text-[10px] text-[#205C43] font-bold">✓</span>
@@ -386,7 +386,7 @@ function LandingPage() {
             </div>
 
             {/* Right Visual Image Showcase with Authentic Hunger Relief & Food Rescue */}
-            <div className="relative lg:col-span-5">
+            <div className="relative lg:col-span-5 min-w-0">
               <div className="relative mx-auto max-w-md">
                 <div className="overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white p-3 shadow-2xl">
                   {/* Category Pills directly above card */}
