@@ -266,7 +266,7 @@ function SignupPage() {
       <header className="lg:hidden border-b border-white/10 bg-[#0E3323]/90 backdrop-blur-xl">
         <div className="flex items-center justify-between px-4 py-3">
           <Link
-            to="/"
+            to="/login"
             aria-label="Go back"
             className="grid size-9 place-items-center rounded-full border border-white/25 bg-white/10 text-[#F8F5ED] transition-transform active:scale-90"
           >
@@ -288,10 +288,10 @@ function SignupPage() {
           <Logo light size="sm" showTagline={false} />
           <div className="flex items-center gap-3">
             <Link
-              to="/"
+              to="/login"
               className="group inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-[#F8F5ED] shadow-xs hover:bg-white/20 hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
             >
-              <span className="inline-block transition-transform duration-200 group-hover:-translate-x-1">←</span> Back to Home
+              <span className="inline-block transition-transform duration-200 group-hover:-translate-x-1">←</span> Sign In
             </Link>
             <Link
               to="/login"

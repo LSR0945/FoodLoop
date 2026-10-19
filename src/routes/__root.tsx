@@ -3,14 +3,16 @@ import {
   Outlet,
   Link,
   createRootRouteWithContext,
+  useNavigate,
   useRouter,
+  useRouterState,
   HeadContent,
   Scripts,
   type ErrorComponentProps,
 } from "@tanstack/react-router";
 import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
-import { AuthProvider } from "@/lib/auth";
+import { AuthProvider, useAuth } from "@/lib/auth";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
 
 import appCss from "../styles.css?url";
@@ -113,12 +115,69 @@ function RootComponent() {
   return (
     <QueryClientProvider client={queryClient}>
       <AuthProvider>
-        <div className="pb-14 md:pb-0">
+        <AuthGate>
           <Outlet />
-        </div>
-        <MobileBottomNav />
+        </AuthGate>
         <Toaster position="top-center" richColors />
       </AuthProvider>
     </QueryClientProvider>
+  );
+}
+
+const AUTH_SCREENS = ["/login", "/signup", "/auth", "/forgot-password", "/reset-password", "/verify-email"];
+
+function AppSplash() {
+  return (
+    <div
+      data-app-splash="true"
+      className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#0E3323] via-[#123A2A] to-[#081F15] text-white"
+    >
+      <div className="pointer-events-none absolute -right-24 -top-24 size-72 rounded-full bg-[#3F8F62]/25 blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-24 -left-24 size-72 rounded-full bg-[#ED7545]/15 blur-3xl" />
+      <div className="relative flex flex-col items-center">
+        <div className="animate-in zoom-in-75 fade-in grid size-24 place-items-center rounded-[1.75rem] border border-white/15 bg-white/10 shadow-2xl backdrop-blur-xl duration-500">
+          <img src="/foodloop-logo.png" alt="FoodLoop" className="size-16 rounded-2xl object-contain" />
+        </div>
+        <p className="mt-5 font-display text-2xl font-extrabold tracking-tight">
+          <span className="text-white">Food</span>
+          <span className="text-[#ED7545]">Loop</span>
+        </p>
+        <p className="mt-1 text-[11px] font-semibold tracking-wide text-white/60">
+          Good food. Shared with purpose.
+        </p>
+        <div className="mt-8 h-1 w-28 overflow-hidden rounded-full bg-white/10">
+          <div className="h-full w-1/2 rounded-full bg-[#ED7545] animate-[splashbar_1.1s_ease-in-out_infinite]" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Real-app behavior: the app opens on the branded splash, then anyone who is
+ * not signed in is sent straight to Login / Registration. The rest of the app
+ * is only reachable after authentication.
+ */
+function AuthGate({ children }: { children: ReactNode }) {
+  const { user, loading } = useAuth();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const navigate = useNavigate();
+
+  const isAuthScreen = AUTH_SCREENS.some((p) => pathname === p || pathname.startsWith(p + "/"));
+
+  useEffect(() => {
+    if (loading || user) return;
+    if (!isAuthScreen) navigate({ to: "/login", replace: true });
+  }, [loading, user, isAuthScreen, navigate]);
+
+  if (!isAuthScreen && !user) {
+    return <AppSplash />;
+  }
+
+  return (
+    <>
+      <div className={isAuthScreen ? undefined : "pb-14 md:pb-0"}>{children}</div>
+      {!isAuthScreen && <MobileBottomNav />}
+    </>
   );
 }

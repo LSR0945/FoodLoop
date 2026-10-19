@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
+import { ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
@@ -217,13 +217,7 @@ function LoginPage() {
       {/* ===== Native app bar (mobile) ===== */}
       <header className="lg:hidden border-b border-white/10 bg-[#081F15]/80 backdrop-blur-xl">
         <div className="flex items-center justify-between px-4 py-3">
-          <Link
-            to="/"
-            aria-label="Go back"
-            className="grid size-9 place-items-center rounded-full border border-white/15 bg-white/10 text-[#F8F5ED] transition-transform active:scale-90"
-          >
-            <ArrowLeft className="size-4" />
-          </Link>
+          <span className="size-9" aria-hidden="true" />
           <Logo light size="sm" showTagline={false} />
           <Link
             to="/signup"
@@ -239,12 +233,6 @@ function LoginPage() {
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <Logo light size="sm" showTagline={false} />
           <div className="flex items-center gap-3">
-            <Link
-              to="/"
-              className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-[#F8F5ED] backdrop-blur-md transition-all hover:border-white/40 hover:bg-white/20"
-            >
-              ← Back to Home
-            </Link>
             <Link
               to="/signup"
               className="inline-flex items-center gap-1.5 rounded-full bg-[#3F8F62] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition-all hover:brightness-110"
