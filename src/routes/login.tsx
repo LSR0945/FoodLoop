@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
@@ -214,8 +214,28 @@ function LoginPage() {
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(63,143,98,0.22),transparent_60%)]" />
       </div>
 
-      {/* Top Mobile-Safe Header */}
-      <header className="border-b border-white/10 bg-[#081F15]/70 backdrop-blur-md px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
+      {/* ===== Native app bar (mobile) ===== */}
+      <header className="lg:hidden border-b border-white/10 bg-[#081F15]/80 backdrop-blur-xl">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Link
+            to="/"
+            aria-label="Go back"
+            className="grid size-9 place-items-center rounded-full border border-white/15 bg-white/10 text-[#F8F5ED] transition-transform active:scale-90"
+          >
+            <ArrowLeft className="size-4" />
+          </Link>
+          <Logo light size="sm" showTagline={false} />
+          <Link
+            to="/signup"
+            className="rounded-full bg-[#ED7545] px-3.5 py-1.5 text-[11px] font-bold text-white shadow-xs transition-transform active:scale-95"
+          >
+            Sign Up
+          </Link>
+        </div>
+      </header>
+
+      {/* ===== Desktop header (web) ===== */}
+      <header className="hidden lg:block border-b border-white/10 bg-[#081F15]/70 backdrop-blur-md px-4 py-3">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
           <Logo light size="sm" showTagline={false} />
           <div className="flex items-center gap-3">
@@ -235,11 +255,38 @@ function LoginPage() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:py-10 flex-1 flex items-center justify-center">
-        <div className="w-full overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white shadow-2xl ring-1 ring-white/20 grid lg:grid-cols-12">
+      {/* ===== Mobile hero (native app style) ===== */}
+      <section className="lg:hidden relative px-5 pt-6 pb-16 text-white">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-bold text-[#F8F5ED] backdrop-blur-md">
+          🌱 Zero Hunger Movement
+        </span>
+        <h1 className="mt-3 font-display text-[2rem] font-extrabold leading-tight text-white">
+          Welcome Back
+        </h1>
+        <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-[#F8F5ED]/75">
+          Sign in to access your surplus food dashboard or active collections.
+        </p>
+        <div className="mt-5 grid grid-cols-3 gap-2">
+          <div className="rounded-2xl border border-white/10 bg-white/10 px-2 py-3 text-center backdrop-blur-md">
+            <p className="text-sm font-extrabold text-white">14,250+</p>
+            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">Meals Shared</p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 px-2 py-3 text-center backdrop-blur-md">
+            <p className="text-sm font-extrabold text-white">48</p>
+            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">Shelter Homes</p>
+          </div>
+          <div className="rounded-2xl border border-white/10 bg-white/10 px-2 py-3 text-center backdrop-blur-md">
+            <p className="text-sm font-extrabold text-white">35 min</p>
+            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">Rapid Pickup</p>
+          </div>
+        </div>
+      </section>
+
+      <main className="mx-auto w-full max-w-5xl px-3 sm:px-4 lg:py-10 flex-1 lg:flex lg:items-center lg:justify-center">
+        <div className="relative z-10 -mt-10 lg:mt-0 w-full overflow-hidden rounded-[2rem] lg:rounded-3xl border border-[#DDD5C8] bg-white shadow-2xl ring-1 ring-white/20 grid lg:grid-cols-12">
 
           {/* Left Column: Hunger Relief & Community Impact Imagery */}
-          <div className="lg:col-span-5 min-w-0 relative bg-[#164330] p-6 sm:p-8 text-white flex flex-col justify-between overflow-hidden">
+          <div className="hidden lg:flex lg:col-span-5 min-w-0 relative bg-[#164330] p-6 sm:p-8 text-white flex-col justify-between overflow-hidden">
             <div className="absolute inset-0 z-0">
               <img
                 src="/images/hunger/hunger3.png"
@@ -279,7 +326,7 @@ function LoginPage() {
           </div>
 
           {/* Right Column: Sign In Form */}
-          <div className="lg:col-span-7 min-w-0 p-6 sm:p-10 flex flex-col justify-center">
+          <div className="lg:col-span-7 min-w-0 p-5 sm:p-10 flex flex-col justify-center">
             <div className="text-left">
               <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-[#242923]">Welcome Back</h1>
               <p className="mt-1 text-xs text-[#656C62]">Sign in to access your surplus food dashboard or active collections</p>
@@ -331,18 +378,18 @@ function LoginPage() {
                       type="button"
                       disabled={busy}
                       onClick={() => setSelectedRole(r.id)}
-                      className={`relative rounded-xl border-2 px-2 py-2.5 text-center transition-all cursor-pointer disabled:opacity-50 ${
+                      className={`group relative rounded-2xl border-2 px-2 py-2.5 text-center transition-all duration-200 cursor-pointer active:scale-95 disabled:opacity-50 ${
                         selectedRole === r.id
-                          ? "border-[#205C43] bg-[#205C43]/10 shadow-xs"
-                          : "border-[#DDD5C8] bg-white hover:border-[#205C43]/50"
+                          ? "border-[#205C43] bg-gradient-to-b from-[#205C43]/12 to-[#205C43]/5 ring-2 ring-[#205C43]/20 scale-[1.03] shadow-md"
+                          : "border-[#DDD5C8] bg-white hover:border-[#205C43]/50 hover:scale-[1.02] hover:shadow-sm"
                       }`}
                     >
                       {selectedRole === r.id && (
-                        <span className="absolute -top-2 -right-2 flex size-4.5 items-center justify-center rounded-full bg-[#205C43] text-[9px] font-bold text-white shadow-xs">
+                        <span className="absolute -top-2 -right-2 grid size-5 place-items-center rounded-full bg-[#205C43] text-[10px] font-bold text-white shadow-md animate-in zoom-in-50 duration-200">
                           ✓
                         </span>
                       )}
-                      <span className="block text-lg leading-none">{r.icon}</span>
+                      <span className="block text-lg leading-none transition-transform duration-200 group-hover:scale-125 group-active:scale-95">{r.icon}</span>
                       <span className={`mt-1 block text-[11px] font-bold ${selectedRole === r.id ? "text-[#205C43]" : "text-[#656C62]"}`}>
                         {r.label}
                       </span>
@@ -364,7 +411,7 @@ function LoginPage() {
                     placeholder="name@organization.org"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:outline-none focus:bg-white transition-all"
+                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                   />
                 </div>
               </div>
@@ -387,7 +434,7 @@ function LoginPage() {
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-10 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:outline-none focus:bg-white transition-all"
+                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-10 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                   />
                   <button
                     type="button"
@@ -413,9 +460,16 @@ function LoginPage() {
               <button
                 type="submit"
                 disabled={busy}
-                className="w-full rounded-full bg-[#205C43] py-3 text-xs font-bold text-white shadow-xs hover:brightness-105 disabled:opacity-50 transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                className="group w-full rounded-full bg-gradient-to-r from-[#164330] via-[#205C43] to-[#3F8F62] py-3.5 text-sm font-bold text-white shadow-md hover:shadow-lg hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-50 disabled:hover:translate-y-0 transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer"
               >
-                {busy ? "Signing In…" : `Sign In as ${selectedRole === "recipient" ? "Shelter NGO" : selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`}
+                {busy ? (
+                  "Signing In…"
+                ) : (
+                  <>
+                    Sign In as {selectedRole === "recipient" ? "Shelter NGO" : selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}
+                    <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+                  </>
+                )}
               </button>
             </form>
 
@@ -436,7 +490,7 @@ function LoginPage() {
                   type="button"
                   disabled={busy}
                   onClick={() => handleFastDemo("donor")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
+                  className="rounded-xl border border-[#DDD5C8] bg-white py-2.5 text-xs font-bold text-[#242923] shadow-2xs transition-all duration-200 hover:border-[#205C43] hover:-translate-y-0.5 hover:shadow-sm active:scale-95 cursor-pointer disabled:opacity-50"
                 >
                   🍲 Donor
                 </button>
@@ -444,7 +498,7 @@ function LoginPage() {
                   type="button"
                   disabled={busy}
                   onClick={() => handleFastDemo("recipient")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
+                  className="rounded-xl border border-[#DDD5C8] bg-white py-2.5 text-xs font-bold text-[#242923] shadow-2xs transition-all duration-200 hover:border-[#205C43] hover:-translate-y-0.5 hover:shadow-sm active:scale-95 cursor-pointer disabled:opacity-50"
                 >
                   🏢 Shelter NGO
                 </button>
@@ -452,7 +506,7 @@ function LoginPage() {
                   type="button"
                   disabled={busy}
                   onClick={() => handleFastDemo("volunteer")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2 text-xs font-bold text-[#242923] hover:border-[#205C43] shadow-2xs cursor-pointer disabled:opacity-50"
+                  className="rounded-xl border border-[#DDD5C8] bg-white py-2.5 text-xs font-bold text-[#242923] shadow-2xs transition-all duration-200 hover:border-[#205C43] hover:-translate-y-0.5 hover:shadow-sm active:scale-95 cursor-pointer disabled:opacity-50"
                 >
                   🚴 Volunteer
                 </button>
@@ -464,9 +518,9 @@ function LoginPage() {
                 <span>New to FoodLoop?</span>
                 <Link
                   to="/signup"
-                  className="inline-flex items-center rounded-full bg-[#205C43]/10 px-3 py-1 font-bold text-[#205C43] hover:bg-[#205C43] hover:text-white transition-all"
+                  className="inline-flex items-center gap-1 rounded-full bg-[#205C43]/10 px-3.5 py-1.5 font-bold text-[#205C43] transition-all duration-200 hover:bg-[#205C43] hover:text-white hover:scale-105 active:scale-95"
                 >
-                  Create Account →
+                  Create Account <span aria-hidden>→</span>
                 </Link>
               </div>
               <p className="text-[10px] text-[#656C62]/80">
@@ -480,7 +534,7 @@ function LoginPage() {
         </div>
       </main>
 
-      <footer className="p-4 pb-6 text-center text-xs text-[#F8F5ED]/60">
+      <footer className="hidden lg:block p-4 pb-6 text-center text-xs text-[#F8F5ED]/60">
         <p>© FoodLoop. Good food. Shared with purpose.</p>
       </footer>
     </div>

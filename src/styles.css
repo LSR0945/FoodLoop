@@ -105,11 +105,28 @@
   * {
     border-color: var(--color-border);
   }
+  html {
+    overscroll-behavior-y: none;
+  }
   body {
     background-color: var(--color-background);
     color: var(--color-foreground);
     font-family: var(--font-sans);
     padding-top: env(safe-area-inset-top, 0px);
+    overscroll-behavior-y: none;
+  }
+  /* Native app feel: no blue tap flash, instant touch response */
+  button,
+  a,
+  label,
+  summary,
+  [role="button"] {
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+  }
+  img {
+    -webkit-user-drag: none;
+    user-select: none;
   }
   h1, h2, h3 {
     font-family: var(--font-display);

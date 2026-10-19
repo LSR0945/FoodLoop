@@ -1,6 +1,7 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import {
+  ArrowLeft,
   ArrowRight,
   Check,
   CheckCircle2,
@@ -261,7 +262,28 @@ function SignupPage() {
         />
       </div>
 
-      <header className="border-b border-white/10 bg-[#0E3323]/90 backdrop-blur-md px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
+      {/* ===== Native app bar (mobile) ===== */}
+      <header className="lg:hidden border-b border-white/10 bg-[#0E3323]/90 backdrop-blur-xl">
+        <div className="flex items-center justify-between px-4 py-3">
+          <Link
+            to="/"
+            aria-label="Go back"
+            className="grid size-9 place-items-center rounded-full border border-white/25 bg-white/10 text-[#F8F5ED] transition-transform active:scale-90"
+          >
+            <ArrowLeft className="size-4" />
+          </Link>
+          <Logo light size="sm" showTagline={false} />
+          <Link
+            to="/login"
+            className="rounded-full bg-[#ED7545] px-3.5 py-1.5 text-[11px] font-bold text-white shadow-xs transition-transform active:scale-95"
+          >
+            Sign In
+          </Link>
+        </div>
+      </header>
+
+      {/* ===== Desktop header (web) ===== */}
+      <header className="hidden lg:block border-b border-white/10 bg-[#0E3323]/90 backdrop-blur-md px-4 py-3">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <Logo light size="sm" showTagline={false} />
           <div className="flex items-center gap-3">
@@ -281,7 +303,29 @@ function SignupPage() {
         </div>
       </header>
 
-      <main className="mx-auto w-full max-w-6xl px-4 py-8 sm:py-12 flex-1">
+      {/* ===== Mobile hero (native app style) ===== */}
+      <section className="lg:hidden relative px-5 pt-7 pb-16 text-white">
+        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-bold text-[#F8F5ED] backdrop-blur-md">
+          <span className="relative flex size-1.5">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3F8F62] opacity-70" />
+            <span className="relative inline-flex size-1.5 rounded-full bg-[#3F8F62]" />
+          </span>
+          🌱 FoodLoop Community Movement
+        </span>
+        <h1 className="mt-3 font-display text-[2rem] font-extrabold leading-tight text-white">
+          Good food,<br />shared with purpose.
+        </h1>
+        <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-[#F8F5ED]/75">
+          Create your free account and start rescuing surplus food in minutes.
+        </p>
+        <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-bold">
+          <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-md">✓ 100% Wholesome Surplus</span>
+          <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-md">🍲 Zero Waste</span>
+          <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-md">⚡ 35-min Pickup</span>
+        </div>
+      </section>
+
+      <main className="mx-auto w-full max-w-6xl px-3 sm:px-4 pb-8 sm:pb-12 lg:py-12 flex-1">
         {/* ============ WELCOME + AUTO-REDIRECT SCREEN ============ */}
         {registered ? (
           <div className="mx-auto max-w-lg rounded-3xl border border-[#DDD5C8] bg-white/95 px-6 py-12 text-center shadow-xl ring-1 ring-white/60 backdrop-blur-sm">
@@ -324,11 +368,11 @@ function SignupPage() {
             </button>
           </div>
         ) : (
-        <div className="grid overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white/95 shadow-2xl ring-1 ring-white/60 backdrop-blur-sm lg:grid-cols-12">
+        <div className="relative z-10 -mt-10 lg:mt-0 grid overflow-hidden rounded-[2rem] lg:rounded-3xl border border-[#DDD5C8] bg-white/95 shadow-2xl ring-1 ring-white/60 backdrop-blur-sm lg:grid-cols-12">
           {/* Brand accent bar */}
           <div className="lg:col-span-12 h-1.5 w-full bg-gradient-to-r from-[#164330] via-[#3F8F62] to-[#ED7545]" />
           {/* Left Hero Column */}
-          <div className="relative min-w-0 overflow-hidden border-b border-[#DDD5C8] bg-gradient-to-b from-[#EBF3ED] to-[#F8F5ED] p-8 sm:p-10 flex flex-col justify-between lg:col-span-5 lg:border-b-0 lg:border-r">
+          <div className="hidden lg:flex lg:col-span-5 relative min-w-0 overflow-hidden border-b border-[#DDD5C8] bg-gradient-to-b from-[#EBF3ED] to-[#F8F5ED] p-8 sm:p-10 flex-col justify-between lg:border-b-0 lg:border-r">
             <div className="absolute -top-16 -right-16 size-48 rounded-full bg-[#205C43]/10 blur-2xl" aria-hidden />
             <div className="absolute -bottom-20 -left-16 size-56 rounded-full bg-[#ED7545]/10 blur-3xl" aria-hidden />
             <div className="absolute right-8 top-1/2 size-40 -translate-y-1/2 rounded-full bg-[#3F8F62]/8 blur-3xl" aria-hidden />
@@ -396,7 +440,7 @@ function SignupPage() {
           </div>
 
           {/* Right Column: Create Account Form */}
-          <div className="lg:col-span-7 min-w-0 p-8 sm:p-10 flex flex-col justify-center">
+          <div className="lg:col-span-7 min-w-0 p-5 sm:p-10 flex flex-col justify-center">
             <div>
               <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-[#242923]">Create Your Account</h1>
               <p className="mt-1 text-xs text-[#656C62]">
@@ -670,7 +714,7 @@ function SignupPage() {
         )}
       </main>
 
-      <footer className="p-4 text-center text-xs text-[#656C62]">
+      <footer className="hidden lg:block p-4 text-center text-xs text-[#656C62]">
         <p>© FoodLoop Inc. Good food. Shared with purpose.</p>
       </footer>
     </div>
