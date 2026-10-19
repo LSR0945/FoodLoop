@@ -35,6 +35,9 @@ interface LocalAccount {
   email: string;
   password: string;
   name?: string | undefined;
+  /** True only for accounts created through signup (or a real Supabase login).
+   *  Ghost entries saved by the old lenient login are NOT registered. */
+  registered?: boolean | undefined;
 }
 
 interface LocalSession {
@@ -64,7 +67,7 @@ function upsertLocalAccount(acc: LocalAccount) {
   saveLocalAccounts(map);
 }
 
-function setLocalSession(sess: LocalSession | null) {
+export function setLocalSession(sess: LocalSession | null) {
   try {
     if (typeof window === "undefined") return;
     if (sess) localStorage.setItem(LOCAL_SESSION_KEY, JSON.stringify(sess));
@@ -139,35 +142,75 @@ function mapAuthError(error: AuthErrorLike | null, fallback: string): AuthError 
   return new AuthError(message, error?.code || "auth/error");
 }
 
+/** True when this email has a real (signup-created) local account on this device. */
+export function hasRegisteredLocalAccount(email: string): boolean {
+  try {
+    const acc = readLocalAccounts()[email.trim().toLowerCase()];
+    return Boolean(acc && acc.registered === true);
+  } catch {
+    return false;
+  }
+}
+
 export async function signInWithEmail(email: string, password: string): Promise<AuthUser> {
   const cleanEmail = email.trim().toLowerCase();
   if (!cleanEmail.includes("@") || password.length < 6) {
     throw new AuthError("Please enter a valid email and a 6+ character password.", "auth/invalid-credential");
   }
 
-  // 1) Try Supabase auth first (works once the email is confirmed).
+  const local = readLocalAccounts()[cleanEmail];
+  const localRegistered = Boolean(local && local.registered === true);
+
   try {
+    // 1) Real Supabase login — always tried first and authoritative.
     const supabase = getSupabase();
     const { data, error } = await supabase.auth.signInWithPassword({ email: cleanEmail, password });
     if (!error && data.user) {
       const user = toAuthUser(data.user)!;
-      upsertLocalAccount({ uid: user.uid, email: cleanEmail, password, name: user.displayName || undefined });
+      upsertLocalAccount({ uid: user.uid, email: cleanEmail, password, name: user.displayName || undefined, registered: true });
       setLocalSession({ uid: user.uid, email: cleanEmail, name: user.displayName || undefined });
       return user;
     }
-  } catch {
-    // Network/offline — fall through to the local demo session.
-  }
 
-  // 2) Local demo fallback. Supabase blocks unconfirmed emails and demo
-  // accounts may not exist server-side, so instead of dead-ending the user
-  // we accept the credentials locally (hackathon demo leniency).
-  const local = readLocalAccounts()[cleanEmail];
-  const name = local?.name || cleanEmail.split("@")[0] || "User";
-  const uid = local?.uid || "local_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
-  upsertLocalAccount({ uid, email: cleanEmail, password, name });
-  setLocalSession({ uid, email: cleanEmail, name });
-  return localSessionToAuthUser({ uid, email: cleanEmail, name });
+    const lower = (error?.message || "").toLowerCase();
+    if (lower.includes("email not confirmed")) {
+      throw new AuthError("Please verify your email address before signing in.", "auth/email-not-confirmed");
+    }
+
+    // 2) "Invalid login credentials": either the email was never registered or
+    // the password is wrong. STRICT rule: only signup-created local accounts
+    // may fall back, and only with the exact password they registered with.
+    if (localRegistered && local && local.password === password) {
+      setLocalSession({ uid: local.uid, email: cleanEmail, name: local.name });
+      return localSessionToAuthUser({ uid: local.uid, email: cleanEmail, name: local.name });
+    }
+    if (localRegistered) {
+      throw new AuthError("Incorrect password for this email. Please try again.", "auth/wrong-password");
+    }
+
+    // 3) Tell the user precisely whether this email exists at all.
+    let profileExists = false;
+    try {
+      const { data: rows } = await supabase.from("profiles").select("uid").eq("email", cleanEmail).limit(1);
+      profileExists = Boolean(rows && rows.length > 0);
+    } catch {}
+    if (profileExists) {
+      throw new AuthError("Incorrect password for this email. Please try again.", "auth/wrong-password");
+    }
+    throw new AuthError("No account found with this email. Please create an account first.", "auth/user-not-found");
+  } catch (err) {
+    if (err instanceof AuthError) throw err;
+    // Network/offline — allow ONLY signup-created local accounts with matching
+    // password. Unknown emails are rejected instead of being let in.
+    if (localRegistered && local && local.password === password) {
+      setLocalSession({ uid: local.uid, email: cleanEmail, name: local.name });
+      return localSessionToAuthUser({ uid: local.uid, email: cleanEmail, name: local.name });
+    }
+    if (localRegistered) {
+      throw new AuthError("Incorrect password for this email. Please try again.", "auth/wrong-password");
+    }
+    throw new AuthError("Could not reach the server. Check your internet connection, or create a new account.", "auth/network-error");
+  }
 }
 
 /** Creates a local-only account + session. Used as the last-resort fallback
@@ -176,7 +219,7 @@ export function createLocalAccountAndSession(email: string, password: string, di
   const cleanEmail = email.trim().toLowerCase();
   const uid = "local_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 8);
   const name = displayName || cleanEmail.split("@")[0] || "User";
-  upsertLocalAccount({ uid, email: cleanEmail, password, name });
+  upsertLocalAccount({ uid, email: cleanEmail, password, name, registered: true });
   setLocalSession({ uid, email: cleanEmail, name });
   return localSessionToAuthUser({ uid, email: cleanEmail, name });
 }
@@ -195,7 +238,7 @@ export async function signUpWithEmail(email: string, password: string, displayNa
   // proceed straight into the app.
   if (data.user) {
     const user = toAuthUser(data.user)!;
-    upsertLocalAccount({ uid: user.uid, email: cleanEmail, password, name: displayName || user.displayName || undefined });
+    upsertLocalAccount({ uid: user.uid, email: cleanEmail, password, name: displayName || user.displayName || undefined, registered: true });
     setLocalSession({ uid: user.uid, email: cleanEmail, name: displayName || user.displayName || undefined });
     return user;
   }
@@ -212,7 +255,7 @@ export async function signUpWithEmail(email: string, password: string, displayNa
       });
       if (!signInError && signInData.user) {
         const user = toAuthUser(signInData.user)!;
-        upsertLocalAccount({ uid: user.uid, email: cleanEmail, password, name: displayName || user.displayName || undefined });
+        upsertLocalAccount({ uid: user.uid, email: cleanEmail, password, name: displayName || user.displayName || undefined, registered: true });
         setLocalSession({ uid: user.uid, email: cleanEmail, name: displayName || user.displayName || undefined });
         return user;
       }

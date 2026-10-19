@@ -33,10 +33,10 @@ function Feed() {
       const matchCat = cat === "All" || l.category === cat;
       const matchSearch =
         !q ||
-        l.title.toLowerCase().includes(q) ||
-        l.locationText.toLowerCase().includes(q) ||
-        l.donorName.toLowerCase().includes(q) ||
-        l.category.toLowerCase().includes(q);
+        (l.title ?? "").toLowerCase().includes(q) ||
+        (l.locationText ?? "").toLowerCase().includes(q) ||
+        (l.donorName ?? "").toLowerCase().includes(q) ||
+        (l.category ?? "").toLowerCase().includes(q);
       return matchCat && matchSearch;
     });
 

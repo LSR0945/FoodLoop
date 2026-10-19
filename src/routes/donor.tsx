@@ -142,7 +142,9 @@ function DonorPortalPage() {
     if (donationFilter !== "all") list = list.filter((l) => l.status === donationFilter);
     if (donationSearch.trim()) {
       const q = donationSearch.trim().toLowerCase();
-      list = list.filter((l) => l.title.toLowerCase().includes(q) || l.category.toLowerCase().includes(q));
+      list = list.filter(
+        (l) => (l.title ?? "").toLowerCase().includes(q) || (l.category ?? "").toLowerCase().includes(q),
+      );
     }
     return list;
   }, [myDonations, donationFilter, donationSearch]);

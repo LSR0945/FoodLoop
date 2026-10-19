@@ -47,3 +47,6 @@ local.properties
 # temp diagnostic
 shot_*.png
 find-overflow.cjs
+
+dev.log
+dev.err.log

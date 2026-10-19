@@ -465,7 +465,7 @@ function AdminPage() {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {verifications
-                    .filter((v) => v.name.toLowerCase().includes(verSearch.toLowerCase()))
+                    .filter((v) => (v.name ?? "").toLowerCase().includes(verSearch.toLowerCase()))
                     .map((item) => (
                       <tr key={item.id} className="hover:bg-muted/20">
                         <td className="p-3.5 font-semibold text-foreground">

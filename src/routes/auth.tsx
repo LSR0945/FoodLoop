@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Bike,
   Building2,
@@ -146,8 +146,13 @@ function AuthPage() {
   const [forgotEmail, setForgotEmail] = useState("");
   const [sendingReset, setSendingReset] = useState(false);
 
+  useEffect(() => {
+    if (!loading && user) {
+      navigate({ to: "/app", replace: true });
+    }
+  }, [loading, user, navigate]);
+
   if (!loading && user) {
-    navigate({ to: "/app", replace: true });
     return null;
   }
 

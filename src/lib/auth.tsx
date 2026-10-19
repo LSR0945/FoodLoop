@@ -1,7 +1,7 @@
 import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
 import type { Profile, Role } from "./types";
 import { getSupabase } from "./supabase";
-import { getLocalSession, localSessionToAuthUser, signOutAuth, toAuthUser, type AuthUser } from "./supabase-auth";
+import { getLocalSession, hasRegisteredLocalAccount, localSessionToAuthUser, setLocalSession, signOutAuth, toAuthUser, type AuthUser } from "./supabase-auth";
 
 interface InternalAuthState {
   user: AuthUser | null;
@@ -162,7 +162,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (fromSupabase) return fromSupabase;
       } catch {}
       const local = getLocalSession();
-      return local ? localSessionToAuthUser(local) : null;
+      // Only accept a local session when it belongs to a real signup-created
+      // account on this device — ghost sessions from old lenient logins are
+      // dropped so unregistered emails can never appear signed in.
+      if (local && hasRegisteredLocalAccount(local.email)) {
+        return localSessionToAuthUser(local);
+      }
+      if (local) setLocalSession(null);
+      return null;
     };
 
     const bootstrap = async () => {

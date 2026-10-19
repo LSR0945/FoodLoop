@@ -94,8 +94,10 @@ function RecipientPortalPage() {
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       arr = arr.filter((l) =>
-        l.title.toLowerCase().includes(q) || l.locationText.toLowerCase().includes(q) ||
-        l.donorName.toLowerCase().includes(q) || l.category.toLowerCase().includes(q),
+        (l.title ?? "").toLowerCase().includes(q) ||
+        (l.locationText ?? "").toLowerCase().includes(q) ||
+        (l.donorName ?? "").toLowerCase().includes(q) ||
+        (l.category ?? "").toLowerCase().includes(q),
       );
     }
     if (filterCategory !== "all") arr = arr.filter((l) => l.category === filterCategory);

@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
@@ -44,16 +44,30 @@ function LoginPage() {
         localStorage.removeItem("foodloop_remember_email");
       }
 
-      // The role selected on this screen decides where the user lands.
-      await updateProfile(cred.uid, { role: selectedRole });
+      // The account's OWN registered role wins; the picker only fills the gap
+      // for accounts that never saved a role (legacy / Supabase-only users).
+      let role: Role = selectedRole;
+      try {
+        const raw = localStorage.getItem("foodloop_profile_" + cred.uid) || localStorage.getItem("annsetu_profile_" + cred.uid);
+        const stored = raw ? (JSON.parse(raw) as { role?: Role }) : null;
+        if (stored?.role) {
+          role = stored.role;
+        } else {
+          const { data } = await getSupabase().from("profiles").select("role").eq("uid", cred.uid).maybeSingle();
+          if (data?.role) role = data.role as Role;
+        }
+      } catch {}
 
-      toast.success(`Welcome back to FoodLoop as ${selectedRole.toUpperCase()}!`);
+      // Keep the profiles table in sync with the account's role.
+      await updateProfile(cred.uid, { role });
+
+      toast.success(`Welcome back to FoodLoop as ${role.toUpperCase()}!`);
       // Wait for AuthProvider to pick up the session before navigating.
       for (let i = 0; i < 20; i++) {
         if (getLocalSession()) break;
         await new Promise((r) => setTimeout(r, 50));
       }
-      navigate({ to: portalForRole(selectedRole) });
+      navigate({ to: portalForRole(role) });
     } catch (err: any) {
       toast.error(err.message || "Login failed. Please check credentials.");
     } finally {
@@ -170,44 +184,50 @@ function LoginPage() {
 
   // Prefill remembered email once on mount.
   const [emailTouched, setEmailTouched] = useState(false);
-  if (!emailTouched && !email) {
+  useEffect(() => {
+    if (emailTouched || email) return;
     const remembered = localStorage.getItem("foodloop_remember_email");
-    if (remembered) {
-      setEmail(remembered);
-    }
+    if (remembered) setEmail(remembered);
     setEmailTouched(true);
-  }
+  }, [emailTouched, email]);
 
   return (
     <div className="min-h-screen text-[#242923] flex flex-col justify-between relative overflow-x-hidden">
-      {/* Professional layered background */}
+      {/* Dark premium layered background */}
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[#F8F5ED]" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#081F15] via-[#123A2A] to-[#081F15]" />
         <img
           src="/images/hunger/hunger3.png"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.08]"
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.10]"
         />
-        <div className="absolute -top-40 -right-40 size-[26rem] rounded-full bg-[#205C43]/12 blur-3xl" />
-        <div className="absolute top-1/3 -left-40 size-[30rem] rounded-full bg-[#ED7545]/10 blur-3xl" />
-        <div className="absolute -bottom-32 right-1/4 size-[22rem] rounded-full bg-[#3F8F62]/10 blur-3xl" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(255,255,255,0.75),transparent_55%)]" />
+        <div className="absolute -top-40 -right-40 size-[26rem] rounded-full bg-[#3F8F62]/25 blur-3xl" />
+        <div className="absolute top-1/3 -left-40 size-[30rem] rounded-full bg-[#ED7545]/20 blur-3xl" />
+        <div className="absolute -bottom-32 right-1/4 size-[22rem] rounded-full bg-[#205C43]/40 blur-3xl" />
+        <div
+          className="absolute inset-0 opacity-[0.05]"
+          style={{
+            backgroundImage: "radial-gradient(#F8F5ED 0.7px, transparent 0.7px)",
+            backgroundSize: "24px 24px",
+          }}
+        />
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,rgba(63,143,98,0.22),transparent_60%)]" />
       </div>
 
       {/* Top Mobile-Safe Header */}
-      <header className="border-b border-[#E2DBD0]/80 bg-white/90 backdrop-blur-md px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
+      <header className="border-b border-white/10 bg-[#081F15]/70 backdrop-blur-md px-4 py-3 pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
         <div className="mx-auto flex max-w-5xl items-center justify-between">
-          <Logo size="sm" showTagline={false} />
+          <Logo light size="sm" showTagline={false} />
           <div className="flex items-center gap-3">
             <Link
               to="/"
-              className="inline-flex items-center gap-1.5 rounded-full border border-[#DDD5C8] bg-[#F8F5ED] px-3.5 py-1.5 text-xs font-bold text-[#205C43] shadow-xs hover:bg-white hover:border-[#205C43] transition-all"
+              className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-[#F8F5ED] backdrop-blur-md transition-all hover:border-white/40 hover:bg-white/20"
             >
               ← Back to Home
             </Link>
             <Link
               to="/signup"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#205C43] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:brightness-105 transition-all"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#3F8F62] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition-all hover:brightness-110"
             >
               Sign Up
             </Link>
@@ -216,7 +236,7 @@ function LoginPage() {
       </header>
 
       <main className="mx-auto w-full max-w-5xl px-4 py-6 sm:py-10 flex-1 flex items-center justify-center">
-        <div className="w-full overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white/95 backdrop-blur-sm shadow-xl grid lg:grid-cols-12">
+        <div className="w-full overflow-hidden rounded-3xl border border-[#DDD5C8] bg-white shadow-2xl ring-1 ring-white/20 grid lg:grid-cols-12">
 
           {/* Left Column: Hunger Relief & Community Impact Imagery */}
           <div className="lg:col-span-5 min-w-0 relative bg-[#164330] p-6 sm:p-8 text-white flex flex-col justify-between overflow-hidden">
@@ -460,7 +480,7 @@ function LoginPage() {
         </div>
       </main>
 
-      <footer className="p-4 text-center text-xs text-[#656C62]">
+      <footer className="p-4 pb-6 text-center text-xs text-[#F8F5ED]/60">
         <p>© FoodLoop. Good food. Shared with purpose.</p>
       </footer>
     </div>
