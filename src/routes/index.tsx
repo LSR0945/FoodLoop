@@ -22,6 +22,7 @@ import {
   UtensilsCrossed,
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import { MobileHome } from "@/components/MobileHome";
 import { ListingCard } from "@/components/ListingBits";
 import { toast } from "sonner";
 import { useAuth } from "@/lib/auth";
@@ -179,6 +180,13 @@ function LandingPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F5ED] text-[#242923]">
+      {/* ===== Native mobile app home (APK experience) ===== */}
+      <div className="md:hidden">
+        <MobileHome user={user} profile={profile} listings={openListings} totalMeals={totalPortionsShared} />
+      </div>
+
+      {/* ===== Desktop / web landing page ===== */}
+      <div className="hidden md:block">
       {/* 1. Mobile-First App Header & Navigation */}
       <header className="sticky top-0 z-40 border-b border-[#E2DBD0]/80 bg-[#F8F5ED]/95 backdrop-blur-md pt-[max(0.75rem,env(safe-area-inset-top,0px))]">
         <div className="mx-auto max-w-6xl px-3 sm:px-4 py-2 sm:py-3 space-y-2">
@@ -1088,6 +1096,7 @@ function LandingPage() {
           </div>
         </div>
       </footer>
+      </div>
     </div>
   );
 }

@@ -138,6 +138,14 @@
   padding-top: max(0.5rem, env(safe-area-inset-top, 0px));
 }
 
+@utility no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 
 @utility hero-overlay {
   background: linear-gradient(
