@@ -27,7 +27,7 @@ function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [rememberMe, setRememberMe] = useState(true);
   const [busy, setBusy] = useState(false);
-  const [selectedRole, setSelectedRole] = useState<Role>("donor");
+  const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
   const portalForRole = (r: Role) =>
     r === "donor" ? "/donor" : r === "volunteer" ? "/volunteer" : r === "admin" ? "/admin" : "/recipient";
@@ -46,7 +46,7 @@ function LoginPage() {
 
       // The account's OWN registered role wins; the picker only fills the gap
       // for accounts that never saved a role (legacy / Supabase-only users).
-      let role: Role = selectedRole;
+      let role: Role | null = null;
       try {
         const raw = localStorage.getItem("foodloop_profile_" + cred.uid) || localStorage.getItem("annsetu_profile_" + cred.uid);
         const stored = raw ? (JSON.parse(raw) as { role?: Role }) : null;
@@ -57,6 +57,11 @@ function LoginPage() {
           if (data?.role) role = data.role as Role;
         }
       } catch {}
+      if (!role) role = selectedRole;
+      if (!role) {
+        toast.error("Please select how you are signing in.");
+        return;
+      }
 
       // Keep the profiles table in sync with the account's role.
       await updateProfile(cred.uid, { role });
@@ -250,7 +255,9 @@ function LoginPage() {
       </header>
 
       {/* ===== Mobile hero (native app style) ===== */}
-      <section className="lg:hidden relative px-5 pt-6 pb-16 text-white">
+      <section className="lg:hidden relative overflow-hidden bg-gradient-to-b from-[#081F15] via-[#123A2A] to-[#0E3323] px-5 pt-6 pb-16 text-white">
+        <div aria-hidden className="pointer-events-none absolute -top-24 -right-20 size-56 rounded-full bg-[#3F8F62]/25 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute bottom-0 -left-20 size-52 rounded-full bg-[#ED7545]/15 blur-3xl" />
         <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-bold text-[#F8F5ED] backdrop-blur-md">
           🌱 Zero Hunger Movement
         </span>
@@ -460,7 +467,9 @@ function LoginPage() {
                   "Signing In…"
                 ) : (
                   <>
-                    Sign In as {selectedRole === "recipient" ? "Shelter NGO" : selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}
+                    {selectedRole
+                      ? `Sign In as ${selectedRole === "recipient" ? "Shelter NGO" : selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`
+                      : "Sign In"}
                     <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
                   </>
                 )}

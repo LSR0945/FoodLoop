@@ -211,7 +211,6 @@ function SignupPage() {
 
   async function handleGoToDashboard() {
     if (!registered) return;
-    const meta = ROLE_META[registered.role];
     // Wait briefly so AuthProvider can pick up the fresh local session
     // (the foodloop_auth_changed event triggers an async re-bootstrap).
     for (let i = 0; i < 20; i++) {
@@ -219,7 +218,7 @@ function SignupPage() {
       if (sess) break;
       await new Promise((r) => setTimeout(r, 50));
     }
-    navigate({ to: meta.portal });
+    navigate({ to: "/" });
   }
 
   return (
@@ -304,7 +303,9 @@ function SignupPage() {
       </header>
 
       {/* ===== Mobile hero (native app style) ===== */}
-      <section className="lg:hidden relative px-5 pt-7 pb-16 text-white">
+      <section className="lg:hidden relative overflow-hidden bg-gradient-to-b from-[#081F15] via-[#123A2A] to-[#0E3323] px-5 pt-7 pb-16 text-white">
+        <div aria-hidden className="pointer-events-none absolute -top-24 -right-20 size-56 rounded-full bg-[#3F8F62]/25 blur-3xl" />
+        <div aria-hidden className="pointer-events-none absolute bottom-0 -left-20 size-52 rounded-full bg-[#ED7545]/15 blur-3xl" />
         <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-bold text-[#F8F5ED] backdrop-blur-md">
           <span className="relative flex size-1.5">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3F8F62] opacity-70" />
@@ -352,7 +353,7 @@ function SignupPage() {
                 />
               </div>
               <p className="mt-3 text-xs text-[#656C62]">
-                {redirecting ? "Taking you to your dashboard…" : "Redirecting to your dashboard in 3 seconds…"}
+                {redirecting ? "Taking you to your home…" : "Redirecting to your home in 3 seconds…"}
               </p>
             </div>
 
@@ -363,7 +364,7 @@ function SignupPage() {
               disabled={redirecting}
               className="group mt-8 inline-flex items-center gap-2 rounded-full bg-[#205C43] px-8 py-3 text-sm font-bold text-white shadow-md hover:brightness-110 hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.98] transition-all duration-200 cursor-pointer disabled:opacity-50"
             >
-              Open {ROLE_META[registered.role].label} Dashboard Now{" "}
+              Go to Home Now{" "}
               <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
             </button>
           </div>

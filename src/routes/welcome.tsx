@@ -48,13 +48,13 @@ function WelcomePage() {
             <Sparkles className="size-3 text-[#F59E0B]" /> ZERO HUNGER MOVEMENT
           </span>
           <h1 className="animate-in fade-in slide-in-from-bottom-3 mt-4 font-display text-[2.6rem] font-extrabold leading-[1.06] duration-500">
-            Share food.
+            Welcome to
             <br />
-            <span className="text-[#ED7545]">Spread hope.</span>
+            <span className="text-[#ED7545]">FoodLoop</span>
           </h1>
           <p className="animate-in fade-in slide-in-from-bottom-3 mt-3 max-w-sm text-[13px] leading-relaxed text-[#F8F5ED]/70 duration-700">
-            Join thousands rescuing surplus meals from kitchens, restaurants and events — and getting them to
-            people who need them.
+            Share food. Spread hope. Join thousands rescuing surplus meals from kitchens, restaurants and
+            events — and getting them to people who need them.
           </p>
 
           {/* Feature chips */}
