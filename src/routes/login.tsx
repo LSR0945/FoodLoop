@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
@@ -217,7 +217,13 @@ function LoginPage() {
       {/* ===== Native app bar (mobile) ===== */}
       <header className="lg:hidden border-b border-white/10 bg-[#081F15]/80 backdrop-blur-xl">
         <div className="flex items-center justify-between px-4 py-3">
-          <span className="size-9" aria-hidden="true" />
+          <Link
+            to="/welcome"
+            aria-label="Go back"
+            className="grid size-9 place-items-center rounded-full border border-white/15 bg-white/10 text-[#F8F5ED] transition-transform active:scale-90"
+          >
+            <ArrowLeft className="size-4" />
+          </Link>
           <Logo light size="sm" showTagline={false} />
           <Link
             to="/signup"

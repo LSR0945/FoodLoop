@@ -124,7 +124,15 @@ function RootComponent() {
   );
 }
 
-const AUTH_SCREENS = ["/login", "/signup", "/auth", "/forgot-password", "/reset-password", "/verify-email"];
+const AUTH_SCREENS = [
+  "/welcome",
+  "/login",
+  "/signup",
+  "/auth",
+  "/forgot-password",
+  "/reset-password",
+  "/verify-email",
+];
 
 function AppSplash() {
   return (
@@ -155,8 +163,8 @@ function AppSplash() {
 
 /**
  * Real-app behavior: the app opens on the branded splash, then anyone who is
- * not signed in is sent straight to Login / Registration. The rest of the app
- * is only reachable after authentication.
+ * not signed in is sent to the Welcome screen with Login / Create Account.
+ * The rest of the app is only reachable after authentication.
  */
 function AuthGate({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -167,7 +175,7 @@ function AuthGate({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (loading || user) return;
-    if (!isAuthScreen) navigate({ to: "/login", replace: true });
+    if (!isAuthScreen) navigate({ to: "/welcome", replace: true });
   }, [loading, user, isAuthScreen, navigate]);
 
   if (!isAuthScreen && !user) {

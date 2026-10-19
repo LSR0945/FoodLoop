@@ -33,6 +33,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as VerificationRouteImport } from './routes/verification'
 import { Route as VerifyEmailRouteImport } from './routes/verify-email'
 import { Route as VolunteerRouteImport } from './routes/volunteer'
+import { Route as WelcomeRouteImport } from './routes/welcome'
 import { Route as AppIndexRouteImport } from './routes/app/index'
 import { Route as AppDonateRouteImport } from './routes/app/donate'
 import { Route as AppNotificationsRouteImport } from './routes/app/notifications'
@@ -164,6 +165,11 @@ const VolunteerRoute = VolunteerRouteImport.update({
   path: '/volunteer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WelcomeRoute = WelcomeRouteImport.update({
+  id: '/welcome',
+  path: '/welcome',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AppIndexRoute = AppIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -240,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/verification': typeof VerificationRoute
   '/verify-email': typeof VerifyEmailRoute
   '/volunteer': typeof VolunteerRoute
+  '/welcome': typeof WelcomeRoute
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
@@ -275,6 +282,7 @@ export interface FileRoutesByTo {
   '/verification': typeof VerificationRoute
   '/verify-email': typeof VerifyEmailRoute
   '/volunteer': typeof VolunteerRoute
+  '/welcome': typeof WelcomeRoute
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
@@ -312,6 +320,7 @@ export interface FileRoutesById {
   '/verification': typeof VerificationRoute
   '/verify-email': typeof VerifyEmailRoute
   '/volunteer': typeof VolunteerRoute
+  '/welcome': typeof WelcomeRoute
   '/app/donate': typeof AppDonateRoute
   '/app/notifications': typeof AppNotificationsRoute
   '/app/profile': typeof AppProfileRoute
@@ -350,6 +359,7 @@ export interface FileRouteTypes {
     | '/verification'
     | '/verify-email'
     | '/volunteer'
+    | '/welcome'
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
@@ -385,6 +395,7 @@ export interface FileRouteTypes {
     | '/verification'
     | '/verify-email'
     | '/volunteer'
+    | '/welcome'
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
@@ -421,6 +432,7 @@ export interface FileRouteTypes {
     | '/verification'
     | '/verify-email'
     | '/volunteer'
+    | '/welcome'
     | '/app/donate'
     | '/app/notifications'
     | '/app/profile'
@@ -458,6 +470,7 @@ export interface RootRouteChildren {
   VerificationRoute: typeof VerificationRoute
   VerifyEmailRoute: typeof VerifyEmailRoute
   VolunteerRoute: typeof VolunteerRoute
+  WelcomeRoute: typeof WelcomeRoute
   DonationsIdRoute: typeof DonationsIdRoute
   OnboardingProfileRoute: typeof OnboardingProfileRoute
   OnboardingRoleRoute: typeof OnboardingRoleRoute
@@ -634,6 +647,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof VolunteerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/welcome': {
+      id: '/welcome'
+      path: '/welcome'
+      fullPath: '/welcome'
+      preLoaderRoute: typeof WelcomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/app/': {
       id: '/app/'
       path: '/'
@@ -754,6 +774,7 @@ const rootRouteChildren: RootRouteChildren = {
   VerificationRoute: VerificationRoute,
   VerifyEmailRoute: VerifyEmailRoute,
   VolunteerRoute: VolunteerRoute,
+  WelcomeRoute: WelcomeRoute,
   DonationsIdRoute: DonationsIdRoute,
   OnboardingProfileRoute: OnboardingProfileRoute,
   OnboardingRoleRoute: OnboardingRoleRoute,

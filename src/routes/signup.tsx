@@ -266,7 +266,7 @@ function SignupPage() {
       <header className="lg:hidden border-b border-white/10 bg-[#0E3323]/90 backdrop-blur-xl">
         <div className="flex items-center justify-between px-4 py-3">
           <Link
-            to="/login"
+            to="/welcome"
             aria-label="Go back"
             className="grid size-9 place-items-center rounded-full border border-white/25 bg-white/10 text-[#F8F5ED] transition-transform active:scale-90"
           >
