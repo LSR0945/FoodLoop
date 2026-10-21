@@ -1,13 +1,17 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Compass, Bookmark, ShoppingBag, User } from "lucide-react";
+import { useState } from "react";
 import { useAuth } from "@/lib/auth";
+import { playTap } from "@/lib/sfx";
 
 export function MobileBottomNav() {
   const { user, profile } = useAuth();
   const router = useRouterState();
   const currentPath = router.location.pathname;
+  const currentHash = router.location.hash.replace(/^#/, "");
+  const [popped, setPopped] = useState<string | null>(null);
 
-  // Determine portal route for profile tab
+  // Determine portal route for orders tab
   const portalPath = profile?.role === "donor"
     ? "/donor"
     : profile?.role === "volunteer"
@@ -16,39 +20,65 @@ export function MobileBottomNav() {
     ? "/admin"
     : "/recipient";
 
+  const ordersTab =
+    profile?.role === "donor" || profile?.role === "recipient" || profile?.role === "ngo"
+      ? "reservations"
+      : profile?.role === "volunteer"
+      ? "active"
+      : null;
+  const ordersHash = ordersTab ? `tab-${ordersTab}` : "";
+
   const navItems = [
     {
       label: "Home",
       to: "/",
+      hash: "",
       icon: Home,
       active: currentPath === "/",
     },
     {
       label: "Discover",
       to: "/explore",
+      hash: "",
       icon: Compass,
       active: currentPath.startsWith("/explore") || currentPath.startsWith("/donations"),
     },
     {
       label: "Community",
       to: "/community",
+      hash: "",
       icon: Bookmark,
       active: currentPath.startsWith("/community"),
     },
     {
       label: "Orders",
       to: user ? portalPath : "/login",
+      hash: user ? ordersHash : "",
       icon: ShoppingBag,
-      active: currentPath.startsWith("/donor") || currentPath.startsWith("/recipient") || currentPath.startsWith("/volunteer"),
+      active: user
+        ? profile?.role === "admin"
+          ? currentPath === "/admin"
+          : !!ordersHash && currentPath === portalPath && currentHash === ordersHash
+        : false,
       badge: user ? "Live" : undefined,
     },
     {
-      label: user ? "Portal" : "Sign In",
-      to: user ? portalPath : "/login",
+      label: user ? "Profile" : "Sign In",
+      to: user ? "/app/profile" : "/login",
+      hash: "",
       icon: User,
-      active: currentPath === "/login" || currentPath === "/signup" || currentPath === portalPath,
+      active:
+        currentPath === "/app/profile" ||
+        (!user && (currentPath === "/login" || currentPath === "/signup")) ||
+        (!!user && currentPath === portalPath && currentHash === "tab-profile"),
     },
   ];
+
+  const handleTap = (label: string) => {
+    playTap();
+    setPopped(label);
+    window.setTimeout(() => setPopped((p) => (p === label ? null : p)), 320);
+  };
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-[#DDD5C8] px-2 py-1.5 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-[max(0.5rem,env(safe-area-inset-bottom))]">
@@ -59,12 +89,18 @@ export function MobileBottomNav() {
             <Link
               key={item.label}
               to={item.to}
-              className={`flex flex-col items-center justify-center py-1 transition-all relative ${
+              {...(item.hash ? { hash: item.hash } : {})}
+              onClick={() => handleTap(item.label)}
+              className={`flex flex-col items-center justify-center py-1 transition-all duration-150 active:scale-90 ${
                 item.active ? "text-[#205C43] font-bold" : "text-[#656C62] hover:text-[#205C43]"
               }`}
             >
               <div className="relative">
-                <Icon className={`size-5 transition-transform ${item.active ? "scale-110 text-[#205C43]" : ""}`} />
+                <Icon
+                  className={`size-5 transition-transform ${item.active ? "scale-110 text-[#205C43]" : ""} ${
+                    popped === item.label ? "animate-[navpop_320ms_ease-out]" : ""
+                  }`}
+                />
                 {item.badge && (
                   <span className="absolute -top-1 -right-2 px-1 py-0.2 text-[8px] font-black rounded-full bg-[#ED7545] text-white">
                     {item.badge}

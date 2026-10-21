@@ -335,7 +335,7 @@ function ProfilePage() {
       : (vehicleType ? `${vehicleType.toUpperCase()} Courier • Verified Volunteer` : "Active Delivery Volunteer");
 
   return (
-    <div className="mx-auto max-w-2xl space-y-6 pb-12">
+    <div className="mx-auto max-w-2xl space-y-6 pb-28 md:pb-12">
       {/* Hidden File Input for Avatar Upload */}
       <input
         ref={fileInputRef}

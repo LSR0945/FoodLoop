@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   Award,
@@ -39,7 +39,9 @@ export const Route = createFileRoute("/donor")({
   component: DonorPortalPage,
 });
 
-type Tab = "dashboard" | "donations" | "new" | "reservations" | "impact" | "profile";
+const DONOR_TABS = ["dashboard", "donations", "new", "reservations", "impact", "profile"] as const;
+type Tab = (typeof DONOR_TABS)[number];
+const isDonorTab = (value: string): value is Tab => (DONOR_TABS as readonly string[]).includes(value);
 
 // ─── Hero food images for donor (warm amber palette) ──────────────────────────
 const DONOR_BG_IMAGES = [
@@ -69,7 +71,11 @@ function DonorPortalPage() {
   const { data: listings } = useListings();
   const { data: notifs } = useNotifications(user?.uid);
 
-  const [activeTab, setActiveTab] = useState<Tab>("dashboard");
+  const hashTab = useRouterState({ select: (s) => s.location.hash }).replace(/^#/, "").replace(/^tab-/, "");
+  const activeTab: Tab = isDonorTab(hashTab) ? hashTab : "dashboard";
+  const setActiveTab = (id: Tab) => {
+    void navigate({ to: "/donor", hash: `tab-${id}`, replace: true });
+  };
   const [heroBgIdx] = useState(() => Math.floor(Math.random() * DONOR_BG_IMAGES.length));
   const [notifOpen, setNotifOpen] = useState(false);
   const [donationFilter, setDonationFilter] = useState<string>("all");
@@ -328,6 +334,16 @@ function DonorPortalPage() {
             </button>
           </div>
         </header>
+
+        <div className="md:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b bg-white px-3 py-2" style={{ borderColor: "#F59E0B30" }}>
+          {navItems.map((item) => (
+            <button key={item.id} onClick={() => setActiveTab(item.id)}
+              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition-all active:scale-95 ${activeTab === item.id ? "text-white" : "bg-gray-100 text-gray-600"}`}
+              style={activeTab === item.id ? { background: "#D97706" } : {}}>
+              {item.label}
+            </button>
+          ))}
+        </div>
 
         <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6">
           {/* ── DASHBOARD ────────────────────────────────────────────── */}
@@ -827,7 +843,7 @@ function DonorPortalPage() {
       </div>
 
       {/* ── Mobile Bottom Nav (Amber) ─────────────────────────────────────── */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t z-40 flex" style={{ borderColor: "#F59E0B30" }}>
+      <nav className="hidden md:flex lg:hidden fixed bottom-0 inset-x-0 bg-white border-t z-40 flex" style={{ borderColor: "#F59E0B30" }}>
         {navItems.slice(0, 5).map(item => (
           <button key={item.id} onClick={() => setActiveTab(item.id)}
             className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors ${activeTab === item.id ? "" : "text-gray-400"}`}

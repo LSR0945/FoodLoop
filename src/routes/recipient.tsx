@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   AlertTriangle,
@@ -37,7 +37,10 @@ export const Route = createFileRoute("/recipient")({
   component: RecipientPortalPage,
 });
 
-type Tab = "dashboard" | "explore" | "reservations" | "history" | "saved" | "profile";
+const RECIPIENT_TABS = ["dashboard", "explore", "reservations", "history", "saved", "profile"] as const;
+type Tab = (typeof RECIPIENT_TABS)[number];
+const isRecipientTab = (value: string): value is Tab =>
+  (RECIPIENT_TABS as readonly string[]).includes(value);
 
 const RECIPIENT_BG_IMAGES = [
   "/images/food/dal_khichdi_roti.jpg", // Indian meals
@@ -66,7 +69,11 @@ function RecipientPortalPage() {
   const { data: listings } = useListings();
   const { data: notifs } = useNotifications(user?.uid);
 
-  const [activeTab, setActiveTab] = useState<Tab>("dashboard");
+  const hashTab = useRouterState({ select: (s) => s.location.hash }).replace(/^#/, "").replace(/^tab-/, "");
+  const activeTab: Tab = isRecipientTab(hashTab) ? hashTab : "dashboard";
+  const setActiveTab = (id: Tab) => {
+    void navigate({ to: "/recipient", hash: `tab-${id}`, replace: true });
+  };
   const [searchQuery, setSearchQuery] = useState("");
   const [filterCategory, setFilterCategory] = useState("all");
   const [filterFoodType, setFilterFoodType] = useState("all");
@@ -244,6 +251,16 @@ function RecipientPortalPage() {
             </button>
           </div>
         </header>
+
+        <div className="md:hidden flex items-center gap-1.5 overflow-x-auto no-scrollbar border-b bg-white px-3 py-2" style={{ borderColor: THEME.border }}>
+          {navItems.map((item) => (
+            <button key={item.id} onClick={() => setActiveTab(item.id)}
+              className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-bold transition-all active:scale-95 ${activeTab === item.id ? "text-white" : "bg-gray-100 text-gray-600"}`}
+              style={activeTab === item.id ? { background: THEME.primary } : {}}>
+              {item.label}
+            </button>
+          ))}
+        </div>
 
         <main className="flex-1 p-4 lg:p-6 pb-24 lg:pb-6">
           {/* ── DASHBOARD ─────────────────────────────────────────── */}
@@ -542,7 +559,7 @@ function RecipientPortalPage() {
       </div>
 
       {/* ── Mobile Bottom Nav (Blue) ───────────────────────────────────── */}
-      <nav className="lg:hidden fixed bottom-0 inset-x-0 bg-white border-t z-40 flex" style={{ borderColor: THEME.border }}>
+      <nav className="hidden md:flex lg:hidden fixed bottom-0 inset-x-0 bg-white border-t z-40 flex" style={{ borderColor: THEME.border }}>
         {navItems.slice(0, 5).map(item => (
           <button key={item.id} onClick={() => setActiveTab(item.id)}
             className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors`}
