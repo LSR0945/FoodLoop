@@ -188,3 +188,26 @@
     transform: translateY(0) scale(1);
   }
 }
+
+@keyframes floaty {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+button,
+a[href],
+[role="button"] {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:not(:disabled):active,
+a[href]:active,
+[role="button"]:active {
+  filter: brightness(0.9) saturate(1.15);
+  transition: filter 120ms ease;
+}

@@ -239,61 +239,45 @@ function SignupPage() {
 
   return (
     <div className="min-h-screen text-[#242923] flex flex-col justify-between relative overflow-x-hidden">
-      {/* ── Background: fixed cream base + dotted texture ───────────────── */}
+      {/* ── Branded dark background ──────────────────────────────────────── */}
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
-        <div className="absolute inset-0 bg-[#F8F5ED]" />
-        <div
-          className="absolute inset-0 opacity-[0.05]"
-          style={{
-            backgroundImage: "radial-gradient(#205C43 0.7px, transparent 0.7px)",
-            backgroundSize: "20px 20px",
-          }}
-        />
-      </div>
-      {/* ── Background: deep-green branded sky fading into cream (scrolls with page) ── */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute inset-x-0 top-0 -z-10 h-[560px] overflow-hidden"
-      >
-        <div
-          className="absolute inset-0"
-          style={{
-            background:
-              "linear-gradient(180deg, #0E3323 0%, #164330 38%, rgba(32,92,67,0.6) 70%, rgba(248,245,237,0) 100%)",
-          }}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#06170F] via-[#0C2C1E] to-[#071B12]" />
+        <img
+          src="/images/food/dal_khichdi_roti.jpg"
+          alt=""
+          className="absolute -right-32 top-1/4 h-[42rem] w-[42rem] object-cover opacity-[0.06] blur-[2px]"
         />
         <img
-          src="/images/hunger/hunger1.png"
+          src="/images/food/fruit_crates.jpg"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-20 mix-blend-soft-light"
+          className="absolute -left-40 bottom-0 h-[30rem] w-[30rem] object-cover opacity-[0.05] blur-[2px]"
         />
-        <div className="absolute -top-24 -right-24 size-[24rem] rounded-full bg-[#ED7545]/25 blur-3xl" />
-        <div className="absolute top-40 -left-32 size-[22rem] rounded-full bg-[#F59E0B]/20 blur-3xl" />
-        <div className="absolute top-16 right-1/4 size-[16rem] rounded-full bg-[#3F8F62]/25 blur-3xl" />
-        {/* subtle grain sparkle */}
+        <div className="absolute -top-40 right-1/4 size-[30rem] rounded-full bg-[#3F8F62]/20 blur-3xl" />
+        <div className="absolute top-1/3 -left-40 size-[26rem] rounded-full bg-[#ED7545]/15 blur-3xl" />
+        <div className="absolute -bottom-32 right-0 size-[24rem] rounded-full bg-[#205C43]/40 blur-3xl" />
         <div
-          className="absolute inset-0 opacity-[0.10]"
+          className="absolute inset-0 opacity-[0.04]"
           style={{
-            backgroundImage: "radial-gradient(rgba(248,245,237,0.9) 0.8px, transparent 0.8px)",
-            backgroundSize: "26px 26px",
+            backgroundImage: "radial-gradient(#F8F5ED 0.7px, transparent 0.7px)",
+            backgroundSize: "24px 24px",
           }}
         />
       </div>
 
       {/* ===== Native app bar (mobile) ===== */}
-      <header className="lg:hidden border-b border-white/10 bg-[#0E3323]/90 backdrop-blur-xl">
+      <header className="lg:hidden sticky top-0 z-30 border-b border-white/10 bg-[#081F15]/85 backdrop-blur-xl">
         <div className="flex items-center justify-between px-4 py-3">
           <Link
             to="/welcome"
             aria-label="Go back"
-            className="grid size-9 place-items-center rounded-full border border-white/25 bg-white/10 text-[#F8F5ED] transition-transform active:scale-90"
+            className="grid size-9 place-items-center rounded-full border border-white/15 bg-white/10 text-[#F8F5ED] transition-transform active:scale-90"
           >
             <ArrowLeft className="size-4" />
           </Link>
           <Logo light size="sm" showTagline={false} />
           <Link
             to="/login"
-            className="rounded-full bg-[#ED7545] px-3.5 py-1.5 text-[11px] font-bold text-white shadow-xs transition-transform active:scale-95"
+            className="rounded-full bg-gradient-to-r from-[#ED7545] to-[#F59E0B] px-3.5 py-1.5 text-[11px] font-extrabold text-white shadow-md shadow-[#ED7545]/20 transition-transform active:scale-95"
           >
             Sign In
           </Link>
@@ -301,31 +285,27 @@ function SignupPage() {
       </header>
 
       {/* ===== Desktop header (web) ===== */}
-      <header className="hidden lg:block border-b border-white/10 bg-[#0E3323]/90 backdrop-blur-md px-4 py-3">
+      <header className="hidden lg:block sticky top-0 z-30 border-b border-white/10 bg-[#081F15]/80 backdrop-blur-md px-4 py-3">
         <div className="mx-auto flex max-w-6xl items-center justify-between">
           <Logo light size="sm" showTagline={false} />
-          <div className="flex items-center gap-3">
-            <Link
-              to="/login"
-              className="group inline-flex items-center gap-1.5 rounded-full border border-white/25 bg-white/10 px-3.5 py-1.5 text-xs font-bold text-[#F8F5ED] shadow-xs hover:bg-white/20 hover:-translate-y-0.5 active:scale-95 transition-all duration-200"
-            >
-              <span className="inline-block transition-transform duration-200 group-hover:-translate-x-1">
-                ←
-              </span>{" "}
-              Sign In
-            </Link>
-            <Link
-              to="/login"
-              className="group inline-flex items-center gap-1.5 rounded-full bg-[#ED7545] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs hover:brightness-110 hover:-translate-y-0.5 hover:shadow-md active:scale-95 transition-all duration-200"
-            >
-              Sign In
-            </Link>
-          </div>
+          <Link
+            to="/login"
+            className="group inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#ED7545] to-[#F59E0B] px-4 py-2 text-xs font-extrabold text-white shadow-md shadow-[#ED7545]/20 transition-all hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:scale-95"
+          >
+            Sign In
+            <ArrowRight className="size-3.5" />
+          </Link>
         </div>
       </header>
 
       {/* ===== Mobile hero (native app style) ===== */}
-      <section className="lg:hidden relative overflow-hidden bg-gradient-to-b from-[#081F15] via-[#123A2A] to-[#0E3323] px-5 pt-7 pb-16 text-white">
+      <section className="lg:hidden relative overflow-hidden bg-gradient-to-b from-[#081F15] via-[#123A2A] to-[#0E3323] px-5 pt-6 pb-14 text-white">
+        <img
+          src="/images/food/fruit_crates.jpg"
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute -right-14 -top-8 h-52 w-52 rotate-6 rounded-3xl object-cover opacity-[0.14]"
+        />
         <div
           aria-hidden
           className="pointer-events-none absolute -top-24 -right-20 size-56 rounded-full bg-[#3F8F62]/25 blur-3xl"
@@ -334,31 +314,33 @@ function SignupPage() {
           aria-hidden
           className="pointer-events-none absolute bottom-0 -left-20 size-52 rounded-full bg-[#ED7545]/15 blur-3xl"
         />
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/20 bg-white/10 px-3 py-1 text-[10px] font-bold text-[#F8F5ED] backdrop-blur-md">
-          <span className="relative flex size-1.5">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3F8F62] opacity-70" />
-            <span className="relative inline-flex size-1.5 rounded-full bg-[#3F8F62]" />
+        <div className="relative">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#3F8F62]/40 bg-[#3F8F62]/15 px-3 py-1.5 text-[10px] font-extrabold tracking-[0.16em] text-[#9FE3BC] backdrop-blur-md">
+            <span className="relative flex size-1.5">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#7FE0A8] opacity-75" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-[#7FE0A8]" />
+            </span>
+            FOODLOOP COMMUNITY MOVEMENT
           </span>
-          🌱 FoodLoop Community Movement
-        </span>
-        <h1 className="mt-3 font-display text-[2rem] font-extrabold leading-tight text-white">
-          Good food,
-          <br />
-          shared with purpose.
-        </h1>
-        <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-[#F8F5ED]/75">
-          Create your free account and start rescuing surplus food in minutes.
-        </p>
-        <div className="mt-5 flex flex-wrap gap-2 text-[11px] font-bold">
-          <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-md">
-            ✓ 100% Wholesome Surplus
-          </span>
-          <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-md">
-            🍲 Zero Waste
-          </span>
-          <span className="rounded-full border border-white/15 bg-white/10 px-3 py-1.5 backdrop-blur-md">
-            ⚡ 35-min Pickup
-          </span>
+          <h1 className="mt-4 font-display text-[2.15rem] font-extrabold leading-tight text-white">
+            Good food,
+            <br />
+            shared with <span className="text-[#F5B942]">purpose.</span>
+          </h1>
+          <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-[#F8F5ED]/70">
+            Create your free account and start rescuing surplus food in minutes.
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2 text-[10.5px] font-bold">
+            <span className="rounded-full border border-white/15 bg-white/[0.07] px-3 py-1.5 backdrop-blur-md">
+              ✓ 100% Wholesome Surplus
+            </span>
+            <span className="rounded-full border border-white/15 bg-white/[0.07] px-3 py-1.5 backdrop-blur-md">
+              🍲 Zero Waste
+            </span>
+            <span className="rounded-full border border-white/15 bg-white/[0.07] px-3 py-1.5 backdrop-blur-md">
+              ⚡ 35-min Pickup
+            </span>
+          </div>
         </div>
       </section>
 
@@ -415,84 +397,103 @@ function SignupPage() {
             {/* Brand accent bar */}
             <div className="lg:col-span-12 h-1.5 w-full bg-gradient-to-r from-[#164330] via-[#3F8F62] to-[#ED7545]" />
             {/* Left Hero Column */}
-            <div className="hidden lg:flex lg:col-span-5 relative min-w-0 overflow-hidden border-b border-[#DDD5C8] bg-gradient-to-b from-[#EBF3ED] to-[#F8F5ED] p-8 sm:p-10 flex-col justify-between lg:border-b-0 lg:border-r">
-              <div
-                className="absolute -top-16 -right-16 size-48 rounded-full bg-[#205C43]/10 blur-2xl"
-                aria-hidden
-              />
-              <div
-                className="absolute -bottom-20 -left-16 size-56 rounded-full bg-[#ED7545]/10 blur-3xl"
-                aria-hidden
-              />
-              <div
-                className="absolute right-8 top-1/2 size-40 -translate-y-1/2 rounded-full bg-[#3F8F62]/8 blur-3xl"
-                aria-hidden
-              />
-              <div className="relative">
-                <div className="inline-flex items-center gap-1.5 rounded-full bg-[#205C43]/10 px-3 py-1 text-xs font-bold text-[#205C43]">
-                  <span className="relative flex size-2">
-                    <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#3F8F62] opacity-60" />
-                    <span className="relative inline-flex size-2 rounded-full bg-[#205C43]" />
+            <div className="hidden lg:flex lg:col-span-5 relative min-w-0 overflow-hidden border-b border-white/10 bg-[#0F3323] p-8 sm:p-10 flex-col justify-between lg:border-b-0 lg:border-r">
+              <div className="absolute inset-0 z-0">
+                <img
+                  src="/images/food/dal_khichdi_roti.jpg"
+                  alt="Fresh surplus meals ready to be shared"
+                  className="h-full w-full object-cover opacity-35 filter brightness-90"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0B281B] via-[#164330]/85 to-[#164330]/40" />
+              </div>
+              <div className="relative z-10">
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-3 py-1.5 text-[10px] font-extrabold tracking-[0.16em] text-[#F8F5ED] backdrop-blur-md">
+                  <span className="relative flex size-1.5">
+                    <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#7FE0A8] opacity-75" />
+                    <span className="relative inline-flex size-1.5 rounded-full bg-[#7FE0A8]" />
                   </span>
-                  🌱 FoodLoop Community Movement
+                  ZERO HUNGER MOVEMENT
                 </div>
-                <h2 className="mt-4 font-display text-3xl sm:text-4xl font-extrabold text-[#164330] leading-tight">
+                <h2 className="mt-4 font-display text-3xl sm:text-4xl font-extrabold text-white leading-tight">
                   Good food, shared with purpose.
                 </h2>
-                <p className="mt-2 text-sm font-semibold text-[#3F8F62]">
+                <p className="mt-2 text-sm font-semibold text-[#9FE3BC]">
                   Rescue surplus. Nourish lives. Close the loop.
                 </p>
 
                 <div className="mt-8 space-y-4 text-xs">
                   <div className="flex items-start gap-3">
-                    <div className="grid size-8 place-items-center rounded-xl bg-white shadow-2xs text-[#205C43] shrink-0 font-bold">
-                      ✓
+                    <div className="grid size-8 shrink-0 place-items-center rounded-xl border border-white/15 bg-white/10 text-[#9FE3BC]">
+                      <CheckCircle2 className="size-4" />
                     </div>
                     <div>
-                      <p className="font-bold text-[#242923]">100% Wholesome Surplus</p>
-                      <p className="text-[#656C62]">
+                      <p className="font-bold text-white">100% Wholesome Surplus</p>
+                      <p className="text-white/55">
                         Hygienically verified meals from banquets, kitchens & cafes.
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="grid size-8 place-items-center rounded-xl bg-white shadow-2xs text-[#ED7545] shrink-0 font-bold">
+                    <div className="grid size-8 shrink-0 place-items-center rounded-xl border border-white/15 bg-white/10 text-base">
                       🍲
                     </div>
                     <div>
-                      <p className="font-bold text-[#242923]">Zero Waste Community</p>
-                      <p className="text-[#656C62]">
+                      <p className="font-bold text-white">Zero Waste Community</p>
+                      <p className="text-white/55">
                         Over 12,500 meals diverted from waste to local shelters.
                       </p>
                     </div>
                   </div>
 
                   <div className="flex items-start gap-3">
-                    <div className="grid size-8 place-items-center rounded-xl bg-white shadow-2xs text-[#205C43] shrink-0 font-bold">
+                    <div className="grid size-8 shrink-0 place-items-center rounded-xl border border-white/15 bg-white/10 text-base">
                       🚴
                     </div>
                     <div>
-                      <p className="font-bold text-[#242923]">Rapid Volunteer Pickup</p>
-                      <p className="text-[#656C62]">
+                      <p className="font-bold text-white">Rapid Volunteer Pickup</p>
+                      <p className="text-white/55">
                         Average pickup within 35 minutes via volunteer couriers.
                       </p>
                     </div>
                   </div>
                 </div>
+
+                <div className="mt-7 grid grid-cols-3 gap-2 rounded-2xl border border-white/10 bg-white/[0.06] p-3 backdrop-blur-md">
+                  <div className="text-center">
+                    <p className="font-display text-lg font-extrabold text-white">14,250+</p>
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-white/45">
+                      Meals served
+                    </p>
+                  </div>
+                  <div className="border-x border-white/10 text-center">
+                    <p className="font-display text-lg font-extrabold text-white">48</p>
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-white/45">
+                      Shelter homes
+                    </p>
+                  </div>
+                  <div className="text-center">
+                    <p className="font-display text-lg font-extrabold text-white">35 min</p>
+                    <p className="text-[9px] font-bold uppercase tracking-wider text-white/45">
+                      Avg pickup
+                    </p>
+                  </div>
+                </div>
               </div>
 
-              <div className="mt-8 relative rounded-2xl overflow-hidden border border-[#DDD5C8]/80 shadow-md">
+              <div className="relative z-10 mt-8 overflow-hidden rounded-2xl border border-white/15 shadow-lg">
                 <img
-                  src="/images/hunger/card2.png"
-                  alt="Community volunteers packing and distributing fresh meals"
-                  className="h-52 w-full object-cover"
+                  src="/images/food/fruit_crates.jpg"
+                  alt="Fresh produce rescued and ready for shelter homes"
+                  className="h-44 w-full object-cover"
                 />
-                <div className="absolute top-3 right-3 rounded-full bg-[#205C43] text-white px-3 py-1 text-[11px] font-extrabold shadow-sm">
+                <div className="absolute top-3 right-3 rounded-full bg-[#ED7545] px-3 py-1 text-[10px] font-extrabold text-white shadow-sm">
                   Zero Waste • Zero Hunger
                 </div>
-                <div className="p-3 bg-white/95 backdrop-blur-xs flex items-center justify-between text-xs font-bold text-[#205C43]">
-                  <span>❤️ Real Meals Shared With Real People</span>
+                <div className="flex items-center justify-between bg-[#071B12]/85 px-3.5 py-3 text-xs font-bold text-white backdrop-blur-md">
+                  <span className="flex items-center gap-1.5">
+                    <span className="text-sm">❤️</span> Real meals shared with real people
+                  </span>
                 </div>
               </div>
             </div>
@@ -500,7 +501,11 @@ function SignupPage() {
             {/* Right Column: Create Account Form */}
             <div className="lg:col-span-7 min-w-0 p-5 sm:p-10 flex flex-col justify-center">
               <div>
-                <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-[#242923]">
+                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#205C43]/10 px-2.5 py-1 text-[10px] font-extrabold uppercase tracking-[0.14em] text-[#205C43]">
+                  <Sparkles className="size-3" />
+                  Join in 60 seconds
+                </span>
+                <h1 className="mt-2 font-display text-2xl sm:text-3xl font-extrabold text-[#242923]">
                   Create Your Account
                 </h1>
                 <p className="mt-1 text-xs text-[#656C62]">
@@ -554,35 +559,56 @@ function SignupPage() {
                 <label className="text-xs font-bold uppercase tracking-wider text-[#656C62]">
                   Select Your Role
                 </label>
-                <div className="mt-2 grid grid-cols-3 gap-2">
+                <div className="mt-2.5 grid grid-cols-3 gap-2 sm:gap-2.5">
                   {[
-                    { r: "donor", emoji: "🍲", label: "Food Donor", desc: "Kitchens & banquets" },
-                    { r: "recipient", emoji: "🏢", label: "Recipient", desc: "Shelters & NGOs" },
-                    { r: "volunteer", emoji: "🚴", label: "Volunteer", desc: "Delivery Heroes" },
+                    { r: "donor", emoji: "🍲", label: "Food Donor", desc: "Share surplus" },
+                    { r: "recipient", emoji: "🏢", label: "Recipient", desc: "Rescue meals" },
+                    { r: "volunteer", emoji: "🚴", label: "Volunteer", desc: "Deliver food" },
                   ].map(({ r, emoji, label, desc }) => (
                     <button
                       key={r}
                       type="button"
+                      aria-pressed={selectedRole === r}
                       onClick={() => setSelectedRole(r as Role)}
-                      className={`group relative rounded-2xl border-2 p-2.5 text-center transition-all duration-200 cursor-pointer active:scale-95 ${
+                      className={`group relative flex flex-col items-center rounded-2xl border-2 px-1.5 py-3 transition-all duration-200 cursor-pointer active:scale-95 ${
                         selectedRole === r
-                          ? "border-[#205C43] bg-gradient-to-b from-[#205C43]/12 to-[#205C43]/5 ring-2 ring-[#205C43]/20 scale-[1.03] shadow-md"
-                          : "border-[#DDD5C8] hover:border-[#205C43]/40 hover:bg-[#F8F5ED] hover:scale-[1.02] hover:shadow-sm"
+                          ? "border-[#205C43] bg-[#205C43] shadow-lg shadow-[#205C43]/25"
+                          : "border-[#E3DCCF] bg-white hover:-translate-y-0.5 hover:border-[#205C43]/40 hover:shadow-sm"
                       }`}
                     >
                       {selectedRole === r && (
-                        <span className="absolute -top-2 -right-2 grid size-5 place-items-center rounded-full bg-[#205C43] text-[10px] font-bold text-white shadow-md animate-in zoom-in-50 duration-200">
-                          ✓
+                        <span className="absolute -top-2 -right-2 grid size-5 place-items-center rounded-full bg-[#ED7545] text-white shadow-md animate-in zoom-in-50 duration-200">
+                          <Check className="size-3" strokeWidth={3} />
                         </span>
                       )}
-                      <span className="block text-lg leading-none transition-transform duration-200 group-hover:scale-125 group-active:scale-95">
+                      <span
+                        className={`grid size-9 place-items-center rounded-xl text-lg leading-none transition-transform duration-200 group-hover:scale-110 ${
+                          selectedRole === r ? "bg-white/15" : "bg-[#F8F5ED]"
+                        }`}
+                      >
                         {emoji}
                       </span>
-                      <p className="mt-1 text-xs font-bold text-[#242923]">{label}</p>
-                      <p className="text-[10px] text-[#656C62] mt-0.5">{desc}</p>
+                      <p
+                        className={`mt-1.5 text-xs font-extrabold ${
+                          selectedRole === r ? "text-white" : "text-[#242923]"
+                        }`}
+                      >
+                        {label}
+                      </p>
+                      <p
+                        className={`mt-0.5 text-[9.5px] font-medium ${
+                          selectedRole === r ? "text-white/70" : "text-[#656C62]"
+                        }`}
+                      >
+                        {desc}
+                      </p>
                     </button>
                   ))}
                 </div>
+                <p className="mt-2 flex items-center justify-center gap-1.5 text-[10.5px] font-medium text-[#656C62]">
+                  <ShieldCheck className="size-3.5 text-[#3F8F62]" />
+                  One account, one role — pick what fits you best.
+                </p>
               </div>
 
               <form onSubmit={handleRegister} className="mt-6 space-y-3.5">
@@ -591,14 +617,14 @@ function SignupPage() {
                     Full Name / Organization
                   </label>
                   <div className="relative mt-1">
-                    <User className="absolute left-3.5 top-3 size-4 text-[#656C62]" />
+                    <User className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#656C62]" />
                     <input
                       type="text"
                       required
                       placeholder="e.g. Ramesh Kumar or Grand Banquet"
                       value={fullName}
                       onChange={(e) => setFullName(e.target.value)}
-                      className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
+                      className="h-11 sm:h-12 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] pl-10 pr-4 text-sm font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                     />
                   </div>
                 </div>
@@ -607,14 +633,14 @@ function SignupPage() {
                   <div>
                     <label className="text-xs font-bold text-[#242923]">Email Address</label>
                     <div className="relative mt-1">
-                      <Mail className="absolute left-3.5 top-3 size-4 text-[#656C62]" />
+                      <Mail className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#656C62]" />
                       <input
                         type="email"
                         required
                         placeholder="you@domain.org"
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
-                        className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
+                        className="h-11 sm:h-12 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] pl-10 pr-4 text-sm font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                       />
                     </div>
                   </div>
@@ -624,13 +650,13 @@ function SignupPage() {
                       Phone <span className="font-medium text-[#656C62]">(optional)</span>
                     </label>
                     <div className="relative mt-1">
-                      <Phone className="absolute left-3.5 top-3 size-4 text-[#656C62]" />
+                      <Phone className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#656C62]" />
                       <input
                         type="tel"
                         placeholder="+91 98765 43210"
                         value={phone}
                         onChange={(e) => setPhone(e.target.value)}
-                        className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
+                        className="h-11 sm:h-12 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] pl-10 pr-4 text-sm font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                       />
                     </div>
                   </div>
@@ -639,19 +665,20 @@ function SignupPage() {
                 <div>
                   <label className="text-xs font-bold text-[#242923]">Password</label>
                   <div className="relative mt-1">
-                    <Lock className="absolute left-3.5 top-3 size-4 text-[#656C62]" />
+                    <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#656C62]" />
                     <input
                       type={showPassword ? "text" : "password"}
                       required
                       placeholder="Minimum 6 characters"
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
-                      className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-10 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
+                      className="h-11 sm:h-12 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] pl-10 pr-11 text-sm font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-3 text-[#656C62] hover:text-[#242923]"
+                      className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-lg text-[#656C62] transition-colors hover:bg-[#205C43]/10 hover:text-[#242923]"
+                      aria-label={showPassword ? "Hide password" : "Show password"}
                     >
                       {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                     </button>
@@ -685,17 +712,17 @@ function SignupPage() {
                 <div>
                   <label className="text-xs font-bold text-[#242923]">Confirm Password</label>
                   <div className="relative mt-1">
-                    <Lock className="absolute left-3.5 top-3 size-4 text-[#656C62]" />
+                    <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#656C62]" />
                     <input
                       type="password"
                       required
                       placeholder="Confirm password"
                       value={confirmPassword}
                       onChange={(e) => setConfirmPassword(e.target.value)}
-                      className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
+                      className="h-11 sm:h-12 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] pl-10 pr-4 text-sm font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
                     />
                     {confirmPassword.length > 0 && confirmPassword === password && (
-                      <Check className="absolute right-3 top-3 size-4 text-[#205C43]" />
+                      <Check className="absolute right-3 top-1/2 size-4 -translate-y-1/2 text-[#205C43]" />
                     )}
                   </div>
                   {confirmPassword.length > 0 && confirmPassword !== password && (
@@ -711,8 +738,11 @@ function SignupPage() {
                     required
                     checked={acceptedTerms}
                     onChange={(e) => setAcceptedTerms(e.target.checked)}
-                    className="mt-0.5 size-4 accent-[#205C43]"
+                    className="peer sr-only"
                   />
+                  <span className="mt-0.5 grid size-4 shrink-0 place-items-center rounded border border-[#C9C1B2] bg-white text-transparent transition-all duration-200 peer-checked:border-[#205C43] peer-checked:bg-[#205C43] peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-[#205C43]/30">
+                    <Check className="size-3" strokeWidth={3} />
+                  </span>
                   <span>
                     I agree to the{" "}
                     <Link to="/terms" className="text-[#205C43] font-bold underline">
@@ -729,25 +759,35 @@ function SignupPage() {
                 <button
                   type="submit"
                   disabled={busy}
-                  className="group w-full rounded-full bg-gradient-to-r from-[#164330] via-[#205C43] to-[#3F8F62] py-3 text-xs font-bold text-white shadow-md hover:shadow-lg hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-50 disabled:hover:translate-y-0 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5"
+                  className="group relative w-full overflow-hidden rounded-full bg-gradient-to-r from-[#164330] via-[#205C43] to-[#3F8F62] py-3.5 text-sm font-extrabold text-white shadow-lg shadow-[#205C43]/25 hover:-translate-y-0.5 hover:shadow-xl hover:brightness-105 active:translate-y-0 active:scale-[0.98] disabled:opacity-50 disabled:hover:translate-y-0 transition-all duration-200 cursor-pointer flex items-center justify-center gap-1.5"
                 >
-                  {busy ? (
-                    "Registering…"
-                  ) : (
-                    <>
-                      Create Free Account
-                      <ArrowRight className="size-3.5 transition-transform duration-200 group-hover:translate-x-1" />
-                    </>
-                  )}
+                  <span
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/25 to-transparent transition-transform duration-700 group-hover:translate-x-full"
+                  />
+                  <span className="relative flex items-center gap-1.5">
+                    {busy ? (
+                      "Registering…"
+                    ) : (
+                      <>
+                        Create Free Account
+                        <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+                      </>
+                    )}
+                  </span>
                 </button>
+                <p className="flex items-center justify-center gap-1.5 text-[10.5px] font-medium text-[#656C62]">
+                  <ShieldCheck className="size-3.5 text-[#3F8F62]" />
+                  Free forever · No credit card required
+                </p>
               </form>
 
               {/* Social Sign Up / 1-Click Fast Access */}
               <div className="mt-5">
                 <div className="relative flex items-center justify-center">
                   <div className="w-full border-t border-[#DDD5C8]"></div>
-                  <span className="bg-white px-3 text-[11px] font-semibold text-[#656C62] uppercase tracking-wider absolute">
-                    or sign up with
+                  <span className="absolute bg-white px-3 text-[10px] font-bold text-[#656C62] uppercase tracking-[0.14em]">
+                    or quick-fill a demo account
                   </span>
                 </div>
 
@@ -764,10 +804,10 @@ function SignupPage() {
                     }}
                     className="group flex items-center justify-center gap-2 rounded-2xl border border-[#DDD5C8] bg-white py-2.5 px-3 text-xs font-bold text-[#242923] hover:border-[#205C43] hover:bg-[#F8F5ED] hover:-translate-y-0.5 hover:shadow-md active:scale-95 transition-all duration-200 cursor-pointer"
                   >
-                    <span className="text-red-500 font-extrabold inline-block transition-transform duration-200 group-hover:scale-125 group-active:rotate-12">
+                    <span className="inline-block text-sm font-extrabold text-[#4285F4] transition-transform duration-200 group-hover:scale-125 group-active:rotate-12">
                       G
                     </span>{" "}
-                    Continue with Google
+                    Google Demo
                   </button>
                   <button
                     type="button"
@@ -784,16 +824,19 @@ function SignupPage() {
                     <span className="inline-block transition-transform duration-200 group-hover:scale-125">
                       &#63743;
                     </span>{" "}
-                    Continue with Apple
+                    Apple Demo
                   </button>
                 </div>
+                <p className="mt-2 text-center text-[10px] font-medium text-[#9AA096]">
+                  Demo buttons only fill test credentials — no third-party login.
+                </p>
               </div>
 
               <div className="mt-5 border-t border-[#DDD5C8] pt-4 text-center text-xs text-[#656C62] flex items-center justify-center gap-2">
                 <span>Already registered?</span>
                 <Link
                   to="/login"
-                  className="group inline-flex items-center gap-1 rounded-full bg-[#205C43]/10 px-3 py-1 font-bold text-[#205C43] hover:bg-[#205C43] hover:text-white hover:scale-105 active:scale-95 transition-all shadow-2xs"
+                  className="group inline-flex items-center gap-1 rounded-full bg-[#205C43] px-3.5 py-1.5 font-bold text-white shadow-sm hover:brightness-110 hover:scale-105 active:scale-95 transition-all"
                 >
                   Sign In Here
                   <span className="inline-block transition-transform duration-200 group-hover:translate-x-1">
@@ -806,7 +849,7 @@ function SignupPage() {
         )}
       </main>
 
-      <footer className="hidden lg:block p-4 text-center text-xs text-[#656C62]">
+      <footer className="hidden lg:block p-4 text-center text-xs text-white/35">
         <p>© FoodLoop Inc. Good food. Shared with purpose.</p>
       </footer>
     </div>

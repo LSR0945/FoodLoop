@@ -14,6 +14,7 @@ import { useEffect, type ReactNode } from "react";
 import { Toaster } from "@/components/ui/sonner";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { MobileBottomNav } from "@/components/MobileBottomNav";
+import { playTap } from "@/lib/sfx";
 
 import appCss from "../styles.css?url";
 import { reportLovableError } from "../lib/lovable-error-reporting";
@@ -127,10 +128,28 @@ function RootComponent() {
         <AuthGate>
           <Outlet />
         </AuthGate>
+        <GlobalTapFeedback />
         <Toaster position="top-center" richColors />
       </AuthProvider>
     </QueryClientProvider>
   );
+}
+
+function GlobalTapFeedback() {
+  useEffect(() => {
+    const onPointerDown = (event: PointerEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (!target) return;
+      const el = target.closest<HTMLElement>("button, a[href], [role='button']");
+      if (!el) return;
+      if (el instanceof HTMLButtonElement && el.disabled) return;
+      if (el.getAttribute("aria-disabled") === "true") return;
+      playTap();
+    };
+    document.addEventListener("pointerdown", onPointerDown, true);
+    return () => document.removeEventListener("pointerdown", onPointerDown, true);
+  }, []);
+  return null;
 }
 
 const AUTH_SCREENS = [

@@ -2,7 +2,6 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Compass, Bookmark, ShoppingBag, User } from "lucide-react";
 import { useState } from "react";
 import { useAuth } from "@/lib/auth";
-import { playTap } from "@/lib/sfx";
 
 export function MobileBottomNav() {
   const { user, profile } = useAuth();
@@ -75,7 +74,6 @@ export function MobileBottomNav() {
   ];
 
   const handleTap = (label: string) => {
-    playTap();
     setPopped(label);
     window.setTimeout(() => setPopped((p) => (p === label ? null : p)), 320);
   };

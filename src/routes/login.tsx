@@ -1,6 +1,6 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { ArrowLeft, ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles } from "lucide-react";
+import { ArrowLeft, ArrowRight, Eye, EyeOff, Lock, Mail, ShieldCheck, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
@@ -270,9 +270,9 @@ function LoginPage() {
       <div aria-hidden className="pointer-events-none fixed inset-0 -z-10">
         <div className="absolute inset-0 bg-gradient-to-b from-[#081F15] via-[#123A2A] to-[#081F15]" />
         <img
-          src="/images/hunger/hunger3.png"
+          src="/images/food/dal_khichdi_roti.jpg"
           alt=""
-          className="absolute inset-0 h-full w-full object-cover opacity-[0.10]"
+          className="absolute inset-0 h-full w-full object-cover opacity-[0.07]"
         />
         <div className="absolute -top-40 -right-40 size-[26rem] rounded-full bg-[#3F8F62]/25 blur-3xl" />
         <div className="absolute top-1/3 -left-40 size-[30rem] rounded-full bg-[#ED7545]/20 blur-3xl" />
@@ -288,7 +288,7 @@ function LoginPage() {
       </div>
 
       {/* ===== Native app bar (mobile) ===== */}
-      <header className="lg:hidden border-b border-white/10 bg-[#081F15]/80 backdrop-blur-xl">
+      <header className="lg:hidden sticky top-0 z-30 border-b border-white/10 bg-[#081F15]/85 backdrop-blur-xl">
         <div className="flex items-center justify-between px-4 py-3">
           <Link
             to="/welcome"
@@ -300,7 +300,7 @@ function LoginPage() {
           <Logo light size="sm" showTagline={false} />
           <Link
             to="/signup"
-            className="rounded-full bg-[#ED7545] px-3.5 py-1.5 text-[11px] font-bold text-white shadow-xs transition-transform active:scale-95"
+            className="rounded-full bg-gradient-to-r from-[#ED7545] to-[#F59E0B] px-3.5 py-1.5 text-[11px] font-extrabold text-white shadow-md shadow-[#ED7545]/20 transition-transform active:scale-95"
           >
             Sign Up
           </Link>
@@ -314,16 +314,23 @@ function LoginPage() {
           <div className="flex items-center gap-3">
             <Link
               to="/signup"
-              className="inline-flex items-center gap-1.5 rounded-full bg-[#3F8F62] px-3.5 py-1.5 text-xs font-bold text-white shadow-xs transition-all hover:brightness-110"
+              className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#ED7545] to-[#F59E0B] px-4 py-2 text-xs font-extrabold text-white shadow-md shadow-[#ED7545]/20 transition-all hover:-translate-y-0.5 hover:brightness-110 active:translate-y-0 active:scale-95"
             >
               Sign Up
+              <ArrowRight className="size-3.5" />
             </Link>
           </div>
         </div>
       </header>
 
       {/* ===== Mobile hero (native app style) ===== */}
-      <section className="lg:hidden relative overflow-hidden bg-gradient-to-b from-[#081F15] via-[#123A2A] to-[#0E3323] px-5 pt-6 pb-16 text-white">
+      <section className="lg:hidden relative overflow-hidden bg-gradient-to-b from-[#081F15] via-[#123A2A] to-[#0E3323] px-5 pb-14 pt-5 text-white">
+        <img
+          src="/images/food/wheat_bread_buns.jpg"
+          alt=""
+          aria-hidden
+          className="pointer-events-none absolute -right-14 -top-8 h-52 w-52 rotate-6 rounded-3xl object-cover opacity-[0.14]"
+        />
         <div
           aria-hidden
           className="pointer-events-none absolute -top-24 -right-20 size-56 rounded-full bg-[#3F8F62]/25 blur-3xl"
@@ -332,33 +339,33 @@ function LoginPage() {
           aria-hidden
           className="pointer-events-none absolute bottom-0 -left-20 size-52 rounded-full bg-[#ED7545]/15 blur-3xl"
         />
-        <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-bold text-[#F8F5ED] backdrop-blur-md">
-          🌱 Zero Hunger Movement
-        </span>
-        <h1 className="mt-3 font-display text-[2rem] font-extrabold leading-tight text-white">
-          Welcome Back
-        </h1>
-        <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-[#F8F5ED]/75">
-          Sign in to access your surplus food dashboard or active collections.
-        </p>
-        <div className="mt-5 grid grid-cols-3 gap-2">
-          <div className="rounded-2xl border border-white/10 bg-white/10 px-2 py-3 text-center backdrop-blur-md">
-            <p className="text-sm font-extrabold text-white">14,250+</p>
-            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">
-              Meals Shared
-            </p>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 px-2 py-3 text-center backdrop-blur-md">
-            <p className="text-sm font-extrabold text-white">48</p>
-            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">
-              Shelter Homes
-            </p>
-          </div>
-          <div className="rounded-2xl border border-white/10 bg-white/10 px-2 py-3 text-center backdrop-blur-md">
-            <p className="text-sm font-extrabold text-white">35 min</p>
-            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">
-              Rapid Pickup
-            </p>
+        <div className="relative">
+          <span className="inline-flex items-center gap-2 rounded-full border border-[#3F8F62]/40 bg-[#3F8F62]/15 px-3 py-1.5 text-[10px] font-extrabold tracking-[0.16em] text-[#9FE3BC] backdrop-blur-md">
+            <span className="relative flex size-1.5">
+              <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#7FE0A8] opacity-75" />
+              <span className="relative inline-flex size-1.5 rounded-full bg-[#7FE0A8]" />
+            </span>
+            ZERO HUNGER MOVEMENT
+          </span>
+          <h1 className="mt-4 font-display text-[2.15rem] font-extrabold leading-tight">
+            Welcome <span className="text-[#F5B942]">back</span>
+          </h1>
+          <p className="mt-2 max-w-sm text-[13px] leading-relaxed text-[#F8F5ED]/70">
+            Sign in to manage donations, track live pickups and keep good food moving.
+          </p>
+          <div className="mt-5 grid grid-cols-3 divide-x divide-white/10 rounded-2xl border border-white/10 bg-white/[0.06] py-3 backdrop-blur-md">
+            {[
+              { value: "14,250+", label: "Meals shared" },
+              { value: "48", label: "Shelter homes" },
+              { value: "35 min", label: "Rapid pickup" },
+            ].map((s) => (
+              <div key={s.label} className="text-center">
+                <p className="font-display text-base font-extrabold text-white">{s.value}</p>
+                <p className="mt-0.5 text-[8.5px] font-bold uppercase tracking-wider text-[#F8F5ED]/50">
+                  {s.label}
+                </p>
+              </div>
+            ))}
           </div>
         </div>
       </section>
@@ -369,46 +376,59 @@ function LoginPage() {
           <div className="hidden lg:flex lg:col-span-5 min-w-0 relative bg-[#164330] p-6 sm:p-8 text-white flex-col justify-between overflow-hidden">
             <div className="absolute inset-0 z-0">
               <img
-                src="/images/hunger/hunger3.png"
+                src="/images/food/dal_khichdi_roti.jpg"
                 alt="Community food donation & hunger relief"
-                className="h-full w-full object-cover opacity-25 filter brightness-90"
+                className="h-full w-full object-cover opacity-40 filter brightness-90"
               />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#164330] via-[#164330]/80 to-transparent" />
+              <div className="absolute inset-0 bg-gradient-to-t from-[#0B281B] via-[#164330]/85 to-[#164330]/40" />
             </div>
 
             <div className="relative z-10">
-              <span className="inline-flex items-center gap-1.5 rounded-full bg-white/15 backdrop-blur-md px-3 py-1 text-[11px] font-bold text-[#F8F5ED] border border-white/20">
-                🌱 Zero Hunger Movement
+              <span className="inline-flex items-center gap-2 rounded-full bg-white/15 backdrop-blur-md px-3 py-1.5 text-[10px] font-extrabold tracking-[0.16em] text-[#F8F5ED] border border-white/20">
+                <span className="relative flex size-1.5">
+                  <span className="absolute inline-flex size-full animate-ping rounded-full bg-[#7FE0A8] opacity-75" />
+                  <span className="relative inline-flex size-1.5 rounded-full bg-[#7FE0A8]" />
+                </span>
+                ZERO HUNGER MOVEMENT
               </span>
               <h2 className="mt-4 font-display text-2xl sm:text-3xl font-extrabold text-white leading-tight">
                 Every meal saved is a life nourished.
               </h2>
-              <p className="mt-2 text-xs sm:text-sm text-[#F8F5ED]/90 leading-relaxed">
+              <p className="mt-2 text-xs sm:text-sm text-[#F8F5ED]/85 leading-relaxed">
                 Connect directly with surplus donor kitchens, verified recipient shelters, and
                 courier volunteers to make sure good food never goes to waste.
               </p>
             </div>
 
             {/* Impact Highlights Card */}
-            <div className="relative z-10 mt-6 rounded-2xl bg-white/10 backdrop-blur-md p-4 border border-white/15 space-y-2.5 text-xs">
-              <div className="flex items-center gap-2">
-                <span className="text-base">🍲</span>
-                <span className="font-semibold text-white">14,250+ Meals Shared Locally</span>
+            <div className="relative z-10 mt-6 rounded-2xl bg-white/[0.08] backdrop-blur-md p-4 border border-white/15 space-y-3 text-xs">
+              <p className="text-[9px] font-extrabold uppercase tracking-[0.16em] text-[#9FE3BC]">
+                Live impact
+              </p>
+              <div className="flex items-center gap-2.5">
+                <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white/10 text-base">
+                  🍲
+                </span>
+                <span className="font-semibold text-white">14,250+ meals shared locally</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-base">🏢</span>
-                <span className="font-semibold text-white">48 Verified Shelter Homes</span>
+              <div className="flex items-center gap-2.5">
+                <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white/10 text-base">
+                  🏢
+                </span>
+                <span className="font-semibold text-white">48 verified shelter homes</span>
               </div>
-              <div className="flex items-center gap-2">
-                <span className="text-base">⏱️</span>
-                <span className="font-semibold text-white">Avg. 35-min Rapid Pickup</span>
+              <div className="flex items-center gap-2.5">
+                <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-white/10 text-base">
+                  ⏱️
+                </span>
+                <span className="font-semibold text-white">Avg. 35-min rapid pickup</span>
               </div>
             </div>
           </div>
 
           {/* Right Column: Sign In Form */}
           <div className="lg:col-span-7 min-w-0 p-5 sm:p-10 flex flex-col justify-center">
-            <div className="text-left">
+            <div className="hidden text-left lg:block">
               <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-[#242923]">
                 Welcome Back
               </h1>
@@ -464,21 +484,21 @@ function LoginPage() {
                 <label className="text-xs font-bold text-[#242923]">
                   I am signing in as <span className="text-[#ED7545]">*</span>
                 </label>
-                <div className="mt-1.5 grid grid-cols-3 gap-2">
+                <div className="mt-2 grid grid-cols-3 gap-2.5">
                   {[
-                    { id: "donor" as Role, icon: "🍲", label: "Donor" },
-                    { id: "recipient" as Role, icon: "🏢", label: "Shelter NGO" },
-                    { id: "volunteer" as Role, icon: "🚴", label: "Volunteer" },
+                    { id: "donor" as Role, icon: "🍲", label: "Donor", sub: "Share surplus" },
+                    { id: "recipient" as Role, icon: "🏢", label: "Shelter NGO", sub: "Rescue meals" },
+                    { id: "volunteer" as Role, icon: "🚴", label: "Volunteer", sub: "Deliver food" },
                   ].map((r) => (
                     <button
                       key={r.id}
                       type="button"
                       disabled={busy}
                       onClick={() => setSelectedRole(r.id)}
-                      className={`group relative rounded-2xl border-2 px-2 py-2.5 text-center transition-all duration-200 cursor-pointer active:scale-95 disabled:opacity-50 ${
+                      className={`group relative rounded-2xl border-2 px-2 py-3 text-center transition-all duration-200 cursor-pointer active:scale-95 disabled:opacity-50 ${
                         selectedRole === r.id
-                          ? "border-[#205C43] bg-gradient-to-b from-[#205C43]/12 to-[#205C43]/5 ring-2 ring-[#205C43]/20 scale-[1.03] shadow-md"
-                          : "border-[#DDD5C8] bg-white hover:border-[#205C43]/50 hover:scale-[1.02] hover:shadow-sm"
+                          ? "border-[#205C43] bg-gradient-to-b from-[#205C43]/12 to-[#205C43]/[0.03] ring-2 ring-[#205C43]/20 scale-[1.02] shadow-md"
+                          : "border-[#E7E1D5] bg-[#FBFAF7] hover:border-[#205C43]/50 hover:scale-[1.01] hover:shadow-sm"
                       }`}
                     >
                       {selectedRole === r.id && (
@@ -486,33 +506,37 @@ function LoginPage() {
                           ✓
                         </span>
                       )}
-                      <span className="block text-lg leading-none transition-transform duration-200 group-hover:scale-125 group-active:scale-95">
+                      <span className="block text-xl leading-none transition-transform duration-200 group-hover:scale-110 group-active:scale-95">
                         {r.icon}
                       </span>
                       <span
-                        className={`mt-1 block text-[11px] font-bold ${selectedRole === r.id ? "text-[#205C43]" : "text-[#656C62]"}`}
+                        className={`mt-1.5 block text-[11px] font-extrabold leading-tight ${selectedRole === r.id ? "text-[#205C43]" : "text-[#40473F]"}`}
                       >
                         {r.label}
+                      </span>
+                      <span className="mt-0.5 block text-[9px] font-semibold text-[#656C62]/75">
+                        {r.sub}
                       </span>
                     </button>
                   ))}
                 </div>
-                <p className="mt-1.5 text-[10px] text-[#656C62]/80">
+                <p className="mt-1.5 flex items-center gap-1 text-[10px] text-[#656C62]/80">
+                  <ShieldCheck className="size-3 shrink-0 text-[#3F8F62]" />
                   Your selected role decides which portal dashboard opens after sign in.
                 </p>
               </div>
 
               <div>
                 <label className="text-xs font-bold text-[#242923]">Email Address</label>
-                <div className="relative mt-1">
-                  <Mail className="absolute left-3.5 top-3 size-4 text-[#656C62]" />
+                <div className="relative mt-1.5">
+                  <Mail className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#656C62]" />
                   <input
                     type="email"
                     required
                     placeholder="name@organization.org"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-4 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
+                    className="h-12 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] pl-10 pr-4 text-sm font-medium text-[#242923] transition-all duration-200 focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none"
                   />
                 </div>
               </div>
@@ -527,20 +551,21 @@ function LoginPage() {
                     Forgot password?
                   </Link>
                 </div>
-                <div className="relative mt-1">
-                  <Lock className="absolute left-3.5 top-3 size-4 text-[#656C62]" />
+                <div className="relative mt-1.5">
+                  <Lock className="absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-[#656C62]" />
                   <input
                     type={showPassword ? "text" : "password"}
                     required
                     placeholder="••••••••"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] py-2.5 pl-10 pr-10 text-xs font-medium text-[#242923] focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none transition-all duration-200"
+                    className="h-12 w-full rounded-xl border border-[#DDD5C8] bg-[#F8F5ED] pl-10 pr-11 text-sm font-medium text-[#242923] transition-all duration-200 focus:border-[#205C43] focus:bg-white focus:ring-2 focus:ring-[#205C43]/15 focus:outline-none"
                   />
                   <button
                     type="button"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-3 text-[#656C62] hover:text-[#242923]"
+                    className="absolute right-2 top-1/2 grid size-8 -translate-y-1/2 place-items-center rounded-lg text-[#656C62] transition-colors hover:bg-[#205C43]/10 hover:text-[#242923]"
                   >
                     {showPassword ? <EyeOff className="size-4" /> : <Eye className="size-4" />}
                   </button>
@@ -548,32 +573,44 @@ function LoginPage() {
               </div>
 
               {/* Remember me */}
-              <label className="flex items-center gap-2 cursor-pointer text-xs text-[#656C62]">
-                <input
-                  type="checkbox"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                  className="size-3.5 accent-[#205C43]"
-                />
-                <span>Remember my email on this device</span>
+              <label className="flex cursor-pointer items-center justify-between rounded-xl border border-[#E7E1D5] bg-[#FBFAF7] px-3.5 py-2.5 transition-colors hover:border-[#205C43]/30">
+                <span className="text-[11px] font-semibold text-[#656C62]">
+                  Remember my email on this device
+                </span>
+                <span className="relative inline-flex h-5 w-9 shrink-0 items-center rounded-full bg-[#DDD5C8] transition-colors duration-200 has-[:checked]:bg-[#205C43] has-[:focus-visible]:ring-2 has-[:focus-visible]:ring-[#205C43]/25">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="peer sr-only"
+                  />
+                  <span className="pointer-events-none absolute left-0.5 size-4 rounded-full bg-white shadow transition-transform duration-200 peer-checked:translate-x-4" />
+                </span>
               </label>
 
-              <button
-                type="submit"
-                disabled={busy}
-                className="group w-full rounded-full bg-gradient-to-r from-[#164330] via-[#205C43] to-[#3F8F62] py-3.5 text-sm font-bold text-white shadow-md hover:shadow-lg hover:brightness-110 hover:-translate-y-0.5 active:translate-y-0 active:scale-[0.98] disabled:opacity-50 disabled:hover:translate-y-0 transition-all duration-200 flex items-center justify-center gap-1.5 cursor-pointer"
-              >
-                {busy ? (
-                  "Signing In…"
-                ) : (
-                  <>
-                    {selectedRole
-                      ? `Sign In as ${selectedRole === "recipient" ? "Shelter NGO" : selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`
-                      : "Sign In"}
-                    <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
-                  </>
-                )}
-              </button>
+              <div className="space-y-2">
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="group relative flex w-full items-center justify-center gap-1.5 overflow-hidden rounded-full bg-gradient-to-r from-[#164330] via-[#205C43] to-[#3F8F62] py-3.5 text-sm font-bold text-white shadow-md transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:brightness-110 active:translate-y-0 active:scale-[0.98] disabled:opacity-50 disabled:hover:translate-y-0 cursor-pointer"
+                >
+                  <span className="pointer-events-none absolute inset-0 -translate-x-full bg-gradient-to-r from-transparent via-white/20 to-transparent transition-transform duration-700 group-hover:translate-x-full" />
+                  {busy ? (
+                    "Signing In…"
+                  ) : (
+                    <>
+                      {selectedRole
+                        ? `Sign In as ${selectedRole === "recipient" ? "Shelter NGO" : selectedRole.charAt(0).toUpperCase() + selectedRole.slice(1)}`
+                        : "Sign In"}
+                      <ArrowRight className="size-4 transition-transform duration-200 group-hover:translate-x-1" />
+                    </>
+                  )}
+                </button>
+                <p className="flex items-center justify-center gap-1.5 text-[10px] font-semibold text-[#656C62]/75">
+                  <ShieldCheck className="size-3 text-[#3F8F62]" />
+                  Secure sign-in · Verified FoodLoop accounts only
+                </p>
+              </div>
             </form>
 
             {/* Divider */}
@@ -586,46 +623,45 @@ function LoginPage() {
             </div>
 
             {/* Quick Evaluator 1-Tap Demo Login (below sign-in) */}
-            <div className="mt-4 rounded-2xl bg-[#205C43]/5 p-3.5 border border-[#205C43]/15">
-              <p className="flex items-center gap-1.5 text-[11px] font-bold text-[#205C43] uppercase tracking-wider">
-                <Sparkles className="size-3.5 text-[#ED7545]" /> 1-Tap Demo Access:
-              </p>
-              <div className="mt-2 grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => handleFastDemo("donor")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2.5 text-xs font-bold text-[#242923] shadow-2xs transition-all duration-200 hover:border-[#205C43] hover:-translate-y-0.5 hover:shadow-sm active:scale-95 cursor-pointer disabled:opacity-50"
-                >
-                  🍲 Donor
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => handleFastDemo("recipient")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2.5 text-xs font-bold text-[#242923] shadow-2xs transition-all duration-200 hover:border-[#205C43] hover:-translate-y-0.5 hover:shadow-sm active:scale-95 cursor-pointer disabled:opacity-50"
-                >
-                  🏢 Shelter NGO
-                </button>
-                <button
-                  type="button"
-                  disabled={busy}
-                  onClick={() => handleFastDemo("volunteer")}
-                  className="rounded-xl border border-[#DDD5C8] bg-white py-2.5 text-xs font-bold text-[#242923] shadow-2xs transition-all duration-200 hover:border-[#205C43] hover:-translate-y-0.5 hover:shadow-sm active:scale-95 cursor-pointer disabled:opacity-50"
-                >
-                  🚴 Volunteer
-                </button>
+            <div className="mt-4 rounded-2xl border border-[#205C43]/15 bg-gradient-to-br from-[#205C43]/[0.07] to-[#ED7545]/[0.05] p-3.5">
+              <div className="flex items-center justify-between gap-2">
+                <p className="flex items-center gap-1.5 text-[10.5px] font-extrabold uppercase tracking-wider text-[#205C43]">
+                  <Sparkles className="size-3.5 text-[#ED7545]" /> 1-Tap Demo Access
+                </p>
+                <span className="rounded-full border border-[#205C43]/20 bg-white/70 px-2 py-0.5 text-[8.5px] font-extrabold uppercase tracking-wide text-[#205C43]">
+                  Demo mode
+                </span>
+              </div>
+              <div className="mt-2.5 grid grid-cols-3 gap-2">
+                {[
+                  { role: "donor" as Role, icon: "🍲", label: "Donor" },
+                  { role: "recipient" as Role, icon: "🏢", label: "NGO" },
+                  { role: "volunteer" as Role, icon: "🚴", label: "Volunteer" },
+                ].map((d) => (
+                  <button
+                    key={d.role}
+                    type="button"
+                    disabled={busy}
+                    onClick={() => handleFastDemo(d.role)}
+                    className="group flex items-center justify-center gap-1.5 whitespace-nowrap rounded-xl border border-[#DDD5C8] bg-white py-2.5 text-[11px] font-extrabold text-[#242923] shadow-2xs transition-all duration-200 hover:-translate-y-0.5 hover:border-[#205C43] hover:shadow-sm active:scale-95 cursor-pointer disabled:opacity-50"
+                  >
+                    <span className="text-sm transition-transform duration-200 group-hover:scale-110">
+                      {d.icon}
+                    </span>
+                    {d.label}
+                  </button>
+                ))}
               </div>
             </div>
 
             <div className="mt-6 border-t border-[#DDD5C8] pt-4 text-center text-xs text-[#656C62] space-y-2">
-              <div className="flex items-center justify-center gap-2">
+              <div className="flex flex-wrap items-center justify-center gap-2">
                 <span>New to FoodLoop?</span>
                 <Link
                   to="/signup"
-                  className="inline-flex items-center gap-1 rounded-full bg-[#205C43]/10 px-3.5 py-1.5 font-bold text-[#205C43] transition-all duration-200 hover:bg-[#205C43] hover:text-white hover:scale-105 active:scale-95"
+                  className="inline-flex items-center gap-1 rounded-full bg-[#205C43] px-4 py-1.5 font-bold text-white shadow-sm transition-all duration-200 hover:scale-105 hover:brightness-110 active:scale-95"
                 >
-                  Create Account <span aria-hidden>→</span>
+                  Create Account <ArrowRight className="size-3.5" />
                 </Link>
               </div>
               <p className="text-[10px] text-[#656C62]/80">
