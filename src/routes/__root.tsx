@@ -24,9 +24,14 @@ function NotFoundComponent() {
       <div className="max-w-md text-center">
         <h1 className="text-7xl font-bold text-foreground">404</h1>
         <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">The page you're looking for doesn't exist.</p>
+        <p className="mt-2 text-sm text-muted-foreground">
+          The page you're looking for doesn't exist.
+        </p>
         <div className="mt-6">
-          <Link to="/" className="inline-flex rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground">
+          <Link
+            to="/"
+            className="inline-flex rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground"
+          >
             Go home
           </Link>
         </div>
@@ -70,7 +75,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { name: "apple-mobile-web-app-capable", content: "yes" },
       { name: "apple-mobile-web-app-status-bar-style", content: "default" },
       { title: "FoodLoop — Good food. Shared with purpose." },
-      { name: "description", content: "FoodLoop is a community-driven surplus food donation and collection platform connecting donors, recipients, and volunteers." },
+      {
+        name: "description",
+        content:
+          "FoodLoop is a community-driven surplus food donation and collection platform connecting donors, recipients, and volunteers.",
+      },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
     ],
@@ -144,7 +153,11 @@ function AppSplash() {
       <div className="pointer-events-none absolute -bottom-24 -left-24 size-72 rounded-full bg-[#ED7545]/15 blur-3xl" />
       <div className="relative flex flex-col items-center">
         <div className="animate-in zoom-in-75 fade-in grid size-24 place-items-center rounded-[1.75rem] border border-white/15 bg-white/10 shadow-2xl backdrop-blur-xl duration-500">
-          <img src="/foodloop-logo.png" alt="FoodLoop" className="size-16 rounded-2xl object-contain" />
+          <img
+            src="/foodloop-logo.png"
+            alt="FoodLoop"
+            className="size-16 rounded-2xl object-contain"
+          />
         </div>
         <p className="mt-5 font-display text-2xl font-extrabold tracking-tight">
           <span className="text-white">Food</span>
@@ -174,9 +187,10 @@ function AuthGate({ children }: { children: ReactNode }) {
   const isAuthScreen = AUTH_SCREENS.some((p) => pathname === p || pathname.startsWith(p + "/"));
 
   useEffect(() => {
-    if (loading || user) return;
-    if (!isAuthScreen) navigate({ to: "/welcome", replace: true });
-  }, [loading, user, isAuthScreen, navigate]);
+    if (loading) return;
+    if (!user && !isAuthScreen) navigate({ to: "/welcome", replace: true });
+    else if (user && pathname === "/welcome") navigate({ to: "/", replace: true });
+  }, [loading, user, isAuthScreen, pathname, navigate]);
 
   if (!isAuthScreen && !user) {
     return <AppSplash />;

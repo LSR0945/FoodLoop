@@ -149,7 +149,7 @@ function AdminPage() {
   async function handleLogout() {
     await signOut();
     toast.success("Signed out successfully.");
-    window.location.href = "/login";
+    window.location.href = "/welcome";
   }
 
   // ── Auth guard: redirect to login when signed out ───────────────────────

@@ -4,7 +4,13 @@ import { ArrowLeft, ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles } from "lucide
 import { toast } from "sonner";
 import { Logo } from "@/components/Logo";
 import { useAuth } from "@/lib/auth";
-import { createListing, registerDonor, registerNGO, registerVolunteer, updateProfile } from "@/lib/db";
+import {
+  createListing,
+  registerDonor,
+  registerNGO,
+  registerVolunteer,
+  updateProfile,
+} from "@/lib/db";
 import { getLocalSession, signInWithEmail, signUpWithEmail } from "@/lib/supabase-auth";
 import { getSupabase } from "@/lib/supabase";
 import type { Role } from "@/lib/types";
@@ -13,7 +19,10 @@ export const Route = createFileRoute("/login")({
   head: () => ({
     meta: [
       { title: "Log In — FoodLoop" },
-      { name: "description", content: "Sign in to your FoodLoop donor, recipient, or volunteer account." },
+      {
+        name: "description",
+        content: "Sign in to your FoodLoop donor, recipient, or volunteer account.",
+      },
     ],
   }),
   component: LoginPage,
@@ -30,7 +39,13 @@ function LoginPage() {
   const [selectedRole, setSelectedRole] = useState<Role | null>(null);
 
   const portalForRole = (r: Role) =>
-    r === "donor" ? "/donor" : r === "volunteer" ? "/volunteer" : r === "admin" ? "/admin" : "/recipient";
+    r === "donor"
+      ? "/donor"
+      : r === "volunteer"
+        ? "/volunteer"
+        : r === "admin"
+          ? "/admin"
+          : "/recipient";
 
   async function handleLogin(e: React.FormEvent) {
     e.preventDefault();
@@ -48,15 +63,23 @@ function LoginPage() {
       // for accounts that never saved a role (legacy / Supabase-only users).
       let role: Role | null = null;
       try {
-        const raw = localStorage.getItem("foodloop_profile_" + cred.uid) || localStorage.getItem("annsetu_profile_" + cred.uid);
+        const raw =
+          localStorage.getItem("foodloop_profile_" + cred.uid) ||
+          localStorage.getItem("annsetu_profile_" + cred.uid);
         const stored = raw ? (JSON.parse(raw) as { role?: Role }) : null;
         if (stored?.role) {
           role = stored.role;
         } else {
-          const { data } = await getSupabase().from("profiles").select("role").eq("uid", cred.uid).maybeSingle();
+          const { data } = await getSupabase()
+            .from("profiles")
+            .select("role")
+            .eq("uid", cred.uid)
+            .maybeSingle();
           if (data?.role) role = data.role as Role;
         }
-      } catch {}
+      } catch {
+        // Role lookup is best-effort; the picker below is the fallback.
+      }
       if (!role) role = selectedRole;
       if (!role) {
         toast.error("Please select how you are signing in.");
@@ -73,8 +96,8 @@ function LoginPage() {
         await new Promise((r) => setTimeout(r, 50));
       }
       navigate({ to: portalForRole(role) });
-    } catch (err: any) {
-      toast.error(err.message || "Login failed. Please check credentials.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Login failed. Please check credentials.");
     } finally {
       setBusy(false);
     }
@@ -122,30 +145,75 @@ function LoginPage() {
         // Seed a few sample listings so the dashboard/table isn't empty on first visit.
         try {
           const { data: existing } = await getSupabase()
-            .from("listings").select("id").eq("donorId", uid).limit(1);
+            .from("listings")
+            .select("id")
+            .eq("donorId", uid)
+            .limit(1);
           if (!existing || existing.length === 0) {
             const samples = [
-              { title: "Vegetable Pulao & Raita", description: "Freshly prepared lunch surplus from campus mess, packed in biodegradable containers.", category: "Cooked meals" as const, foodType: "veg" as const, quantity: 40, unit: "plates", storage: "hot" as const, photo: "/images/food/dal_khichdi_roti.jpg", deadlineH: 3, locationText: "Kitchen Gate 2, GLA Campus", instructions: "Ask for Chef Ramesh at service dock" },
-              { title: "Assorted Bread & Buns", description: "End-of-day bakery surplus — loaves, burger buns, dinner rolls.", category: "Bakery" as const, foodType: "veg" as const, quantity: 25, unit: "pieces", storage: "room" as const, photo: "/images/food/wheat_bread_buns.jpg", deadlineH: 5, locationText: "Campus Bakery, Block C", instructions: "Collect from bakery counter" },
-              { title: "Fresh Fruit Crates", description: "Slightly overripe bananas and apples — perfect for shelters.", category: "Fruits & vegetables" as const, foodType: "veg" as const, quantity: 15, unit: "kg", storage: "room" as const, photo: "/images/food/fruit_crates.jpg", deadlineH: 6, locationText: "Central Store, GLA Campus", instructions: "Gate pass required at security" },
+              {
+                title: "Vegetable Pulao & Raita",
+                description:
+                  "Freshly prepared lunch surplus from campus mess, packed in biodegradable containers.",
+                category: "Cooked meals" as const,
+                foodType: "veg" as const,
+                quantity: 40,
+                unit: "plates",
+                storage: "hot" as const,
+                photo: "/images/food/dal_khichdi_roti.jpg",
+                deadlineH: 3,
+                locationText: "Kitchen Gate 2, GLA Campus",
+                instructions: "Ask for Chef Ramesh at service dock",
+              },
+              {
+                title: "Assorted Bread & Buns",
+                description: "End-of-day bakery surplus — loaves, burger buns, dinner rolls.",
+                category: "Bakery" as const,
+                foodType: "veg" as const,
+                quantity: 25,
+                unit: "pieces",
+                storage: "room" as const,
+                photo: "/images/food/wheat_bread_buns.jpg",
+                deadlineH: 5,
+                locationText: "Campus Bakery, Block C",
+                instructions: "Collect from bakery counter",
+              },
+              {
+                title: "Fresh Fruit Crates",
+                description: "Slightly overripe bananas and apples — perfect for shelters.",
+                category: "Fruits & vegetables" as const,
+                foodType: "veg" as const,
+                quantity: 15,
+                unit: "kg",
+                storage: "room" as const,
+                photo: "/images/food/fruit_crates.jpg",
+                deadlineH: 6,
+                locationText: "Central Store, GLA Campus",
+                instructions: "Gate pass required at security",
+              },
             ];
             for (const s of samples) {
               const { deadlineH, locationText, instructions, ...rest } = s;
-              await createListing({
-                donorId: uid,
-                donorName: "Campus Dining Services",
-                donorPhone: "+91 98765 43210",
-                preparedAt: now - 3600_000,
-                pickupDeadline: now + deadlineH * 3600_000,
-                locationText,
-                pickupInstructions: instructions,
-                allergens: [],
-                checklist: { covered: true, temperature: true, hygienic: true, notExpired: true },
-                ...rest,
-              }, "Campus Dining Services");
+              await createListing(
+                {
+                  donorId: uid,
+                  donorName: "Campus Dining Services",
+                  donorPhone: "+91 98765 43210",
+                  preparedAt: now - 3600_000,
+                  pickupDeadline: now + deadlineH * 3600_000,
+                  locationText,
+                  pickupInstructions: instructions,
+                  allergens: [],
+                  checklist: { covered: true, temperature: true, hygienic: true, notExpired: true },
+                  ...rest,
+                },
+                "Campus Dining Services",
+              );
             }
           }
-        } catch { /* seeding is best-effort */ }
+        } catch {
+          /* seeding is best-effort */
+        }
       } else if (role === "recipient" || role === "ngo") {
         await registerNGO({
           uid,
@@ -180,8 +248,8 @@ function LoginPage() {
         await new Promise((r) => setTimeout(r, 50));
       }
       navigate({ to: targetPortal });
-    } catch (err: any) {
-      toast.error(err.message || "Could not log in as demo.");
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Could not log in as demo.");
     } finally {
       setBusy(false);
     }
@@ -256,8 +324,14 @@ function LoginPage() {
 
       {/* ===== Mobile hero (native app style) ===== */}
       <section className="lg:hidden relative overflow-hidden bg-gradient-to-b from-[#081F15] via-[#123A2A] to-[#0E3323] px-5 pt-6 pb-16 text-white">
-        <div aria-hidden className="pointer-events-none absolute -top-24 -right-20 size-56 rounded-full bg-[#3F8F62]/25 blur-3xl" />
-        <div aria-hidden className="pointer-events-none absolute bottom-0 -left-20 size-52 rounded-full bg-[#ED7545]/15 blur-3xl" />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute -top-24 -right-20 size-56 rounded-full bg-[#3F8F62]/25 blur-3xl"
+        />
+        <div
+          aria-hidden
+          className="pointer-events-none absolute bottom-0 -left-20 size-52 rounded-full bg-[#ED7545]/15 blur-3xl"
+        />
         <span className="inline-flex items-center gap-1.5 rounded-full border border-white/15 bg-white/10 px-3 py-1 text-[10px] font-bold text-[#F8F5ED] backdrop-blur-md">
           🌱 Zero Hunger Movement
         </span>
@@ -270,22 +344,27 @@ function LoginPage() {
         <div className="mt-5 grid grid-cols-3 gap-2">
           <div className="rounded-2xl border border-white/10 bg-white/10 px-2 py-3 text-center backdrop-blur-md">
             <p className="text-sm font-extrabold text-white">14,250+</p>
-            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">Meals Shared</p>
+            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">
+              Meals Shared
+            </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/10 px-2 py-3 text-center backdrop-blur-md">
             <p className="text-sm font-extrabold text-white">48</p>
-            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">Shelter Homes</p>
+            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">
+              Shelter Homes
+            </p>
           </div>
           <div className="rounded-2xl border border-white/10 bg-white/10 px-2 py-3 text-center backdrop-blur-md">
             <p className="text-sm font-extrabold text-white">35 min</p>
-            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">Rapid Pickup</p>
+            <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wide text-[#F8F5ED]/60">
+              Rapid Pickup
+            </p>
           </div>
         </div>
       </section>
 
       <main className="mx-auto w-full max-w-5xl px-3 sm:px-4 lg:py-10 flex-1 lg:flex lg:items-center lg:justify-center">
         <div className="relative z-10 -mt-10 lg:mt-0 w-full overflow-hidden rounded-[2rem] lg:rounded-3xl border border-[#DDD5C8] bg-white shadow-2xl ring-1 ring-white/20 grid lg:grid-cols-12">
-
           {/* Left Column: Hunger Relief & Community Impact Imagery */}
           <div className="hidden lg:flex lg:col-span-5 min-w-0 relative bg-[#164330] p-6 sm:p-8 text-white flex-col justify-between overflow-hidden">
             <div className="absolute inset-0 z-0">
@@ -305,7 +384,8 @@ function LoginPage() {
                 Every meal saved is a life nourished.
               </h2>
               <p className="mt-2 text-xs sm:text-sm text-[#F8F5ED]/90 leading-relaxed">
-                Connect directly with surplus donor kitchens, verified recipient shelters, and courier volunteers to make sure good food never goes to waste.
+                Connect directly with surplus donor kitchens, verified recipient shelters, and
+                courier volunteers to make sure good food never goes to waste.
               </p>
             </div>
 
@@ -329,20 +409,36 @@ function LoginPage() {
           {/* Right Column: Sign In Form */}
           <div className="lg:col-span-7 min-w-0 p-5 sm:p-10 flex flex-col justify-center">
             <div className="text-left">
-              <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-[#242923]">Welcome Back</h1>
-              <p className="mt-1 text-xs text-[#656C62]">Sign in to access your surplus food dashboard or active collections</p>
+              <h1 className="font-display text-2xl sm:text-3xl font-extrabold text-[#242923]">
+                Welcome Back
+              </h1>
+              <p className="mt-1 text-xs text-[#656C62]">
+                Sign in to access your surplus food dashboard or active collections
+              </p>
             </div>
 
             {/* Active Session Alert */}
             {user && (
               <div className="mt-4 rounded-2xl bg-amber-50 border border-amber-200 p-3.5 text-xs text-amber-900">
                 <p className="font-semibold">
-                  Signed in as: <strong>{user.email || profile?.name || "Active Member"}</strong> ({profile?.role || "donor"})
+                  Signed in as: <strong>{user.email || profile?.name || "Active Member"}</strong> (
+                  {profile?.role || "member"})
                 </p>
                 <div className="mt-2.5 flex items-center gap-2">
                   <button
                     type="button"
-                    onClick={() => navigate({ to: profile?.role === "donor" ? "/donor" : profile?.role === "volunteer" ? "/volunteer" : profile?.role === "admin" ? "/admin" : "/recipient" })}
+                    onClick={() =>
+                      navigate({
+                        to:
+                          profile?.role === "donor"
+                            ? "/donor"
+                            : profile?.role === "volunteer"
+                              ? "/volunteer"
+                              : profile?.role === "admin"
+                                ? "/admin"
+                                : "/recipient",
+                      })
+                    }
                     className="rounded-lg bg-[#205C43] px-3.5 py-1.5 text-xs font-bold text-white hover:brightness-110 shadow-xs"
                   >
                     Open Dashboard →
@@ -369,11 +465,11 @@ function LoginPage() {
                   I am signing in as <span className="text-[#ED7545]">*</span>
                 </label>
                 <div className="mt-1.5 grid grid-cols-3 gap-2">
-                  {([
+                  {[
                     { id: "donor" as Role, icon: "🍲", label: "Donor" },
                     { id: "recipient" as Role, icon: "🏢", label: "Shelter NGO" },
                     { id: "volunteer" as Role, icon: "🚴", label: "Volunteer" },
-                  ]).map((r) => (
+                  ].map((r) => (
                     <button
                       key={r.id}
                       type="button"
@@ -390,8 +486,12 @@ function LoginPage() {
                           ✓
                         </span>
                       )}
-                      <span className="block text-lg leading-none transition-transform duration-200 group-hover:scale-125 group-active:scale-95">{r.icon}</span>
-                      <span className={`mt-1 block text-[11px] font-bold ${selectedRole === r.id ? "text-[#205C43]" : "text-[#656C62]"}`}>
+                      <span className="block text-lg leading-none transition-transform duration-200 group-hover:scale-125 group-active:scale-95">
+                        {r.icon}
+                      </span>
+                      <span
+                        className={`mt-1 block text-[11px] font-bold ${selectedRole === r.id ? "text-[#205C43]" : "text-[#656C62]"}`}
+                      >
                         {r.label}
                       </span>
                     </button>
@@ -479,7 +579,9 @@ function LoginPage() {
             {/* Divider */}
             <div className="mt-5 flex items-center gap-3">
               <div className="h-px flex-1 bg-[#DDD5C8]" />
-              <span className="text-[10px] font-bold uppercase tracking-wider text-[#656C62]/80">or try instantly — no password</span>
+              <span className="text-[10px] font-bold uppercase tracking-wider text-[#656C62]/80">
+                or try instantly — no password
+              </span>
               <div className="h-px flex-1 bg-[#DDD5C8]" />
             </div>
 

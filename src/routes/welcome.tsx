@@ -6,7 +6,10 @@ export const Route = createFileRoute("/welcome")({
   head: () => ({
     meta: [
       { title: "Welcome — FoodLoop" },
-      { name: "description", content: "Join FoodLoop — rescue surplus food and get it to people who need it." },
+      {
+        name: "description",
+        content: "Join FoodLoop — rescue surplus food and get it to people who need it.",
+      },
     ],
   }),
   component: WelcomePage,
@@ -53,8 +56,8 @@ function WelcomePage() {
             <span className="text-[#ED7545]">FoodLoop</span>
           </h1>
           <p className="animate-in fade-in slide-in-from-bottom-3 mt-3 max-w-sm text-[13px] leading-relaxed text-[#F8F5ED]/70 duration-700">
-            Share food. Spread hope. Join thousands rescuing surplus meals from kitchens, restaurants and
-            events — and getting them to people who need them.
+            Share food. Spread hope. Join thousands rescuing surplus meals from kitchens,
+            restaurants and events — and getting them to people who need them.
           </p>
 
           {/* Feature chips */}

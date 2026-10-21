@@ -60,7 +60,7 @@ function PublicProfilePage() {
         uid: userId,
         name: sample.donorName,
         role: "donor",
-        area: sample.locationText.split(",")[0] || "City Area",
+        area: (sample.locationText || "").split(",")[0] || "City Area",
         photoURL: sample.donorAvatar,
         bio: "Dedicated food donor committed to zero food waste and community nourishment via FoodLoop.",
         verified: true,
